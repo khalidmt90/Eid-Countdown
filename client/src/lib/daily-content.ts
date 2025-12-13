@@ -6,11 +6,13 @@ export interface DailyContent {
     translation: string;
     tafsir: string;
     source: string;
+    sourceUrl: string;
   };
   hadith: {
     text: string;
     narrator: string;
     source: string; // e.g., Sahih Bukhari 123
+    sourceUrl: string;
     context: string;
     lesson: string;
   };
@@ -20,6 +22,7 @@ export interface DailyContent {
     story: string;
     lesson: string;
     source: string;
+    sourceUrl: string;
   };
 }
 
@@ -31,12 +34,14 @@ export const DAILY_CONTENT: DailyContent[] = [
       verseNumber: 255,
       translation: "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth.",
       tafsir: "آية الكرسي هي أعظم آية في كتاب الله، تدل على وحدانية الله وقيوميته وعظمته التي لا تحدها حدود.",
-      source: "مجمع الملك فهد لطباعة المصحف الشريف"
+      source: "مجمع الملك فهد لطباعة المصحف الشريف",
+      sourceUrl: "https://quran.ksu.edu.sa/index.php?l=ar&nSora=2&nAya=255"
     },
     hadith: {
       text: "لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ",
       narrator: "أنس بن مالك",
       source: "صحيح البخاري 13",
+      sourceUrl: "https://sunnah.com/bukhari:13",
       context: "حديث عظيم يبين ركيزة أساسية في الإيمان وتماسك المجتمع المسلم.",
       lesson: "الإيثار وحب الخير للناس من كمال الإيمان، وهو طريق لنشر المحبة والسلام في المجتمع."
     },
@@ -45,7 +50,8 @@ export const DAILY_CONTENT: DailyContent[] = [
       prophet: "أيوب",
       story: "كان أيوب عليه السلام غاية في الصبر، فقد ابتلاه الله في ماله وولده وجسده، فصبر واحتسب ولم يزدد إلا حمداً لله، حتى كشف الله ضره وأبدله خيراً.",
       lesson: "الصبر مفتاح الفرج، وأن الله يبتلي عباده الصالحين ليرفع درجاتهم.",
-      source: "قصص الأنبياء لابن كثير"
+      source: "قصص الأنبياء لابن كثير",
+      sourceUrl: "https://www.islamweb.net/ar/article/147285/"
     }
   },
   {
@@ -55,12 +61,14 @@ export const DAILY_CONTENT: DailyContent[] = [
       verseNumber: 114,
       translation: "And say, 'My Lord, increase me in knowledge.'",
       tafsir: "أمر الله نبيه بطلب الزيادة في العلم، ولم يأمره بطلب الزيادة في شيء من الدنيا إلا العلم، لما فيه من الخير والرفعة.",
-      source: "مجمع الملك فهد لطباعة المصحف الشريف"
+      source: "مجمع الملك فهد لطباعة المصحف الشريف",
+      sourceUrl: "https://quran.ksu.edu.sa/index.php?l=ar&nSora=20&nAya=114"
     },
     hadith: {
       text: "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
       narrator: "عمر بن الخطاب",
       source: "صحيح البخاري 1",
+      sourceUrl: "https://sunnah.com/bukhari:1",
       context: "هذا الحديث هو ميزان الأعمال الباطنة، وعليه مدار الإسلام.",
       lesson: "وجوب إخلاص النية لله في كل عمل، وأن العبرة في القبول بما وقر في القلب."
     },
@@ -69,7 +77,8 @@ export const DAILY_CONTENT: DailyContent[] = [
       prophet: "نوح",
       story: "دعا نوح قومه ألف سنة إلا خمسين عاماً، فكذبوه وسخروا منه، فأمره الله ببناء السفينة في الصحراء، لتكون نجاة للمؤمنين وهلاكاً للكافرين بالطوفان.",
       lesson: "الثبات على الحق مهما طال الزمن وكثر المعاندون، وأن العاقبة للمتقين.",
-      source: "قصص الأنبياء لابن كثير"
+      source: "قصص الأنبياء لابن كثير",
+      sourceUrl: "https://www.islamweb.net/ar/article/21629/"
     }
   },
   {
@@ -79,12 +88,14 @@ export const DAILY_CONTENT: DailyContent[] = [
       verseNumber: 153,
       translation: "Indeed, Allah is with the patient.",
       tafsir: "معية الله الخاصة للصابرين بالتأييد والنصر والتوفيق، وهي تسلية للمؤمنين عند المصائب.",
-      source: "مجمع الملك فهد لطباعة المصحف الشريف"
+      source: "مجمع الملك فهد لطباعة المصحف الشريف",
+      sourceUrl: "https://quran.ksu.edu.sa/index.php?l=ar&nSora=2&nAya=153"
     },
     hadith: {
       text: "تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ لَكَ صَدَقَةٌ",
       narrator: "أبو ذر الغفاري",
       source: "سنن الترمذي (حسن صحيح)",
+      sourceUrl: "https://sunnah.com/tirmidhi:1956",
       context: "تشجيع على مكارم الأخلاق وحسن المعاملة بأيسر الطرق.",
       lesson: "فعل الخير لا يقتصر على المال، بل يشمل الكلمة الطيبة والوجه البشوش."
     },
@@ -93,7 +104,8 @@ export const DAILY_CONTENT: DailyContent[] = [
       prophet: "إبراهيم",
       story: "رأى إبراهيم في المنام أنه يذبح ابنه إسماعيل، فاستجاب الاثنان لأمر الله، وفداه الله بذبح عظيم، لتصبح سنة الأضحية.",
       lesson: "تمام التسليم لأمر الله وطاعته، وأن من ترك شيئاً لله عوضه الله خيراً منه.",
-      source: "قصص الأنبياء لابن كثير"
+      source: "قصص الأنبياء لابن كثير",
+      sourceUrl: "https://www.islamweb.net/ar/article/35889/"
     }
   }
 ];

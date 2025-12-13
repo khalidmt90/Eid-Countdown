@@ -58,7 +58,15 @@ export function DailyContentView() {
           
           <div className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1 opacity-70">
             <span>المصدر:</span>
-            <span className="font-bold">{content.ayah.source}</span>
+            <a 
+              href={content.ayah.sourceUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="font-bold hover:underline hover:text-primary flex items-center gap-1"
+            >
+              {content.ayah.source}
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </CardContent>
       </Card>
@@ -78,8 +86,17 @@ export function DailyContentView() {
           </div>
           
           <div className="flex justify-center">
-            <span className="text-secondary font-bold text-sm bg-secondary/10 px-3 py-1 rounded-md">
-              الراوي: {content.hadith.narrator} | {content.hadith.source}
+            <span className="text-secondary font-bold text-sm bg-secondary/10 px-3 py-1 rounded-md flex items-center gap-2">
+              الراوي: {content.hadith.narrator} | 
+              <a 
+                href={content.hadith.sourceUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:underline flex items-center gap-1"
+              >
+                {content.hadith.source}
+                <ExternalLink className="w-3 h-3" />
+              </a>
             </span>
           </div>
 
@@ -133,8 +150,16 @@ export function DailyContentView() {
           </div>
 
           <div className="text-xs text-muted-foreground text-left flex items-center justify-end gap-1 opacity-70">
-            <ExternalLink className="w-3 h-3" />
-            <span>المصدر: {content.prophetStory.source}</span>
+            <span>المصدر:</span>
+            <a 
+              href={content.prophetStory.sourceUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="font-bold hover:underline hover:text-accent flex items-center gap-1"
+            >
+              {content.prophetStory.source}
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </CardContent>
       </Card>
