@@ -33,76 +33,42 @@
 }
 
 :root {
-  /* High Contrast Elegant Theme - Light Mode */
+  /* High Contrast Dark Theme Only */
+  --background: 222 47% 8%; /* Deep Navy */
+  --foreground: 0 0% 100%; /* Pure White */
   
-  /* Slightly darker cream/beige to make white cards pop */
-  --background: 35 30% 92%; 
+  --card: 222 47% 12%; /* Slightly Lighter Navy */
+  --card-foreground: 0 0% 100%;
   
-  /* Very Dark Blue-Black for maximum readability */
-  --foreground: 222 47% 10%; 
+  --popover: 222 47% 12%;
+  --popover-foreground: 0 0% 100%;
   
-  /* Pure White cards */
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 10%;
-  
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 10%;
-  
-  /* Deep Rich Gold/Bronze - strong contrast */
-  --primary: 35 100% 32%; 
+  --primary: 210 100% 50%; /* Bright Blue for Fajr */
   --primary-foreground: 0 0% 100%;
   
-  /* Deep Emerald for accents */
-  --secondary: 160 40% 95%; 
-  --secondary-foreground: 165 90% 20%; 
+  --secondary: 30 100% 50%; /* Bright Orange for Maghrib */
+  --secondary-foreground: 0 0% 100%;
   
-  /* Darker muted text - ensuring it's readable */
-  --muted: 35 20% 90%;
-  --muted-foreground: 220 20% 35%;
+  --muted: 222 40% 20%;
+  --muted-foreground: 215 20% 70%;
   
-  --accent: 43 74% 90%;
-  --accent-foreground: 35 90% 30%;
-  
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 98%;
-
-  --border: 220 15% 80%;
-  --input: 220 15% 80%;
-  --ring: 35 100% 32%;
-  
-  --radius: 0.75rem;
-}
-
-.dark {
-  /* Deep Navy & Gold Theme - Dark Mode */
-  --background: 222 50% 6%; /* Almost black blue */
-  --foreground: 40 30% 98%; 
-  
-  --card: 222 50% 10%;
-  --card-foreground: 40 30% 98%;
-  
-  --popover: 222 50% 10%;
-  --popover-foreground: 40 30% 98%;
-  
-  /* Bright Gold for dark backgrounds */
-  --primary: 45 100% 50%; 
-  --primary-foreground: 222 50% 10%;
-  
-  --secondary: 222 40% 15%;
-  --secondary-foreground: 40 30% 98%;
-  
-  --muted: 222 40% 15%;
-  --muted-foreground: 215 20% 75%;
-  
-  --accent: 43 74% 20%;
-  --accent-foreground: 43 74% 80%;
+  --accent: 140 80% 40%; /* Green for Eid */
+  --accent-foreground: 0 0% 100%;
   
   --destructive: 0 62% 30%;
   --destructive-foreground: 0 0% 98%;
   
-  --border: 222 40% 20%;
-  --input: 222 40% 20%;
-  --ring: 45 100% 50%;
+  --border: 222 40% 25%;
+  --input: 222 40% 25%;
+  --ring: 210 100% 50%;
+  
+  --radius: 1rem;
+}
+
+/* Force Dark Mode always */
+.dark {
+  --background: 222 47% 8%; 
+  --foreground: 0 0% 100%; 
 }
 
 @layer base {
@@ -111,12 +77,5 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
-  }
-  
-  /* Geometric Pattern Background - Subtle but visible */
-  .bg-pattern {
-    background-image: radial-gradient(var(--color-primary) 0.5px, transparent 0.5px);
-    background-size: 24px 24px;
-    opacity: 0.1;
   }
 }
