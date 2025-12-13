@@ -15,21 +15,21 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getDailyContent, getRandomContent, type DailyContent } from "@/lib/daily-content";
+import { getDailyContent, getRandomContent, type DailyContentBundle } from "@/lib/daily-content";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function DailyContentView() {
-  const { t } = useTranslation();
-  const [content, setContent] = useState<DailyContent | null>(null);
+  const { t, i18n } = useTranslation();
+  const [content, setContent] = useState<DailyContentBundle | null>(null);
   const [activeTab, setActiveTab] = useState("ayah");
 
   useEffect(() => {
-    setContent(getDailyContent());
-  }, []);
+    setContent(getDailyContent(i18n.language));
+  }, [i18n.language]);
 
   const handleGenerateNew = () => {
-    setContent(getRandomContent());
+    setContent(getRandomContent(i18n.language));
   };
 
   if (!content) return null;

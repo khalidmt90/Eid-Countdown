@@ -1,72 +1,72 @@
 import { DAILY_CONTENT_DATA } from "./daily-content-data";
 
+export interface ContentItem {
+  text?: string;
+  surah?: string;
+  verseNumber?: number;
+  narrator?: string;
+  prophet?: string;
+  title: string;
+  story: string;
+  quranReference?: string;
+  quranCitation?: string;
+  source: string;
+  sourceUrl: string;
+}
+
+export interface DailyContentBundle {
+  ayah: ContentItem;
+  hadith: ContentItem;
+  prophetStory: ContentItem;
+}
+
 export interface DailyContent {
-  ayah: {
-    text: string;
-    surah: string;
-    verseNumber: number;
-    title: string;
-    story: string;
-    source: string;
-    sourceUrl: string;
-  };
-  hadith: {
-    text: string;
-    narrator: string;
-    title: string;
-    story: string; // The context/story behind the hadith
-    source: string;
-    sourceUrl: string;
-  };
-  prophetStory: {
-    title: string;
-    prophet: string;
-    story: string;
-    quranReference?: string; // Verse text
-    quranCitation?: string; // Surah name and verse number for the reference
-    source: string;
-    sourceUrl: string;
+  id: string;
+  locales: {
+    [key: string]: DailyContentBundle;
   };
 }
 
 // Re-export the data from the separate file
 export const DAILY_CONTENT = DAILY_CONTENT_DATA;
 
-export function getDailyContent(): DailyContent {
+export function getDailyContent(lang: string = 'ar'): DailyContentBundle {
   // Use local storage to persist the "daily" content for the day
-  // This ensures it doesn't change on refresh, but changes every 24h
   const todayStr = new Date().toDateString();
   const storedDate = localStorage.getItem('dailyContentDate');
   const storedIndex = localStorage.getItem('dailyContentIndex');
+  
+  let index = 0;
 
   if (storedDate === todayStr && storedIndex) {
-    const index = parseInt(storedIndex, 10);
-    // Ensure index is valid
-    if (!isNaN(index) && index >= 0 && index < DAILY_CONTENT.length) {
-      return DAILY_CONTENT[index];
+    const parsedIndex = parseInt(storedIndex, 10);
+    if (!isNaN(parsedIndex) && parsedIndex >= 0 && parsedIndex < DAILY_CONTENT.length) {
+      index = parsedIndex;
     }
+  } else {
+    // If no valid stored content for today, pick a new random one
+    index = Math.floor(Math.random() * DAILY_CONTENT.length);
+    localStorage.setItem('dailyContentDate', todayStr);
+    localStorage.setItem('dailyContentIndex', index.toString());
   }
-
-  // If no valid stored content for today, pick a new random one
-  const newIndex = Math.floor(Math.random() * DAILY_CONTENT.length);
-  localStorage.setItem('dailyContentDate', todayStr);
-  localStorage.setItem('dailyContentIndex', newIndex.toString());
   
-  return DAILY_CONTENT[newIndex];
+  const content = DAILY_CONTENT[index];
+  // Return requested language or fallback to English, then Arabic
+  return content.locales[lang] || content.locales['en'] || content.locales['ar'];
 }
 
-export function getRandomContent(): DailyContent {
+export function getRandomContent(lang: string = 'ar'): DailyContentBundle {
   let randomIndex = Math.floor(Math.random() * DAILY_CONTENT.length);
   
-  // Try to avoid the currently displayed one if possible (simple check)
+  // Try to avoid the currently displayed one if possible
   const storedIndex = localStorage.getItem('dailyContentIndex');
   if (storedIndex && DAILY_CONTENT.length > 1) {
     const currentIdx = parseInt(storedIndex, 10);
-    // Simple retry once to get a different one
     if (randomIndex === currentIdx) {
        randomIndex = (randomIndex + 1) % DAILY_CONTENT.length;
     }
   }
   
-  return DAILY_CONTENT[randomIndex];
+  const content = DAILY_CONTENT[randomIndex];
+  return content.locales[lang] || content.locales['en'] || content.locales['ar'];
 }
