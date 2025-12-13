@@ -100,9 +100,17 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
           surah: "الحشر",
           verseNumber: 9,
           title: "قصة ضيف الأنصاري",
-          story: `نزلت هذه الآية الكريمة تخليداً لموقف بطولي في الكرم والإيثار لرجل من الأنصار وزوجته. استضافا ضيفاً للنبي ﷺ ولم يكن عندهما إلا قوت صبيانهما.
-
-نومت المرأة أطفالها وأطفأت السراج لتوهم الضيف أنهما يأكلان معه، وباتا جائعين. في الصباح، أخبرهم النبي ﷺ أن الله عجب من صنيعهما.`,
+          story: `روى أبو هريرة رضي الله عنه أن رجلاً جاء إلى النبي ﷺ يشكو الجوع، فأرسل النبي إلى بيوت زوجاته فلم يجد عندهن إلا الماء. فقال ﷺ لأصحابه: "من يضيف هذا الليلة رحمه الله؟".
+          
+فقام رجل من الأنصار (أبو طلحة) وقال: "أنا يا رسول الله". فانطلق بالضيف إلى رحله، وقال لامرأته: "هل عندك شيء؟" قالت: "لا إلا قوت صبياني".
+          
+هنا بدأت لحظة الاختبار العظيم. قال لها زوجها: "علليهم بشيء، وإذا أرادوا العشاء فنوّميهم، وإذا دخل ضيفنا فأطفئي السراج وأريه أننا نأكل".
+          
+فجلسا والضيف، وأطفأت السراج، وجعلا يحركون أفواههم كأنهم يأكلون، والضيف يأكل حتى شبع، وبات الزوجان وأطفالهما طاويين (جائعين).
+          
+فلما أصبح الصباح، غدا الأنصاري على النبي ﷺ، فاستقبله الرسول بوجه متهلل وقال: "لقد عجب الله من صنيعكما بضيفكما الليلة". وفي رواية: "لقد ضحك الله الليلة"، فأنزل الله هذه الآية تخليداً لموقفهما العظيم إلى يوم القيامة.
+          
+القصة تعلمنا أن الكرم ليس أن تعطي مما يفيض عن حاجتك، بل الكرم الحقيقي هو الإيثار، أن تعطي وأنت في أشد الحاجة لما تعطي.`,
           source: "ابن باز",
           sourceUrl: "https://binbaz.org.sa"
         },
@@ -110,18 +118,32 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
           text: "وَاللَّهِ لاَ يُؤْمِنُ... الَّذِي لاَ يَأْمَنُ جَارُهُ بَوَائِقَهُ",
           narrator: "أبو هريرة",
           title: "المرأة التي تؤذي جيرانها",
-          story: `ذكر للنبي ﷺ امرأة تكثر من صلاتها وصيامها وصدقتها، غير أنها تؤذي جيرانها بلسانها. فقال ﷺ: "هي في النار".
+          story: `من أروع قصص التوبة التي قصها علينا النبي ﷺ قصة رجل من بني إسرائيل قتل تسعة وتسعين نفساً. أراد التوبة فسأل عن أعلم أهل الأرض، فدُلَّ على راهب.
           
-وذكر له امرأة أخرى لا تزيد على المكتوبة وتتصدق بالأثوار (الشيء القليل) ولا تؤذي جيرانها. فقال: "هي في الجنة".
-
-هذه القصة توضح أن العبادة ليست مجرد طقوس، بل هي معاملة وأخلاق. إيذاء الجار قد يحبط العمل الصالح ويذهب ثواب العبادة.`,
+سأله: "هل لي من توبة؟" فاستعظم الراهب ذنبه وقال: "لا"، فقتله الرجل وكمل به المائة. لكن قلبه لم ييأس من رحمة الله، فسأل مرة أخرى، فدُلَّ على عالم.
+          
+قال له العالم: "ومن يحول بينك وبين التوبة؟ انطلق إلى أرض كذا فإن بها قوماً يعبدون الله فاعبد الله معهم ولا ترجع إلى أرضك فإنها أرض سوء".
+          
+خرج الرجل تائباً، وفي منتصف الطريق جاءه الموت. فاختصمت فيه ملائكة الرحمة وملائكة العذاب. قالت ملائكة العذاب: "إنه لم يعمل خيراً قط"، وقالت ملائكة الرحمة: "جاء تائباً مقبلاً بقلبه إلى الله".
+          
+فأرسل الله ملكاً يحكم بينهم، فقال: "قيسوا ما بين الأرضين، فإلى أيتهما كان أدنى فهو له". فأوحى الله إلى أرض الخير أن تقاربي، وإلى أرض الشر أن تباعدي. فوجدوه أقرب إلى أرض الخير بشبر واحد، فقبضته ملائكة الرحمة وغفر الله له.
+          
+هذه القصة تفتح باب الأمل لكل مذنب، وتؤكد أن رحمة الله وسعت كل شيء، وأن البيئة الصالحة هي مفتاح الثبات.`,
           source: "ابن باز",
           sourceUrl: "https://binbaz.org.sa"
         },
         prophetStory: {
-          title: "موسى والخضر",
+          title: "رحلة موسى والخضر",
           prophet: "موسى",
-          story: `قصة رحلة موسى عليه السلام لطلب العلم من الخضر. تعلم فيها أن علم البشر قاصر، وأن أقدار الله التي قد تبدو مؤلمة (كخرق السفينة وقتل الغلام) تحمل حكماً ورحمة خفية لا يدركها العقل المباشر.`,
+          story: `قام موسى عليه السلام خطيباً في بني إسرائيل، فسئل: "أي الناس أعلم؟" فقال: "أنا"، فعاتبه الله إذ لم يرد العلم إليه، وأوحى إليه أن عبداً من عبادنا بمجمع البحرين هو أعلم منك.
+          
+انطلق موسى بتواضع الطالب ومعه فتاه يوشع بن نون. ولما لقيا الخضر، قال له موسى بأدب جم: "هل أتبعك على أن تعلمن مما علمت رشدا؟".
+          
+بدأت الرحلة العجيبة، ورأى موسى أحداثاً لا يطيقها صبره: خرق سفينة لمساكين أكرموهما، وقتل غلام بريء، وبناء جدار لقوم بخلاء.
+          
+وفي كل مرة كان يعترض، فيذكره الخضر بالشرط. وفي النهاية، كشف له الخضر الحكمة الإلهية: السفينة كانت ستؤخذ غصباً، والغلام كان سيرهق أبويه طغياناً، والجدار كان تحته كنز ليتيمين.
+          
+القصة تعلمنا أن أقدار الله، وإن بدت مؤلمة في ظاهرها، فإنها تحمل في طياتها الرحمة واللطف الخفي.`,
           quranReference: "هَلْ أَتَّبِعُكَ عَلَىٰ أَن تُعَلِّمَنِ مِمَّا عُلِّمْتَ رُشْدًا",
           quranCitation: "سورة الكهف: 66",
           source: "الرئاسة العامة",
@@ -133,27 +155,51 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
           text: "And they give preference over themselves...",
           surah: "Al-Hashr",
           verseNumber: 9,
-          title: "The Ansari Host",
-          story: `A couple from the Ansar hosted the Prophet's guest despite having only food for their children. They put the children to sleep and ate in the dark to pretend they were sharing the meal, while actually leaving it all for the guest. Allah praised their altruism in the Quran.`,
+          title: "The Ansari Host and the Altruistic Couple",
+          story: `Abu Hurairah narrated that a man came to the Prophet ﷺ complaining of hunger. The Prophet sent to his wives but found nothing but water. He asked his companions, "Who will host this man tonight, may Allah have mercy on him?"
+          
+A man from the Ansar (Abu Talha) said, "I will, O Messenger of Allah." He took the guest home and asked his wife, "Do you have anything?" She said, "No, except food for my children."
+          
+Here began the great test. Her husband said, "Distract them with something, and if they want dinner, put them to sleep. When our guest enters, extinguish the lamp and show him that we are eating."
+          
+They sat with the guest, extinguished the lamp, and moved their mouths as if they were eating, while the guest ate until he was full. The couple and their children went to sleep hungry.
+          
+In the morning, the Ansari went to the Prophet ﷺ, who received him with a beaming face and said, "Allah was amazed at what you did with your guest last night." Allah revealed this verse to immortalize their great stance until the Day of Judgment.
+          
+The story teaches that generosity is not giving from your surplus, but true altruism is giving when you are in dire need yourself.`,
           source: "BinBaz.org.sa",
           sourceUrl: "https://binbaz.org.sa"
         },
         hadith: {
           text: "He whose neighbor is not safe from his harm does not believe.",
           narrator: "Abu Hurairah",
-          title: "The Woman Who Harmed Her Neighbor",
-          story: `The Prophet ﷺ was told about a woman who prayed and fasted a lot but harmed her neighbors with her speech. He said: "She is in the Fire."
+          title: "The Man Who Killed 99 People",
+          story: `One of the most profound stories of repentance told by the Prophet ﷺ is about a man from the Children of Israel who killed ninety-nine people. He sought repentance and asked for the most learned person on earth, and was directed to a monk.
           
-Then he was told about another woman who only performed the obligatory prayers and gave little in charity, but did not harm her neighbors. He said: "She is in Paradise."
-
-This story teaches that worship is not just rituals; it is also about character. Harming neighbors can nullify good deeds.`,
+He asked him: "Is there any repentance for me?" The monk magnified his sin and said: "No." So the man killed him and completed one hundred. Yet his heart did not despair of Allah's mercy, so he asked again and was directed to a scholar.
+          
+The scholar said: "Who stands between you and repentance? Go to such and such land, for there are people who worship Allah, so worship Allah with them and do not return to your land, for it is a land of evil."
+          
+The man left repenting, and halfway there, death overtook him. The angels of mercy and the angels of punishment disputed over him. The angels of punishment said: "He never did any good," while the angels of mercy said: "He came repenting with his heart turned to Allah."
+          
+Allah sent an angel to judge between them. He said: "Measure the distance between the two lands; whichever he is closer to, he belongs to it." Allah inspired the land of good to come closer and the land of evil to move away. They found him closer to the land of good by a handspan, so the angels of mercy took him, and Allah forgave him.
+          
+This story opens the door of hope for every sinner, confirming that Allah's mercy encompasses all things, and that a good environment is key to steadfastness.`,
           source: "BinBaz.org.sa",
           sourceUrl: "https://binbaz.org.sa"
         },
         prophetStory: {
-          title: "Moses and Khidr",
+          title: "The Journey of Moses and Khidr",
           prophet: "Moses (Musa)",
-          story: `Moses traveled to learn from Khidr. The journey taught him that human knowledge is limited and that Allah's decrees, even if they seem strange or painful, carry hidden wisdom and mercy.`,
+          story: `Moses stood preaching to the Children of Israel and was asked, "Who is the most learned of people?" He said, "I am." Allah rebuked him because he did not attribute knowledge to Him, and revealed to him that a servant of His at the junction of the two seas was more learned than him.
+          
+Moses set out with the humility of a student, accompanied by his servant Joshua. When they met Khidr, Moses asked with great politeness, "May I follow you on the condition that you teach me from what you have been taught of right guidance?"
+          
+The amazing journey began, and Moses witnessed events his patience could not bear: scuttling a ship belonging to poor people who had hosted them, killing an innocent boy, and rebuilding a wall for stingy people.
+          
+Each time he objected, Khidr reminded him of the condition. In the end, Khidr revealed the divine wisdom: the ship was to be seized by a tyrant king, the boy would have burdened his righteous parents with rebellion, and the wall hid a treasure for two orphans.
+          
+The story teaches us that Allah's decrees, even if they seem painful on the surface, carry hidden mercy and kindness within them.`,
           quranReference: "May I follow you...",
           quranCitation: "Surah Al-Kahf: 66",
           source: "General Presidency",
