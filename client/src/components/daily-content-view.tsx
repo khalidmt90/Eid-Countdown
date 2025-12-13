@@ -226,7 +226,7 @@ export function DailyContentView() {
                   </div>
 
                   <div className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                    <p className="text-lg md:text-xl leading-[2.2] text-muted-foreground text-justify whitespace-pre-line font-medium">
+                    <p className="md:text-xl text-muted-foreground text-justify whitespace-pre-line font-medium text-[22px]">
                       {content.prophetStory.story}
                     </p>
                   </div>
