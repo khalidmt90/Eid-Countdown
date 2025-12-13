@@ -9,7 +9,8 @@ import {
   Sunset, 
   Clock, 
   Share2,
-  Globe
+  Globe,
+  Navigation
 } from "lucide-react";
 import { 
   Card, 
@@ -58,7 +59,9 @@ export function PrayerTimesSection() {
   // State for Country and City
   const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]); // Default Saudi Arabia
   const [selectedCity, setSelectedCity] = useState<City>(COUNTRIES[0].cities[0]); // Default Riyadh
-  
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [usingExactLocation, setUsingExactLocation] = useState(false);
+
   const [nextPrayer, setNextPrayer] = useState<{name: string, time: Date} | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [dailyAyah] = useState(getDailyAyah());
@@ -79,55 +82,58 @@ export function PrayerTimesSection() {
           setSelectedCity(country.cities[0]); // Fallback to first city
         }
       }
-    } else if ("geolocation" in navigator) {
-      // Attempt geolocation if no saved preference
-      navigator.geolocation.getCurrentPosition((position) => {
-        let closestCity = COUNTRIES[0].cities[0];
-        let closestCountry = COUNTRIES[0];
-        let minDist = Infinity;
-
-        COUNTRIES.forEach(country => {
-          country.cities.forEach(city => {
-            const dist = Math.sqrt(
-              Math.pow(city.lat - position.coords.latitude, 2) + 
-              Math.pow(city.lng - position.coords.longitude, 2)
-            );
-            if (dist < minDist) {
-              minDist = dist;
-              closestCity = city;
-              closestCountry = country;
-            }
-          });
-        });
-        
-        setSelectedCountry(closestCountry);
-        setSelectedCity(closestCity);
-      });
     }
+    // Note: We don't auto-geolocate on load anymore to give user choice
   }, []);
+
+  const handleUseCurrentLocation = () => {
+    setLoading(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        setUsingExactLocation(true);
+        setLoading(false); // Trigger refetch in useEffect
+      }, (error) => {
+        console.error("Geolocation error:", error);
+        alert("تعذر تحديد موقعك بدقة. الرجاء التأكد من تفعيل خدمة الموقع.");
+        setLoading(false);
+      });
+    } else {
+      alert("المتصفح لا يدعم تحديد الموقع.");
+      setLoading(false);
+    }
+  };
 
   // Fetch Prayer Times
   useEffect(() => {
     setLoading(true);
     const date = new Date();
-    // Cache check
-    const cacheKey = `prayerTimes_${selectedCity.nameEn}_${date.toDateString()}`;
+    
+    // Determine coordinates to use
+    const lat = usingExactLocation && userLocation ? userLocation.lat : selectedCity.lat;
+    const lng = usingExactLocation && userLocation ? userLocation.lng : selectedCity.lng;
+
+    // Cache check (skip cache if using exact location for freshness)
+    const cacheKey = `prayerTimes_${usingExactLocation ? 'exact' : selectedCity.nameEn}_${date.toDateString()}`;
     const cached = localStorage.getItem(cacheKey);
     
-    if (cached) {
+    if (cached && !usingExactLocation) {
       setPrayerData(JSON.parse(cached));
       setLoading(false);
       return;
     }
 
     fetch(
-      `https://api.aladhan.com/v1/timings/${Math.floor(date.getTime() / 1000)}?latitude=${selectedCity.lat}&longitude=${selectedCity.lng}&method=4`
+      `https://api.aladhan.com/v1/timings/${Math.floor(date.getTime() / 1000)}?latitude=${lat}&longitude=${lng}&method=4`
     )
       .then(res => res.json())
       .then(data => {
         if (data.code === 200) {
           setPrayerData(data.data);
-          localStorage.setItem(cacheKey, JSON.stringify(data.data));
+          if (!usingExactLocation) {
+            localStorage.setItem(cacheKey, JSON.stringify(data.data));
+          }
         }
         setLoading(false);
       })
@@ -135,7 +141,7 @@ export function PrayerTimesSection() {
         console.error("Failed to fetch prayer times", err);
         setLoading(false);
       });
-  }, [selectedCity]);
+  }, [selectedCity, userLocation, usingExactLocation]);
 
   // Calculate Next Prayer Countdown
   useEffect(() => {
@@ -258,38 +264,76 @@ export function PrayerTimesSection() {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-2xl shadow-lg border border-border">
         
         {/* Location Selectors */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-          
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Globe className="text-muted-foreground w-5 h-5" />
-            <Select onValueChange={handleCountryChange} value={selectedCountry.nameEn}>
-              <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
-                <SelectValue placeholder="اختر الدولة" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
-                {COUNTRIES.map(country => (
-                  <SelectItem key={country.nameEn} value={country.nameEn} className="font-sans">
-                    {country.nameAr}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="flex flex-col gap-3 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Globe className="text-muted-foreground w-5 h-5" />
+              <Select 
+                onValueChange={(val) => {
+                  setUsingExactLocation(false);
+                  handleCountryChange(val);
+                }} 
+                value={usingExactLocation ? undefined : selectedCountry.nameEn}
+                disabled={usingExactLocation}
+              >
+                <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
+                  <SelectValue placeholder={usingExactLocation ? "موقعك الحالي" : "اختر الدولة"} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
+                  {COUNTRIES.map(country => (
+                    <SelectItem key={country.nameEn} value={country.nameEn} className="font-sans">
+                      {country.nameAr}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <MapPin className="text-primary w-5 h-5" />
+              <Select 
+                onValueChange={(val) => {
+                  setUsingExactLocation(false);
+                  handleCityChange(val);
+                }} 
+                value={usingExactLocation ? undefined : selectedCity.nameEn}
+                disabled={usingExactLocation}
+              >
+                <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
+                  <SelectValue placeholder={usingExactLocation ? "تم التحديد آلياً" : "اختر المدينة"} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
+                  {selectedCountry.cities.map(city => (
+                    <SelectItem key={city.nameEn} value={city.nameEn} className="font-sans">
+                      {city.nameAr}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <MapPin className="text-primary w-5 h-5" />
-            <Select onValueChange={handleCityChange} value={selectedCity.nameEn}>
-              <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
-                <SelectValue placeholder="اختر المدينة" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
-                {selectedCountry.cities.map(city => (
-                  <SelectItem key={city.nameEn} value={city.nameEn} className="font-sans">
-                    {city.nameAr}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-2">
+            {!usingExactLocation ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleUseCurrentLocation}
+                className="w-full text-xs gap-2 border-primary/20 hover:bg-primary/10 hover:text-primary"
+              >
+                <Navigation className="w-3 h-3" />
+                استخدم موقعي الحالي (دقة عالية)
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setUsingExactLocation(false)}
+                className="w-full text-xs gap-2 text-destructive hover:bg-destructive/10"
+              >
+                إلغاء الموقع الحالي والعودة للقائمة
+              </Button>
+            )}
           </div>
         </div>
         

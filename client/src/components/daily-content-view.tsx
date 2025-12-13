@@ -10,11 +10,8 @@ import {
 import { 
   Card, 
   CardContent, 
-  CardHeader, 
-  CardTitle 
 } from "@/components/ui/card";
 import { getDailyContent, type DailyContent } from "@/lib/daily-content";
-import { cn } from "@/lib/utils";
 
 export function DailyContentView() {
   const [content, setContent] = useState<DailyContent | null>(null);
@@ -26,17 +23,20 @@ export function DailyContentView() {
   if (!content) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       
       {/* 1. Quranic Verse (Ayah) */}
       <Card className="border-2 border-primary/30 shadow-xl bg-card overflow-hidden group hover:border-primary/50 transition-all">
         <div className="bg-primary/10 p-4 flex items-center gap-3 border-b border-primary/20">
           <BookOpen className="w-6 h-6 text-primary" />
-          <h2 className="text-xl font-bold text-primary font-serif">آية وتفسير</h2>
+          <div>
+            <h2 className="text-xl font-bold text-primary font-serif">آية وقصة</h2>
+            <p className="text-xs text-primary/70 font-sans">تأملات في كتاب الله</p>
+          </div>
         </div>
         <CardContent className="p-6 md:p-8 space-y-6">
           <div className="text-center space-y-4">
-            <p className="text-3xl md:text-4xl leading-loose font-serif font-black text-foreground" style={{ lineHeight: '2' }}>
+            <p className="text-2xl md:text-3xl leading-loose font-serif font-black text-foreground" style={{ lineHeight: '2' }}>
               {content.ayah.text}
             </p>
             <div className="inline-flex items-center gap-2 text-primary font-bold bg-primary/5 px-4 py-1 rounded-full text-sm md:text-base border border-primary/10">
@@ -46,17 +46,17 @@ export function DailyContentView() {
             </div>
           </div>
 
-          <div className="bg-muted/30 p-4 rounded-xl space-y-2 border border-border">
-            <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
-              <BookMarked className="w-4 h-4 text-secondary" />
-              التفسير الميسر:
+          <div className="bg-muted/30 p-5 rounded-xl space-y-3 border border-border">
+            <h3 className="font-bold text-xl text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
+              <BookMarked className="w-5 h-5 text-secondary" />
+              {content.ayah.title}
             </h3>
-            <p className="text-muted-foreground leading-relaxed text-lg">
-              {content.ayah.tafsir}
+            <p className="text-muted-foreground leading-loose text-lg text-justify">
+              {content.ayah.story}
             </p>
           </div>
           
-          <div className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1 opacity-70">
+          <div className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1 opacity-70 pt-2">
             <span>المصدر:</span>
             <a 
               href={content.ayah.sourceUrl} 
@@ -75,7 +75,10 @@ export function DailyContentView() {
       <Card className="border-2 border-secondary/30 shadow-xl bg-card overflow-hidden group hover:border-secondary/50 transition-all">
         <div className="bg-secondary/10 p-4 flex items-center gap-3 border-b border-secondary/20">
           <Quote className="w-6 h-6 text-secondary" />
-          <h2 className="text-xl font-bold text-secondary font-serif">من الهدي النبوي</h2>
+          <div>
+            <h2 className="text-xl font-bold text-secondary font-serif">من الهدي النبوي</h2>
+            <p className="text-xs text-secondary/70 font-sans">سياق الحديث وسببه</p>
+          </div>
         </div>
         <CardContent className="p-6 md:p-8 space-y-6">
           <div className="relative">
@@ -86,33 +89,30 @@ export function DailyContentView() {
           </div>
           
           <div className="flex justify-center">
-            <span className="text-secondary font-bold text-sm bg-secondary/10 px-3 py-1 rounded-md flex items-center gap-2">
-              الراوي: {content.hadith.narrator} | 
-              <a 
-                href={content.hadith.sourceUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="hover:underline flex items-center gap-1"
-              >
-                {content.hadith.source}
-                <ExternalLink className="w-3 h-3" />
-              </a>
+            <span className="text-secondary font-bold text-sm bg-secondary/10 px-3 py-1 rounded-md">
+              الراوي: {content.hadith.narrator}
             </span>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4 mt-4">
-            <div className="bg-muted/30 p-4 rounded-xl border border-border">
-              <h3 className="font-bold text-secondary mb-2 text-lg">سياق الحديث</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {content.hadith.context}
-              </p>
-            </div>
-            <div className="bg-secondary/5 p-4 rounded-xl border border-secondary/10">
-              <h3 className="font-bold text-secondary mb-2 text-lg">درس مستفاد</h3>
-              <p className="text-foreground/80 leading-relaxed font-medium">
-                {content.hadith.lesson}
-              </p>
-            </div>
+          <div className="bg-secondary/5 p-5 rounded-xl border border-secondary/10 space-y-3">
+            <h3 className="font-bold text-secondary text-lg border-b border-secondary/10 pb-2">
+              {content.hadith.title}
+            </h3>
+            <p className="text-foreground/80 leading-loose text-lg text-justify">
+              {content.hadith.story}
+            </p>
+          </div>
+
+          <div className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1 opacity-70">
+            <a 
+              href={content.hadith.sourceUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:underline flex items-center gap-1"
+            >
+              <ExternalLink className="w-3 h-3" />
+              {content.hadith.source}
+            </a>
           </div>
         </CardContent>
       </Card>
@@ -121,7 +121,10 @@ export function DailyContentView() {
       <Card className="border-2 border-accent/30 shadow-xl bg-card overflow-hidden group hover:border-accent/50 transition-all">
         <div className="bg-accent/10 p-4 flex items-center gap-3 border-b border-accent/20">
           <Scroll className="w-6 h-6 text-accent" />
-          <h2 className="text-xl font-bold text-accent font-serif">قصص الأنبياء</h2>
+          <div>
+            <h2 className="text-xl font-bold text-accent font-serif">قصص الأنبياء</h2>
+            <p className="text-xs text-accent/70 font-sans">عبر من حياة المرسلين</p>
+          </div>
         </div>
         <CardContent className="p-6 md:p-8 space-y-6">
           <div className="flex items-center justify-between">
@@ -139,15 +142,17 @@ export function DailyContentView() {
             </p>
           </div>
 
-          <div className="bg-accent/5 border-r-4 border-accent p-4 rounded-l-xl">
-            <h4 className="font-bold text-accent mb-1 flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              العبرة من القصة
-            </h4>
-            <p className="text-foreground font-medium text-lg">
-              {content.prophetStory.lesson}
-            </p>
-          </div>
+          {content.prophetStory.quranReference && (
+            <div className="bg-accent/5 border-r-4 border-accent p-4 rounded-l-xl my-4">
+              <h4 className="font-bold text-accent mb-2 flex items-center gap-2 text-sm">
+                <MessageCircle className="w-4 h-4" />
+                ذكر في القرآن الكريم
+              </h4>
+              <p className="text-foreground font-serif text-lg leading-relaxed">
+                "{content.prophetStory.quranReference}"
+              </p>
+            </div>
+          )}
 
           <div className="text-xs text-muted-foreground text-left flex items-center justify-end gap-1 opacity-70">
             <span>المصدر:</span>

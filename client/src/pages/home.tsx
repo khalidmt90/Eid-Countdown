@@ -5,10 +5,12 @@ import { PrayerTimesSection } from "@/components/prayer-times";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { QiblahFinder } from "@/components/qiblah-finder";
 
 export default function Home() {
   const [nextEid, setNextEid] = useState<EidDate | null>(null);
@@ -61,13 +63,20 @@ export default function Home() {
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
           <div className="flex justify-center mb-8">
-            <TabsList className="grid w-full max-w-md grid-cols-2 h-14 bg-card border border-border shadow-lg">
+            <TabsList className="grid w-full max-w-md grid-cols-3 h-14 bg-card border border-border shadow-lg">
               <TabsTrigger 
                 value="home" 
                 className="text-lg font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-all"
               >
                 <Clock className="w-5 h-5 ml-2" />
                 المواقيت
+              </TabsTrigger>
+              <TabsTrigger 
+                value="qiblah" 
+                className="text-lg font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-all"
+              >
+                <Compass className="w-5 h-5 ml-2" />
+                القبلة
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
@@ -145,6 +154,10 @@ export default function Home() {
                 </motion.div>
               )}
             </section>
+          </TabsContent>
+
+          <TabsContent value="qiblah">
+            <QiblahFinder />
           </TabsContent>
 
           <TabsContent value="daily">

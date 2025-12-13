@@ -1,0 +1,179 @@
+import { useEffect, useState } from "react";
+import { Compass, Navigation } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+
+export function QiblahFinder() {
+  const [heading, setHeading] = useState<number | null>(null);
+  const [qiblahBearing, setQiblahBearing] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
+
+  // Mecca Coordinates
+  const MECCA_LAT = 21.4225;
+  const MECCA_LNG = 39.8262;
+
+  const calculateQiblah = (lat: number, lng: number) => {
+    const phiK = MECCA_LAT * Math.PI / 180.0;
+    const lambdaK = MECCA_LNG * Math.PI / 180.0;
+    const phi = lat * Math.PI / 180.0;
+    const lambda = lng * Math.PI / 180.0;
+    
+    const psi = 180.0 / Math.PI * Math.atan2(
+      Math.sin(lambdaK - lambda),
+      Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda)
+    );
+    
+    return Math.round(psi < 0 ? psi + 360 : psi);
+  };
+
+  const startCompass = () => {
+    if (!navigator.geolocation) {
+      setError("المتصفح لا يدعم تحديد الموقع");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ lat: latitude, lng: longitude });
+        const bearing = calculateQiblah(latitude, longitude);
+        setQiblahBearing(bearing);
+
+        // Request device orientation if available (mobile)
+        if (window.DeviceOrientationEvent) {
+          window.addEventListener("deviceorientationabsolute", handleOrientation as any, true);
+          // Fallback for some browsers
+          window.addEventListener("deviceorientation", handleOrientation, true);
+        } else {
+          setError("الجهاز لا يدعم البوصلة");
+        }
+      },
+      (err) => {
+        setError("تعذر الوصول للموقع. تأكد من تفعيل الـ GPS");
+        console.error(err);
+      }
+    );
+  };
+
+  const handleOrientation = (event: DeviceOrientationEvent) => {
+    let compass = 0;
+    // @ts-ignore - webkitCompassHeading is non-standard but common on iOS
+    if (event.webkitCompassHeading) {
+      // @ts-ignore
+      compass = event.webkitCompassHeading;
+    } else if (event.alpha) {
+      compass = 360 - event.alpha;
+    }
+    setHeading(compass);
+  };
+
+  // Clean up
+  useEffect(() => {
+    return () => {
+      window.removeEventListener("deviceorientationabsolute", handleOrientation as any);
+      window.removeEventListener("deviceorientation", handleOrientation);
+    };
+  }, []);
+
+  // Calculate rotation for the Qiblah arrow
+  // If we have heading (compass), arrow points to Qiblah relative to North
+  // Rotation = Qiblah Bearing - Current Heading
+  const arrowRotation = (qiblahBearing || 0) - (heading || 0);
+
+  return (
+    <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in duration-500">
+      <Card className="w-full max-w-md border-2 border-primary/20 shadow-2xl overflow-hidden bg-card/50 backdrop-blur-sm relative">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+        
+        <CardHeader className="text-center pb-2">
+          <CardTitle className="text-2xl font-black font-serif text-primary flex items-center justify-center gap-2">
+            <Compass className="w-8 h-8" />
+            اتجاه القبلة
+          </CardTitle>
+          <p className="text-muted-foreground text-sm">
+            {location ? "تم تحديد موقعك بدقة" : "اضغط لبدء تحديد الاتجاه"}
+          </p>
+        </CardHeader>
+
+        <CardContent className="flex flex-col items-center pt-8 pb-12 space-y-8 relative">
+          
+          {/* Compass Visualization */}
+          <div className="relative w-64 h-64 flex items-center justify-center">
+            {/* Outer Ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-muted/30 shadow-inner bg-background/50" />
+            
+            {/* Degree Marks */}
+            {[0, 90, 180, 270].map((deg) => (
+              <div 
+                key={deg} 
+                className="absolute text-xs font-bold text-muted-foreground"
+                style={{ 
+                  transform: `rotate(${deg}deg) translate(0, -110px) rotate(-${deg}deg)` 
+                }}
+              >
+                {deg === 0 ? 'N' : deg === 90 ? 'E' : deg === 180 ? 'S' : 'W'}
+              </div>
+            ))}
+
+            {/* Qiblah Arrow (Kaaba Direction) */}
+            {qiblahBearing !== null && (
+              <motion.div 
+                className="absolute w-full h-full flex items-center justify-center z-20"
+                animate={{ rotate: arrowRotation }}
+                transition={{ type: "spring", damping: 20 }}
+              >
+                <div className="w-2 h-32 bg-gradient-to-t from-transparent to-primary rounded-full absolute -top-4 shadow-[0_0_15px_rgba(var(--primary),0.6)] origin-bottom" />
+                <div className="w-4 h-4 bg-primary rounded-full absolute top-0 shadow-lg" />
+                
+                {/* Kaaba Icon at tip */}
+                <div className="absolute top-[-30px] bg-black text-white p-1 rounded-sm shadow-md border border-gold transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center">
+                  <div className="w-full h-1 bg-[#D4AF37] absolute top-2" />
+                </div>
+              </motion.div>
+            )}
+
+            {/* Center Point */}
+            <div className="w-4 h-4 bg-foreground rounded-full z-30 ring-4 ring-background" />
+          </div>
+
+          <div className="text-center space-y-2">
+            {qiblahBearing !== null ? (
+              <>
+                <div className="text-4xl font-mono font-black text-foreground">
+                  {Math.round(qiblahBearing)}°
+                </div>
+                <p className="text-sm text-muted-foreground font-medium">
+                  {heading !== null 
+                    ? "قم بتدوير هاتفك حتى يشير السهم للكعبة" 
+                    : "درجة القبلة من الشمال"}
+                </p>
+              </>
+            ) : (
+              <Button 
+                onClick={startCompass} 
+                size="lg" 
+                className="rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-primary/20 transition-all gap-2"
+              >
+                <Navigation className="w-5 h-5" />
+                تحديد الاتجاه
+              </Button>
+            )}
+          </div>
+
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg font-bold">
+              {error}
+            </div>
+          )}
+          
+        </CardContent>
+      </Card>
+      
+      <div className="text-center max-w-sm text-muted-foreground text-sm px-4">
+        <p>⚠️ للحصول على أفضل دقة، حرك هاتفك على شكل رقم 8 وتأكد من تفعيل خدمة الموقع.</p>
+      </div>
+    </div>
+  );
+}
