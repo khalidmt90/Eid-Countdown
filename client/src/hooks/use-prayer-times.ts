@@ -2,6 +2,30 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { COUNTRIES, getDailyAyah, type Country, type City, type PrayerData } from "@/lib/prayer-data";
 
+function findNearestCity(lat: number, lng: number): { country: Country; city: City } | null {
+  let nearestCity: City | null = null;
+  let nearestCountry: Country | null = null;
+  let minDistance = Infinity;
+
+  for (const country of COUNTRIES) {
+    for (const city of country.cities) {
+      const dLat = lat - city.lat;
+      const dLng = lng - city.lng;
+      const distance = Math.sqrt(dLat * dLat + dLng * dLng);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCity = city;
+        nearestCountry = country;
+      }
+    }
+  }
+
+  if (nearestCity && nearestCountry) {
+    return { country: nearestCountry, city: nearestCity };
+  }
+  return null;
+}
+
 export function usePrayerTimes() {
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -43,6 +67,13 @@ export function usePrayerTimes() {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
         setUsingExactLocation(true);
+        
+        const nearest = findNearestCity(latitude, longitude);
+        if (nearest) {
+          setSelectedCountry(nearest.country);
+          setSelectedCity(nearest.city);
+        }
+        
         setLoading(false);
       }, (error) => {
         console.error("Geolocation error:", error);
