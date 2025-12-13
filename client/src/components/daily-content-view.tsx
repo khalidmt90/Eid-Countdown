@@ -94,7 +94,7 @@ export function DailyContentView() {
                   </div>
                   <div className="flex items-center gap-2 text-xs font-bold text-primary/60 bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>4 {t('min')}</span>
+                    <span>⏱ {content.ayah.readingTime || 1} {t('min_read')}</span>
                   </div>
                 </div>
                 
@@ -152,7 +152,7 @@ export function DailyContentView() {
                   </div>
                   <div className="flex items-center gap-2 text-xs font-bold text-secondary/60 bg-secondary/5 px-3 py-1.5 rounded-full border border-secondary/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>4 {t('min')}</span>
+                    <span>⏱ {content.hadith.readingTime || 1} {t('min_read')}</span>
                   </div>
                 </div>
 
@@ -211,7 +211,7 @@ export function DailyContentView() {
                   </div>
                   <div className="flex items-center gap-2 text-xs font-bold text-accent/60 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>4 {t('min')}</span>
+                    <span>⏱ {content.prophetStory.readingTime || 1} {t('min_read')}</span>
                   </div>
                 </div>
 

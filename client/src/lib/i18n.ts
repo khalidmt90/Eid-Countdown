@@ -71,7 +71,8 @@ i18n
           "accuracy_tip": "For best accuracy, move your phone in a figure-8 and ensure GPS is on.",
           "loading": "Loading...",
           "turn_right": "Right",
-          "turn_left": "Left"
+          "turn_left": "Left",
+          "min_read": "min read"
         }
       },
       ar: {
@@ -133,7 +134,8 @@ i18n
           "accuracy_tip": "للحصول على أفضل دقة، حرك هاتفك على شكل رقم 8 وتأكد من تفعيل خدمة الموقع.",
           "loading": "جاري التحميل...",
           "turn_right": "يمين",
-          "turn_left": "يسار"
+          "turn_left": "يسار",
+          "min_read": "دقائق قراءة"
         }
       },
       ur: {
@@ -193,7 +195,8 @@ i18n
           "accuracy_tip": "بہترین درستگی کے لیے، اپنے فون کو 8 کے ہندسے کی شکل میں گھمائیں اور یقینی بنائیں کہ GPS آن ہے۔",
           "loading": "لوڈ ہو رہا ہے...",
           "turn_right": "دائیں",
-          "turn_left": "بائیں"
+          "turn_left": "بائیں",
+          "min_read": "منٹ پڑھنے کا وقت"
         }
       },
       fa: {
@@ -253,7 +256,8 @@ i18n
           "accuracy_tip": "برای بهترین دقت، تلفن خود را به شکل عدد 8 حرکت دهید و از روشن بودن GPS اطمینان حاصل کنید.",
           "loading": "در حال بارگذاری...",
           "turn_right": "راست",
-          "turn_left": "چپ"
+          "turn_left": "چپ",
+          "min_read": "دقیقه مطالعه"
         }
       },
       id: {
@@ -313,7 +317,8 @@ i18n
           "accuracy_tip": "Untuk akurasi terbaik, gerakkan ponsel Anda membentuk angka 8 dan pastikan GPS aktif.",
           "loading": "Memuat...",
           "turn_right": "Kanan",
-          "turn_left": "Kiri"
+          "turn_left": "Kiri",
+          "min_read": "menit baca"
         }
       },
       tr: {
@@ -373,7 +378,8 @@ i18n
           "accuracy_tip": "En iyi doğruluk için telefonunuzu 8 şeklinde hareket ettirin ve GPS'in açık olduğundan emin olun.",
           "loading": "Yükleniyor...",
           "turn_right": "Sağ",
-          "turn_left": "Sol"
+          "turn_left": "Sol",
+          "min_read": "dk okuma"
         }
       },
       fr: {
@@ -433,7 +439,8 @@ i18n
           "accuracy_tip": "Pour une meilleure précision, faites un mouvement en 8 avec votre téléphone et assurez-vous que le GPS est activé.",
           "loading": "Chargement...",
           "turn_right": "Droite",
-          "turn_left": "Gauche"
+          "turn_left": "Gauche",
+          "min_read": "min de lecture"
         }
       },
       bn: {
@@ -493,7 +500,8 @@ i18n
           "accuracy_tip": "সেরা নির্ভুলতার জন্য, আপনার ফোনটি ৮ আকৃতিতে সরান এবং জিপিএস চালু আছে কিনা নিশ্চিত করুন।",
           "loading": "লোড হচ্ছে...",
           "turn_right": "ডানে",
-          "turn_left": "বামে"
+          "turn_left": "বামে",
+          "min_read": "মিনিট পড়া"
         }
       },
       ru: {
@@ -553,7 +561,8 @@ i18n
           "accuracy_tip": "Для лучшей точности перемещайте телефон по восьмерке и убедитесь, что GPS включен.",
           "loading": "Загрузка...",
           "turn_right": "Направо",
-          "turn_left": "Налево"
+          "turn_left": "Налево",
+          "min_read": "мин чтения"
         }
       },
       es: {
@@ -613,7 +622,8 @@ i18n
           "accuracy_tip": "Para mayor precisión, mueve tu teléfono en forma de 8 y asegúrate de que el GPS esté activado.",
           "loading": "Cargando...",
           "turn_right": "Derecha",
-          "turn_left": "Izquierda"
+          "turn_left": "Izquierda",
+          "min_read": "min de lectura"
         }
       }
     }
