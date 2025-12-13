@@ -130,7 +130,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col font-sans">
+    <div className="min-h-[100dvh] bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col font-sans w-full max-w-[100vw]">
       {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
