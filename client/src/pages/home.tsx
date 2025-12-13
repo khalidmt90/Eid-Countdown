@@ -161,28 +161,25 @@ ${t('isha')}: ${prayerData.timings.Isha}
         
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <div className="flex justify-center mb-6 sticky top-2 z-40">
-            <TabsList className="grid w-full max-w-sm grid-cols-3 h-12 bg-card/90 backdrop-blur-md border border-border shadow-md rounded-full px-1">
+          <div className="flex justify-center mb-8 sticky top-4 z-40">
+            <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-card/95 backdrop-blur-xl border-2 border-primary/20 shadow-xl rounded-full px-1.5">
               <TabsTrigger 
                 value="home" 
-                className="rounded-full text-xs md:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-10 transition-all"
+                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-all"
               >
-                <Clock className="w-4 h-4 mx-1" />
-                <span className="hidden sm:inline">{t('prayer_times')}</span>
+                {t('prayer_times')}
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
-                className="rounded-full text-xs md:text-sm font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-10 transition-all"
+                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-all"
               >
-                <Compass className="w-4 h-4 mx-1" />
-                <span className="hidden sm:inline">{t('qiblah')}</span>
+                {t('qiblah')}
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
-                className="rounded-full text-xs md:text-sm font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-10 transition-all"
+                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-all"
               >
-                <BookOpen className="w-4 h-4 mx-1" />
-                <span className="hidden sm:inline">{t('daily_content')}</span>
+                {t('daily_content')}
               </TabsTrigger>
             </TabsList>
           </div>
