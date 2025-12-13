@@ -99,7 +99,7 @@ export function QiblahFinder() {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in duration-500">
-      <Card className="w-full max-w-md border-2 border-primary/20 shadow-2xl overflow-hidden bg-card/50 backdrop-blur-sm relative">
+      <Card className="w-full max-w-md border-2 border-primary/20 shadow-lg overflow-hidden bg-card relative">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
         
         <CardHeader className="text-center pb-2">

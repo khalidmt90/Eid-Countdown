@@ -156,14 +156,14 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col font-sans w-full max-w-[100vw]">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+      {/* Decorative Elements - Simplified for mobile performance */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
       {/* Language Switcher */}
       <div className="absolute top-3 left-4 z-50">
          <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
-          <SelectTrigger className="w-[100px] h-8 text-xs bg-card/80 backdrop-blur-sm border-border">
+          <SelectTrigger className="w-[100px] h-8 text-xs bg-card border-border">
             <Languages className="w-3 h-3 mr-2" />
             <SelectValue placeholder="Language" />
           </SelectTrigger>
@@ -187,22 +187,22 @@ ${t('isha')}: ${prayerData.timings.Isha}
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
           <div className="flex justify-center mb-8 sticky top-2 z-50">
-            <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl rounded-full px-1.5">
+            <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-black/90 border border-white/10 shadow-lg rounded-full px-1.5">
               <TabsTrigger 
                 value="home" 
-                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-all"
+                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-colors"
               >
                 {t('prayer_times')}
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
-                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-all"
+                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-colors"
               >
                 {t('qiblah')}
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
-                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-all"
+                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-colors"
               >
                 {t('daily_content')}
               </TabsTrigger>
@@ -258,7 +258,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 className="w-full max-w-4xl mx-auto"
               >
                 <Card className={cn(
-                  "overflow-hidden border-2 shadow-2xl transition-all relative",
+                  "overflow-hidden border-2 shadow-lg relative",
                   nextPrayer.name === 'Fajr' ? "border-primary/50 shadow-primary/20" : 
                   nextPrayer.name === 'Maghrib' ? "border-secondary/50 shadow-secondary/20" : 
                   "border-border"
@@ -318,10 +318,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     
                     return (
                       <div key={name} className={cn(
-                        "flex flex-col items-center justify-center p-4 rounded-2xl transition-all duration-300 border hover:shadow-md cursor-default",
+                        "flex flex-col items-center justify-center p-4 rounded-2xl border cursor-default",
                         isNext 
-                          ? "bg-primary text-primary-foreground border-primary shadow-lg scale-105 z-10" 
-                          : "bg-card text-foreground border-border hover:border-primary/30"
+                          ? "bg-primary text-primary-foreground border-primary shadow-md z-10" 
+                          : "bg-card text-foreground border-border"
                       )}>
                         <div className="flex items-center gap-2 mb-2">
                           <Icon className={cn("w-5 h-5", isNext ? "text-primary-foreground" : "text-muted-foreground")} />
@@ -430,7 +430,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
       <div className="fixed bottom-6 left-6 z-50">
         <Button 
           onClick={handleShare}
-          className="rounded-full w-14 h-14 bg-[#25D366] hover:bg-[#128C7E] text-white shadow-2xl flex items-center justify-center transition-transform hover:scale-110"
+          className="rounded-full w-14 h-14 bg-[#25D366] hover:bg-[#128C7E] text-white shadow-lg flex items-center justify-center"
         >
           <Share2 className="w-6 h-6" />
         </Button>

@@ -41,19 +41,19 @@ export function DailyContentView() {
         <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-2xl mb-6">
           <TabsTrigger 
             value="ayah" 
-            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-[16px]"
+            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors text-[16px]"
           >
             {t('ayah_story')}
           </TabsTrigger>
           <TabsTrigger 
             value="hadith" 
-            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground transition-all text-[16px]"
+            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground transition-colors text-[16px]"
           >
             {t('hadith_guidance')}
           </TabsTrigger>
           <TabsTrigger 
             value="prophet" 
-            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all text-[16px]"
+            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-colors text-[16px]"
           >
             {t('prophet_stories')}
           </TabsTrigger>
@@ -82,7 +82,7 @@ export function DailyContentView() {
             
             {/* 1. Ayah & Story Content */}
             <TabsContent value="ayah" className="mt-0">
-              <Card className="border-2 border-primary/20 shadow-xl bg-card overflow-hidden rounded-3xl">
+              <Card className="border-2 border-primary/20 shadow-md bg-card overflow-hidden rounded-3xl">
                 <div className="bg-primary/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-primary/20">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/20 p-2 rounded-full">
