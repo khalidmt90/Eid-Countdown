@@ -9,7 +9,7 @@ import {
   Sunset, 
   Clock, 
   Share2,
-  ChevronDown 
+  Globe
 } from "lucide-react";
 import { 
   Card, 
@@ -27,10 +27,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { 
   type PrayerTimes, 
-  type City, 
-  CITIES, 
-  getDailyAyah,
-  type PrayerData 
+  type City,
+  type Country,
+  type PrayerData,
+  COUNTRIES,
+  getDailyAyah
 } from "@/lib/prayer-data";
 import { cn } from "@/lib/utils";
 
@@ -53,35 +54,54 @@ function parseTime(timeStr: string): Date {
 export function PrayerTimesSection() {
   const [loading, setLoading] = useState(true);
   const [prayerData, setPrayerData] = useState<PrayerData | null>(null);
-  const [selectedCity, setSelectedCity] = useState<City>(CITIES[0]); // Default Riyadh
+  
+  // State for Country and City
+  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]); // Default Saudi Arabia
+  const [selectedCity, setSelectedCity] = useState<City>(COUNTRIES[0].cities[0]); // Default Riyadh
+  
   const [nextPrayer, setNextPrayer] = useState<{name: string, time: Date} | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [dailyAyah] = useState(getDailyAyah());
 
-  // Load saved city preference
+  // Load saved country and city preference
   useEffect(() => {
+    const savedCountryName = localStorage.getItem("selectedCountry");
     const savedCityName = localStorage.getItem("selectedCity");
-    if (savedCityName) {
-      const city = CITIES.find(c => c.nameEn === savedCityName);
-      if (city) setSelectedCity(city);
-    }
-    // Attempt geolocation if no saved preference
-    else if ("geolocation" in navigator) {
+
+    if (savedCountryName && savedCityName) {
+      const country = COUNTRIES.find(c => c.nameEn === savedCountryName);
+      if (country) {
+        setSelectedCountry(country);
+        const city = country.cities.find(c => c.nameEn === savedCityName);
+        if (city) {
+          setSelectedCity(city);
+        } else {
+          setSelectedCity(country.cities[0]); // Fallback to first city
+        }
+      }
+    } else if ("geolocation" in navigator) {
+      // Attempt geolocation if no saved preference
       navigator.geolocation.getCurrentPosition((position) => {
-        // Simple distance check to find closest city
-        let closest = CITIES[0];
+        let closestCity = COUNTRIES[0].cities[0];
+        let closestCountry = COUNTRIES[0];
         let minDist = Infinity;
-        CITIES.forEach(city => {
-          const dist = Math.sqrt(
-            Math.pow(city.lat - position.coords.latitude, 2) + 
-            Math.pow(city.lng - position.coords.longitude, 2)
-          );
-          if (dist < minDist) {
-            minDist = dist;
-            closest = city;
-          }
+
+        COUNTRIES.forEach(country => {
+          country.cities.forEach(city => {
+            const dist = Math.sqrt(
+              Math.pow(city.lat - position.coords.latitude, 2) + 
+              Math.pow(city.lng - position.coords.longitude, 2)
+            );
+            if (dist < minDist) {
+              minDist = dist;
+              closestCity = city;
+              closestCountry = country;
+            }
+          });
         });
-        setSelectedCity(closest);
+        
+        setSelectedCountry(closestCountry);
+        setSelectedCity(closestCity);
       });
     }
   }, []);
@@ -152,8 +172,18 @@ export function PrayerTimesSection() {
     return () => clearInterval(interval);
   }, [prayerData]);
 
+  const handleCountryChange = (val: string) => {
+    const country = COUNTRIES.find(c => c.nameEn === val);
+    if (country) {
+      setSelectedCountry(country);
+      setSelectedCity(country.cities[0]); // Default to first city of new country
+      localStorage.setItem("selectedCountry", val);
+      localStorage.setItem("selectedCity", country.cities[0].nameEn);
+    }
+  };
+
   const handleCityChange = (val: string) => {
-    const city = CITIES.find(c => c.nameEn === val);
+    const city = selectedCountry.cities.find(c => c.nameEn === val);
     if (city) {
       setSelectedCity(city);
       localStorage.setItem("selectedCity", val);
@@ -164,7 +194,7 @@ export function PrayerTimesSection() {
     if (!prayerData || !nextPrayer) return;
     
     const text = `
-🕌 مواقيت الصلاة في ${selectedCity.nameAr}
+🕌 مواقيت الصلاة في ${selectedCity.nameAr}، ${selectedCountry.nameAr}
 📅 ${prayerData.date.hijri.date} ${prayerData.date.hijri.month.ar} ${prayerData.date.hijri.year}
 
 الفجر: ${prayerData.timings.Fajr}
@@ -226,20 +256,41 @@ export function PrayerTimesSection() {
       
       {/* Top Bar: Location & Date */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-2xl shadow-lg border border-border">
-        <div className="flex items-center gap-3">
-          <MapPin className="text-primary w-6 h-6" />
-          <Select onValueChange={handleCityChange} value={selectedCity.nameEn}>
-            <SelectTrigger className="w-[180px] bg-background border-border text-foreground font-bold z-50 relative">
-              <SelectValue placeholder="اختر المدينة" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover text-popover-foreground border-border z-[100]">
-              {CITIES.map(city => (
-                <SelectItem key={city.nameEn} value={city.nameEn} className="font-sans">
-                  {city.nameAr}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        
+        {/* Location Selectors */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Globe className="text-muted-foreground w-5 h-5" />
+            <Select onValueChange={handleCountryChange} value={selectedCountry.nameEn}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
+                <SelectValue placeholder="اختر الدولة" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
+                {COUNTRIES.map(country => (
+                  <SelectItem key={country.nameEn} value={country.nameEn} className="font-sans">
+                    {country.nameAr}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <MapPin className="text-primary w-5 h-5" />
+            <Select onValueChange={handleCityChange} value={selectedCity.nameEn}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
+                <SelectValue placeholder="اختر المدينة" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
+                {selectedCountry.cities.map(city => (
+                  <SelectItem key={city.nameEn} value={city.nameEn} className="font-sans">
+                    {city.nameAr}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
         <div className="text-center md:text-left text-muted-foreground font-medium">
