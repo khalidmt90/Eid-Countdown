@@ -72,72 +72,62 @@
 }
 
 @layer base {
-  html {
+  /* 1. Only BODY should scroll */
+  html, body {
     height: auto;
     min-height: 100%;
     overflow-x: hidden;
-    overflow-y: scroll;
-    scroll-behavior: auto;
-    width: 100%;
+    overflow-y: auto;
   }
+  
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    height: auto;
-    min-height: 100%;
     margin: 0;
-    overflow: visible !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
-    width: 100%;
   }
+  
   * {
     @apply border-border;
     -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
   }
-  #root {
-    min-height: 100%;
-    height: auto;
+  
+  /* 2. REMOVE scrolling from ALL layout wrappers */
+  #root,
+  main,
+  .layout,
+  .page,
+  .container,
+  .wrapper {
+    min-height: 100vh;
     overflow: visible !important;
-  }
-  main {
-    min-height: 100%;
-    height: auto;
-    overflow: visible !important;
-  }
-  .pointer-events-none {
-    pointer-events: none !important;
+    height: auto !important;
   }
   
-  /* Prevent cards and containers from trapping scroll */
+  /* 3. Cards / tables MUST NOT be scroll containers */
   [class*="Card"],
   [class*="card"],
+  table,
   .rounded-2xl,
   .rounded-3xl,
   .rounded-xl {
-    overflow: visible;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
   }
   
-  /* Ensure all interactive elements allow scroll passthrough */
-  button, a, [role="button"], [role="tab"], [role="tablist"], [role="tabpanel"] {
-    touch-action: pan-y !important;
-  }
-  
-  /* Force scroll passthrough on tab components */
-  [data-radix-collection-item],
-  [data-state] {
-    touch-action: pan-y !important;
-  }
-  
-  /* Global touch action fix - allow vertical scroll everywhere */
+  /* 4. Global touch behavior - no element should block scroll */
   * {
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-y pinch-zoom !important;
   }
   
-  /* Prevent any element from being a scroll container except html */
-  div, section, article, aside, nav, header, footer, main {
-    overflow: visible;
+  /* Ensure no element becomes a scroll container */
+  div, section, article, aside, nav, header, footer {
+    overflow: visible !important;
+  }
+  
+  .pointer-events-none {
+    pointer-events: none !important;
   }
 }
