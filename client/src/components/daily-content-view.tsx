@@ -68,7 +68,7 @@ export function DailyContentView() {
             className="gap-2 rounded-full hover:bg-muted font-bold text-xs"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            {t('generate_new')}
+            {t('another_story')}
           </Button>
         </div>
 
@@ -130,7 +130,7 @@ export function DailyContentView() {
                       rel="noopener noreferrer" 
                       className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors bg-muted/30 px-4 py-2 rounded-full hover:bg-primary/5"
                     >
-                      <span className="font-medium">{t('source')}:</span>
+                      <span className="font-medium">{t('read_more')}:</span>
                       <span className="font-bold border-b border-transparent group-hover:border-primary transition-all">{content.ayah.source}</span>
                       <ExternalLink className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
@@ -189,7 +189,7 @@ export function DailyContentView() {
                       rel="noopener noreferrer" 
                       className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-secondary transition-colors bg-muted/30 px-4 py-2 rounded-full hover:bg-secondary/5"
                     >
-                      <span className="font-medium">{t('source')}:</span>
+                      <span className="font-medium">{t('read_more')}:</span>
                       <span className="font-bold border-b border-transparent group-hover:border-secondary transition-all">{content.hadith.source}</span>
                       <ExternalLink className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
@@ -258,7 +258,7 @@ export function DailyContentView() {
                       rel="noopener noreferrer" 
                       className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors bg-muted/30 px-4 py-2 rounded-full hover:bg-accent/5"
                     >
-                      <span className="font-medium">{t('source')}:</span>
+                      <span className="font-medium">{t('read_more')}:</span>
                       <span className="font-bold border-b border-transparent group-hover:border-accent transition-all">{content.prophetStory.source}</span>
                       <ExternalLink className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />
                     </a>
