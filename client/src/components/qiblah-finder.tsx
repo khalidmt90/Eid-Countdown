@@ -3,8 +3,10 @@ import { Compass, Navigation } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export function QiblahFinder() {
+  const { t } = useTranslation();
   const [heading, setHeading] = useState<number | null>(null);
   const [qiblahBearing, setQiblahBearing] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export function QiblahFinder() {
 
   const startCompass = () => {
     if (!navigator.geolocation) {
-      setError("المتصفح لا يدعم تحديد الموقع");
+      setError(t('compass_error'));
       return;
     }
 
@@ -47,11 +49,11 @@ export function QiblahFinder() {
           // Fallback for some browsers
           window.addEventListener("deviceorientation", handleOrientation, true);
         } else {
-          setError("الجهاز لا يدعم البوصلة");
+          setError(t('device_error'));
         }
       },
       (err) => {
-        setError("تعذر الوصول للموقع. تأكد من تفعيل الـ GPS");
+        setError(t('gps_error'));
         console.error(err);
       }
     );
@@ -90,10 +92,10 @@ export function QiblahFinder() {
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-2xl font-black font-serif text-primary flex items-center justify-center gap-2">
             <Compass className="w-8 h-8" />
-            اتجاه القبلة
+            {t('qiblah_direction')}
           </CardTitle>
           <p className="text-muted-foreground text-sm">
-            {location ? "تم تحديد موقعك بدقة" : "اضغط لبدء تحديد الاتجاه"}
+            {location ? t('location_set') : t('tap_to_start')}
           </p>
         </CardHeader>
 
@@ -146,8 +148,8 @@ export function QiblahFinder() {
                 </div>
                 <p className="text-sm text-muted-foreground font-medium">
                   {heading !== null 
-                    ? "قم بتدوير هاتفك حتى يشير السهم للكعبة" 
-                    : "درجة القبلة من الشمال"}
+                    ? t('rotate_phone') 
+                    : t('degree_from_north')}
                 </p>
               </>
             ) : (
@@ -157,7 +159,7 @@ export function QiblahFinder() {
                 className="rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-primary/20 transition-all gap-2"
               >
                 <Navigation className="w-5 h-5" />
-                تحديد الاتجاه
+                {t('locate_direction')}
               </Button>
             )}
           </div>
@@ -172,7 +174,7 @@ export function QiblahFinder() {
       </Card>
       
       <div className="text-center max-w-sm text-muted-foreground text-sm px-4">
-        <p>⚠️ للحصول على أفضل دقة، حرك هاتفك على شكل رقم 8 وتأكد من تفعيل خدمة الموقع.</p>
+        <p>{t('accuracy_tip')}</p>
       </div>
     </div>
   );

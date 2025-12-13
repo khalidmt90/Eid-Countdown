@@ -135,3 +135,8 @@ export function getDailyContent(): DailyContent {
   
   return DAILY_CONTENT[dayOfYear % DAILY_CONTENT.length];
 }
+
+export function getRandomContent(): DailyContent {
+  const randomIndex = Math.floor(Math.random() * DAILY_CONTENT.length);
+  return DAILY_CONTENT[randomIndex];
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface CountdownTimerProps {
   targetDate: string;
@@ -17,6 +18,7 @@ interface TimeLeft {
 }
 
 export function CountdownTimer({ targetDate, className, onComplete }: CountdownTimerProps) {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isMounted, setIsMounted] = useState(false);
 
@@ -52,10 +54,10 @@ export function CountdownTimer({ targetDate, className, onComplete }: CountdownT
 
   return (
     <div className={cn("grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl mx-auto", className)}>
-      <TimeUnit value={timeLeft.days} label="يوم" delay={0} />
-      <TimeUnit value={timeLeft.hours} label="ساعة" delay={0.1} />
-      <TimeUnit value={timeLeft.minutes} label="دقيقة" delay={0.2} />
-      <TimeUnit value={timeLeft.seconds} label="ثانية" delay={0.3} />
+      <TimeUnit value={timeLeft.days} label={t('days')} delay={0} />
+      <TimeUnit value={timeLeft.hours} label={t('hours')} delay={0.1} />
+      <TimeUnit value={timeLeft.minutes} label={t('minutes')} delay={0.2} />
+      <TimeUnit value={timeLeft.seconds} label={t('seconds')} delay={0.3} />
     </div>
   );
 }

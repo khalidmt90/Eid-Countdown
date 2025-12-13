@@ -35,6 +35,7 @@ import {
   getDailyAyah
 } from "@/lib/prayer-data";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 // Helper to format time remaining
 function formatTimeRemaining(ms: number) {
@@ -53,6 +54,7 @@ function parseTime(timeStr: string): Date {
 }
 
 export function PrayerTimesSection() {
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [prayerData, setPrayerData] = useState<PrayerData | null>(null);
   
@@ -96,11 +98,11 @@ export function PrayerTimesSection() {
         setLoading(false); // Trigger refetch in useEffect
       }, (error) => {
         console.error("Geolocation error:", error);
-        alert("تعذر تحديد موقعك بدقة. الرجاء التأكد من تفعيل خدمة الموقع.");
+        alert(t('gps_error'));
         setLoading(false);
       });
     } else {
-      alert("المتصفح لا يدعم تحديد الموقع.");
+      alert(t('compass_error'));
       setLoading(false);
     }
   };
@@ -199,33 +201,33 @@ export function PrayerTimesSection() {
   const handleShare = () => {
     if (!prayerData || !nextPrayer) return;
     
+    const cityName = i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn;
+    const countryName = i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn;
+    const prayerName = t(nextPrayer.name.toLowerCase());
+
     const text = `
-🕌 مواقيت الصلاة في ${selectedCity.nameAr}، ${selectedCountry.nameAr}
+🕌 ${t('prayer_times_in')} ${cityName}, ${countryName}
 📅 ${prayerData.date.hijri.date} ${prayerData.date.hijri.month.ar} ${prayerData.date.hijri.year}
 
-الفجر: ${prayerData.timings.Fajr}
-الشروق: ${prayerData.timings.Sunrise}
-الظهر: ${prayerData.timings.Dhuhr}
-العصر: ${prayerData.timings.Asr}
-المغرب: ${prayerData.timings.Maghrib}
-العشاء: ${prayerData.timings.Isha}
+${t('fajr')}: ${prayerData.timings.Fajr}
+${t('sunrise')}: ${prayerData.timings.Sunrise}
+${t('dhuhr')}: ${prayerData.timings.Dhuhr}
+${t('asr')}: ${prayerData.timings.Asr}
+${t('maghrib')}: ${prayerData.timings.Maghrib}
+${t('isha')}: ${prayerData.timings.Isha}
 
-⏳ الصلاة القادمة: ${nextPrayer.name === 'Fajr' ? 'الفجر' : 
-                   nextPrayer.name === 'Maghrib' ? 'المغرب' : 
-                   nextPrayer.name === 'Dhuhr' ? 'الظهر' : 
-                   nextPrayer.name === 'Asr' ? 'العصر' : 
-                   nextPrayer.name === 'Isha' ? 'العشاء' : 'الشروق'}
+⏳ ${t('next_prayer')}: ${prayerName}
 `;
     
     if (navigator.share) {
       navigator.share({
-        title: 'مواقيت الصلاة',
+        title: t('prayer_times'),
         text: text,
       });
     } else {
       // Fallback to clipboard
       navigator.clipboard.writeText(text);
-      alert("تم نسخ المواقيت إلى الحافظة");
+      alert(t('copied'));
     }
   };
 
@@ -248,17 +250,8 @@ export function PrayerTimesSection() {
     Isha: Moon
   };
 
-  const prayerNamesAr: Record<string, string> = {
-    Fajr: "الفجر",
-    Sunrise: "الشروق",
-    Dhuhr: "الظهر",
-    Asr: "العصر",
-    Maghrib: "المغرب",
-    Isha: "العشاء"
-  };
-
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 px-4 font-sans" dir="rtl">
+    <div className="w-full max-w-4xl mx-auto space-y-8 px-4 font-sans">
       
       {/* Top Bar: Location & Date */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-2xl shadow-lg border border-border">
@@ -277,12 +270,12 @@ export function PrayerTimesSection() {
                 disabled={usingExactLocation}
               >
                 <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
-                  <SelectValue placeholder={usingExactLocation ? "موقعك الحالي" : "اختر الدولة"} />
+                  <SelectValue placeholder={usingExactLocation ? t('use_current_location') : t('select_country')} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
                   {COUNTRIES.map(country => (
                     <SelectItem key={country.nameEn} value={country.nameEn} className="font-sans">
-                      {country.nameAr}
+                      {i18n.language === 'ar' ? country.nameAr : country.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -300,12 +293,12 @@ export function PrayerTimesSection() {
                 disabled={usingExactLocation}
               >
                 <SelectTrigger className="w-full sm:w-[160px] bg-background border-border text-foreground font-bold">
-                  <SelectValue placeholder={usingExactLocation ? "تم التحديد آلياً" : "اختر المدينة"} />
+                  <SelectValue placeholder={usingExactLocation ? t('auto_selected') : t('select_city')} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover text-popover-foreground border-border max-h-[300px]">
                   {selectedCountry.cities.map(city => (
                     <SelectItem key={city.nameEn} value={city.nameEn} className="font-sans">
-                      {city.nameAr}
+                      {i18n.language === 'ar' ? city.nameAr : city.nameEn}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -322,7 +315,7 @@ export function PrayerTimesSection() {
                 className="w-full text-xs gap-2 border-primary/20 hover:bg-primary/10 hover:text-primary"
               >
                 <Navigation className="w-3 h-3" />
-                استخدم موقعي الحالي (دقة عالية)
+                {t('use_current_location')}
               </Button>
             ) : (
               <Button 
@@ -331,7 +324,7 @@ export function PrayerTimesSection() {
                 onClick={() => setUsingExactLocation(false)}
                 className="w-full text-xs gap-2 text-destructive hover:bg-destructive/10"
               >
-                إلغاء الموقع الحالي والعودة للقائمة
+                {t('cancel_location')}
               </Button>
             )}
           </div>
@@ -360,7 +353,7 @@ export function PrayerTimesSection() {
             "bg-card text-foreground"
           )}>
             <CardTitle className="text-2xl font-bold font-serif">
-              المتبقي لصلاة {prayerNamesAr[nextPrayer.name]}
+              {t('remaining_to')} {t(nextPrayer.name.toLowerCase())}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center items-center py-10 bg-card">
@@ -369,19 +362,19 @@ export function PrayerTimesSection() {
                 <span className="block text-5xl md:text-7xl font-mono font-black tracking-tighter text-foreground">
                   {String(hours).padStart(2, '0')}
                 </span>
-                <span className="text-sm md:text-base text-muted-foreground font-bold mt-2 block">ساعة</span>
+                <span className="text-sm md:text-base text-muted-foreground font-bold mt-2 block">{t('hours')}</span>
               </div>
               <div>
                 <span className="block text-5xl md:text-7xl font-mono font-black tracking-tighter text-foreground">
                   {String(minutes).padStart(2, '0')}
                 </span>
-                <span className="text-sm md:text-base text-muted-foreground font-bold mt-2 block">دقيقة</span>
+                <span className="text-sm md:text-base text-muted-foreground font-bold mt-2 block">{t('minutes')}</span>
               </div>
               <div>
                 <span className="block text-5xl md:text-7xl font-mono font-black tracking-tighter text-foreground">
                   {String(seconds).padStart(2, '0')}
                 </span>
-                <span className="text-sm md:text-base text-muted-foreground font-bold mt-2 block">ثانية</span>
+                <span className="text-sm md:text-base text-muted-foreground font-bold mt-2 block">{t('seconds')}</span>
               </div>
             </div>
           </CardContent>
@@ -408,7 +401,7 @@ export function PrayerTimesSection() {
                     "w-8 h-8",
                     isNext ? "text-primary" : "text-muted-foreground"
                   )} />
-                  <h3 className="font-bold text-lg">{prayerNamesAr[name]}</h3>
+                  <h3 className="font-bold text-lg">{t(name.toLowerCase())}</h3>
                   <p className="text-2xl font-mono font-black tracking-tight">{time}</p>
                 </div>
               </Card>
@@ -419,7 +412,7 @@ export function PrayerTimesSection() {
       {/* Ayah of the Day */}
       <Card className="bg-card border-2 border-accent/20 overflow-hidden">
         <div className="bg-accent/10 p-2 text-center text-accent font-bold text-sm">
-          آية اليوم
+          {t('ayah_of_day')}
         </div>
         <CardContent className="p-8 text-center space-y-6">
           <p className="text-2xl md:text-4xl leading-loose font-serif text-foreground font-bold" style={{ lineHeight: '1.8' }}>
