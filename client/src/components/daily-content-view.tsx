@@ -41,19 +41,19 @@ export function DailyContentView() {
         <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-2xl mb-6">
           <TabsTrigger 
             value="ayah" 
-            className="rounded-xl py-3 text-sm md:text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
+            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all text-[16px]"
           >
             {t('ayah_story')}
           </TabsTrigger>
           <TabsTrigger 
             value="hadith" 
-            className="rounded-xl py-3 text-sm md:text-base font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground transition-all"
+            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground transition-all text-[16px]"
           >
             {t('hadith_guidance')}
           </TabsTrigger>
           <TabsTrigger 
             value="prophet" 
-            className="rounded-xl py-3 text-sm md:text-base font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all"
+            className="rounded-xl py-3 md:text-base font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all text-[16px]"
           >
             {t('prophet_stories')}
           </TabsTrigger>
