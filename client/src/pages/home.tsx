@@ -398,6 +398,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
                        " مواقيت الصلاة تعتمد على تقويم أم القرى. جميع المحتويات الدينية مراجعة من مصادر موثوقة." : 
                        " Prayer times are based on Umm Al-Qura calendar. All religious content is verified from trusted sources."}
                     </div>
+                    <br/>
+                    <div className="bg-amber-500/10 p-3 rounded-lg border border-amber-500/20 text-foreground text-sm">
+                      <strong>{i18n.language === 'ar' ? "تنبيه:" : "Disclaimer:"}</strong>
+                       {i18n.language === 'ar' ? 
+                       " بعض المحتويات الدينية (القصص والتفاسير) يتم إنشاؤها بواسطة الذكاء الاصطناعي وقد تحتوي على أخطاء. يرجى التحقق من المصادر الموثوقة." : 
+                       " Some religious content (stories and interpretations) is AI-generated and may contain errors. Please verify with trusted sources."}
+                    </div>
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>

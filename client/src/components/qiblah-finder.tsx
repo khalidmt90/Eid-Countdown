@@ -90,7 +90,7 @@ export function QiblahFinder() {
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
         
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-[38px] font-black font-serif text-primary flex items-center justify-center gap-2">
+          <CardTitle className="text-[38px] tracking-tight font-black font-serif text-primary flex items-center justify-center gap-2">
             <Compass className="w-8 h-8" />
             {t('qiblah_direction')}
           </CardTitle>

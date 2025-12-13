@@ -36,7 +36,6 @@ export function DailyContentView() {
 
   return (
     <div className="space-y-6 pb-20 w-full max-w-4xl mx-auto">
-      
       {/* Sub-navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-2xl mb-6">
@@ -117,7 +116,7 @@ export function DailyContentView() {
                       {content.ayah.title}
                     </h3>
                     <div className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                      <p className="text-lg md:text-xl leading-[2.2] text-muted-foreground text-justify whitespace-pre-line font-medium">
+                      <p className="md:text-xl text-muted-foreground text-justify whitespace-pre-line font-medium text-[20px]">
                         {content.ayah.story}
                       </p>
                     </div>

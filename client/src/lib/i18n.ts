@@ -67,7 +67,7 @@ i18n
           "compass_error": "Browser does not support geolocation",
           "device_error": "Device does not support compass",
           "gps_error": "Could not access location. Enable GPS.",
-          "accuracy_tip": "⚠️ For best accuracy, move your phone in a figure-8 and ensure GPS is on.",
+          "accuracy_tip": "For best accuracy, move your phone in a figure-8 and ensure GPS is on.",
           "loading": "Loading..."
         }
       },
@@ -126,7 +126,7 @@ i18n
           "compass_error": "المتصفح لا يدعم تحديد الموقع",
           "device_error": "الجهاز لا يدعم البوصلة",
           "gps_error": "تعذر الوصول للموقع. تأكد من تفعيل الـ GPS",
-          "accuracy_tip": "⚠️ للحصول على أفضل دقة، حرك هاتفك على شكل رقم 8 وتأكد من تفعيل خدمة الموقع.",
+          "accuracy_tip": "للحصول على أفضل دقة، حرك هاتفك على شكل رقم 8 وتأكد من تفعيل خدمة الموقع.",
           "loading": "جاري التحميل..."
         }
       },
@@ -183,7 +183,7 @@ i18n
           "compass_error": "براؤزر جغرافیائی محل وقوع کی حمایت نہیں کرتا ہے",
           "device_error": "آلہ کمپاس کی حمایت نہیں کرتا ہے",
           "gps_error": "مقام تک رسائی حاصل نہیں ہو سکی۔ GPS کو فعال کریں۔",
-          "accuracy_tip": "⚠️ بہترین درستگی کے لیے، اپنے فون کو 8 کے ہندسے کی شکل میں گھمائیں اور یقینی بنائیں کہ GPS آن ہے۔",
+          "accuracy_tip": "بہترین درستگی کے لیے، اپنے فون کو 8 کے ہندسے کی شکل میں گھمائیں اور یقینی بنائیں کہ GPS آن ہے۔",
           "loading": "لوڈ ہو رہا ہے..."
         }
       },
@@ -240,7 +240,7 @@ i18n
           "compass_error": "مرورگر از موقعیت مکانی پشتیبانی نمی‌کند",
           "device_error": "دستگاه از قطب‌نما پشتیبانی نمی‌کند",
           "gps_error": "دسترسی به مکان امکان‌پذیر نیست. GPS را فعال کنید.",
-          "accuracy_tip": "⚠️ برای بهترین دقت، تلفن خود را به شکل عدد 8 حرکت دهید و از روشن بودن GPS اطمینان حاصل کنید.",
+          "accuracy_tip": "برای بهترین دقت، تلفن خود را به شکل عدد 8 حرکت دهید و از روشن بودن GPS اطمینان حاصل کنید.",
           "loading": "در حال بارگذاری..."
         }
       },
@@ -297,7 +297,7 @@ i18n
           "compass_error": "Browser tidak mendukung geolokasi",
           "device_error": "Perangkat tidak mendukung kompas",
           "gps_error": "Tidak dapat mengakses lokasi. Aktifkan GPS.",
-          "accuracy_tip": "⚠️ Untuk akurasi terbaik, gerakkan ponsel Anda membentuk angka 8 dan pastikan GPS aktif.",
+          "accuracy_tip": "Untuk akurasi terbaik, gerakkan ponsel Anda membentuk angka 8 dan pastikan GPS aktif.",
           "loading": "Memuat..."
         }
       },
@@ -354,7 +354,7 @@ i18n
           "compass_error": "Tarayıcı coğrafi konumu desteklemiyor",
           "device_error": "Cihaz pusulayı desteklemiyor",
           "gps_error": "Konuma erişilemedi. GPS'i etkinleştirin.",
-          "accuracy_tip": "⚠️ En iyi doğruluk için telefonunuzu 8 şeklinde hareket ettirin ve GPS'in açık olduğundan emin olun.",
+          "accuracy_tip": "En iyi doğruluk için telefonunuzu 8 şeklinde hareket ettirin ve GPS'in açık olduğundan emin olun.",
           "loading": "Yükleniyor..."
         }
       },
@@ -411,7 +411,7 @@ i18n
           "compass_error": "Le navigateur ne supporte pas la géolocalisation",
           "device_error": "L'appareil ne supporte pas la boussole",
           "gps_error": "Impossible d'accéder à la localisation. Activez le GPS.",
-          "accuracy_tip": "⚠️ Pour une meilleure précision, faites un mouvement en 8 avec votre téléphone et assurez-vous que le GPS est activé.",
+          "accuracy_tip": "Pour une meilleure précision, faites un mouvement en 8 avec votre téléphone et assurez-vous que le GPS est activé.",
           "loading": "Chargement..."
         }
       },
@@ -468,7 +468,7 @@ i18n
           "compass_error": "ব্রাউজার জিওলোকেশন সমর্থন করে না",
           "device_error": "ডিভাইস কম্পাস সমর্থন করে না",
           "gps_error": "অবস্থান অ্যাক্সেস করা যায়নি। জিপিএস চালু করুন।",
-          "accuracy_tip": "⚠️ সেরা নির্ভুলতার জন্য, আপনার ফোনটি ৮ আকৃতিতে সরান এবং জিপিএস চালু আছে কিনা নিশ্চিত করুন।",
+          "accuracy_tip": "সেরা নির্ভুলতার জন্য, আপনার ফোনটি ৮ আকৃতিতে সরান এবং জিপিএস চালু আছে কিনা নিশ্চিত করুন।",
           "loading": "লোড হচ্ছে..."
         }
       },
@@ -525,7 +525,7 @@ i18n
           "compass_error": "Браузер не поддерживает геолокацию",
           "device_error": "Устройство не поддерживает компас",
           "gps_error": "Не удалось получить доступ к местоположению. Включите GPS.",
-          "accuracy_tip": "⚠️ Для лучшей точность перемещайте телефон по восьмерке и убедитесь, что GPS включен.",
+          "accuracy_tip": "Для лучшей точности перемещайте телефон по восьмерке и убедитесь, что GPS включен.",
           "loading": "Загрузка..."
         }
       },
@@ -582,7 +582,7 @@ i18n
           "compass_error": "El navegador no soporta geolocalización",
           "device_error": "El dispositivo no soporta brújula",
           "gps_error": "No se pudo acceder a la ubicación. Habilita el GPS.",
-          "accuracy_tip": "⚠️ Para mayor precisión, mueve tu teléfono en forma de 8 y asegúrate de que el GPS esté activado.",
+          "accuracy_tip": "Para mayor precisión, mueve tu teléfono en forma de 8 y asegúrate de que el GPS esté activado.",
           "loading": "Cargando..."
         }
       }
