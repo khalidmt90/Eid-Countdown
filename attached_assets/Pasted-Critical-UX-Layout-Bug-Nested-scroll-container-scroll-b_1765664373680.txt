@@ -1,0 +1,153 @@
+Critical UX / Layout Bug — Nested scroll container + scroll blocking (confirmed on live site)
+
+I reviewed the live site and confirmed the issue:
+
+The page has TWO vertical scroll contexts:
+
+Browser/body scrollbar (far right)
+
+An inner scroll container wrapping the main content
+
+Because of this:
+
+It feels like there are two pages
+
+Mouse wheel / touch scroll fails or moves only a few pixels when the cursor is over cards (prayer times, tables, countdowns)
+
+Scrolling only works reliably when the cursor is on empty background
+
+This is not a device issue — it’s a layout/CSS issue.
+
+Root Cause (what’s actually wrong)
+
+There is a page-level wrapper (likely main, #root, or a layout div) that has both:
+
+height: 100vh (or h-screen)
+
+overflow-y: auto / scroll
+
+At the same time, body is also scrollable.
+
+➡️ This creates nested scrolling, and inner elements capture the scroll wheel / touch events.
+
+Required Fix (this will solve it)
+1) Enforce ONE scroll only — the browser (body)
+
+Body must be the only scroll container.
+
+html,
+body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+2) REMOVE scrolling from all layout wrappers (mandatory)
+
+Find the main layout wrapper (examples):
+
+main
+
+#root
+
+.app
+
+.page
+
+.container
+
+any wrapper around the entire page content
+
+❌ REMOVE these if present:
+
+height: 100vh
+
+h-screen
+
+overflow-y: auto
+
+overflow: scroll
+
+✅ Replace with:
+
+min-height: 100vh;
+overflow: visible;
+
+
+This is the most important fix.
+
+3) Cards / tables must NOT be scroll containers
+
+Prayer time cards and tables currently trap scroll events.
+
+Ensure:
+
+No card/table/container has:
+
+overflow: auto
+
+overflow-y: auto
+
+fixed heights that force inner scrolling
+
+If horizontal scrolling is needed anywhere:
+
+overflow-x: auto;
+overflow-y: visible;
+
+4) Fix pointer/touch behavior globally (important)
+
+Some elements are intercepting input.
+
+Add globally:
+
+body {
+  touch-action: pan-y;
+}
+
+
+Ensure no element has:
+
+touch-action: none;
+
+
+unless absolutely required.
+
+5) Check Framer Motion / gesture handlers
+
+If any container uses Framer Motion:
+
+Make sure drag is NOT enabled
+
+Remove onPan, onDrag, or pointer handlers from page-level components
+
+These can silently block scroll.
+
+Acceptance Criteria (non-negotiable)
+
+Only one scrollbar visible
+
+Scrolling works anywhere, including directly on:
+
+prayer time cards
+
+tables
+
+countdown cards
+
+No “dead zones” where scroll stops
+
+Works on desktop mouse wheel + mobile touch
+
+Why this matters
+
+This issue makes the site feel:
+
+broken
+
+heavy
+
+unpolished
+
+Even if everything else is perfect, nested scroll kills UX immediately.

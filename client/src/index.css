@@ -72,36 +72,51 @@
 }
 
 @layer base {
-  html, body {
-    @apply overflow-x-hidden w-full;
+  html {
     height: auto;
     min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
     scroll-behavior: auto;
+    width: 100%;
   }
-  html {
-    overflow-y: auto;
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    height: auto;
+    min-height: 100%;
+    margin: 0;
+    overflow: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
   * {
     @apply border-border;
     -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
   }
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
-    margin: 0;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch;
-    overflow: visible;
-  }
   #root {
     min-height: 100%;
-    overflow: visible;
+    height: auto;
+    overflow: visible !important;
   }
   main {
     min-height: 100%;
-    overflow: visible;
+    height: auto;
+    overflow: visible !important;
   }
   .pointer-events-none {
     pointer-events: none !important;
+  }
+  
+  /* Prevent cards and containers from trapping scroll */
+  [class*="Card"],
+  [class*="card"],
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-xl {
+    overflow: visible;
   }
 }
