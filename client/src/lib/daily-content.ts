@@ -20,7 +20,8 @@ export interface DailyContent {
     title: string;
     prophet: string;
     story: string;
-    quranReference?: string; // Verse mentioning the story
+    quranReference?: string; // Verse text
+    quranCitation?: string; // Surah name and verse number for the reference
     source: string;
     sourceUrl: string;
   };
@@ -70,6 +71,7 @@ export const DAILY_CONTENT: DailyContent[] = [
 
 تعلمنا القصة أن تدبير الله دقيق ولطيف، وأنه "غالب على أمره ولكن أكثر الناس لا يعلمون". تعلمنا أن المحنة قد تكون باطنها منحة، وأن الصبر والتقوى هما مفتاح التمكين والنصر.`,
       quranReference: "وَرَفَعَ أَبَوَيْهِ عَلَى الْعَرْشِ وَخَرُّوا لَهُ سُجَّدًا ۖ وَقَالَ يَا أَبَتِ هَٰذَا تَأْوِيلُ رُؤْيَايَ مِن قَبْلُ قَدْ جَعَلَهَا رَبِّي حَقًّا",
+      quranCitation: "سورة يوسف: 100",
       source: "الرئاسة العامة للبحوث العلمية والإفتاء",
       sourceUrl: "https://www.alifta.gov.sa/Ar/IftaContents/IbnBaz/Pages/FatawaDetails.aspx?ID=353"
     }
@@ -117,6 +119,7 @@ export const DAILY_CONTENT: DailyContent[] = [
 
 تعلمنا القصة أن علم البشر مهما اتسع فهو قطرة في بحر علم الله، وأن أقدار الله التي قد نراها مؤلمة أو غير مفهومة، تحمل في طياتها حكماً بالغة ولطفاً خفياً، وأن التسليم لأمر الله وحكمته هو جوهر العبودية.`,
       quranReference: "قَالَ لَهُ مُوسَىٰ هَلْ أَتَّبِعُكَ عَلَىٰ أَن تُعَلِّمَنِ مِمَّا عُلِّمْتَ رُشْدًا",
+      quranCitation: "سورة الكهف: 66",
       source: "الرئاسة العامة للبحوث العلمية والإفتاء",
       sourceUrl: "https://www.alifta.gov.sa"
     }

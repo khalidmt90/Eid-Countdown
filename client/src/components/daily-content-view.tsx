@@ -189,6 +189,13 @@ export function DailyContentView() {
               <p className="text-foreground font-serif text-xl md:text-2xl leading-relaxed">
                 "{content.prophetStory.quranReference}"
               </p>
+              {content.prophetStory.quranCitation && (
+                <div className="text-accent/80 text-sm font-bold mt-2 text-left w-full flex items-center justify-end gap-1 opacity-80">
+                  <span className="bg-accent/10 px-2 py-0.5 rounded-md">
+                    {content.prophetStory.quranCitation}
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
