@@ -74,15 +74,23 @@
 @layer base {
   html, body {
     @apply overflow-x-hidden w-full;
+    height: 100%;
     scroll-behavior: auto;
   }
   * {
     @apply border-border;
     -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
     margin: 0;
-    overscroll-behavior: none;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .pointer-events-none {
+    pointer-events: none !important;
   }
 }
