@@ -228,7 +228,7 @@ export function PrayerTimesSection() {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-card p-4 rounded-2xl shadow-lg border border-border">
         <div className="flex items-center gap-3">
           <MapPin className="text-primary w-6 h-6" />
-          <Select onValueChange={handleCityChange} defaultValue={selectedCity.nameEn}>
+          <Select onValueChange={handleCityChange} value={selectedCity.nameEn}>
             <SelectTrigger className="w-[180px] bg-background border-border text-foreground font-bold z-50 relative">
               <SelectValue placeholder="اختر المدينة" />
             </SelectTrigger>
