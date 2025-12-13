@@ -197,8 +197,7 @@ export function QiblahFinder() {
   const isNear = degreesRemaining > ALIGNED_TOLERANCE && degreesRemaining <= NEAR_THRESHOLD;
 
   const getColorClass = () => {
-    if (isStableAligned) return 'green';
-    if (isWithinAlignedRange) return 'yellow';
+    if (isWithinAlignedRange) return 'green';
     if (isNear) return 'yellow';
     return 'red';
   };
