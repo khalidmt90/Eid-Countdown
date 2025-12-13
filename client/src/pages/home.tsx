@@ -336,24 +336,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
               </div>
             </div>
 
-            {/* Ayah of the Day - Compact */}
-            <div className="w-full max-w-4xl mx-auto">
-               <Card className="bg-card border border-accent/20 shadow-sm">
-                <div className="bg-accent/5 px-4 py-2 flex items-center gap-2 border-b border-accent/10">
-                   <BookOpen className="w-4 h-4 text-accent" />
-                   <span className="text-xs font-bold text-accent uppercase tracking-wider">{t('ayah_of_day')}</span>
-                </div>
-                <CardContent className="p-8 md:p-10 text-center space-y-6">
-                  <p className="text-3xl md:text-5xl leading-[1.8] md:leading-[1.6] font-serif text-foreground font-black drop-shadow-sm">
-                    {dailyAyah.text}
-                  </p>
-                  <div className="pt-2">
-                    <span className="inline-block text-sm font-bold text-accent bg-accent/10 px-4 py-1.5 rounded-full border border-accent/20">{dailyAyah.source}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Secondary: Eid Countdown */}
              <div className="w-full h-px bg-border/50 max-w-4xl mx-auto" />
              
