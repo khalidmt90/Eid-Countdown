@@ -1,9 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Compass, Navigation } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+
+function normalizeDegrees(deg: number): number {
+  return ((deg % 360) + 360) % 360;
+}
+
+function getAngleDifference(angle1: number, angle2: number): number {
+  const diff = normalizeDegrees(angle1 - angle2);
+  return diff > 180 ? 360 - diff : diff;
+}
 
 export function QiblahFinder() {
   const { t } = useTranslation();
@@ -11,8 +20,8 @@ export function QiblahFinder() {
   const [qiblahBearing, setQiblahBearing] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [isListening, setIsListening] = useState(false);
 
-  // Mecca Coordinates
   const MECCA_LAT = 21.4225;
   const MECCA_LNG = 39.8262;
 
@@ -27,13 +36,45 @@ export function QiblahFinder() {
       Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda)
     );
     
-    return Math.round(psi < 0 ? psi + 360 : psi);
+    return Math.round(normalizeDegrees(psi));
   };
 
-  const startCompass = () => {
+  const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
+    let compass: number | null = null;
+    
+    // @ts-ignore - webkitCompassHeading is non-standard but common on iOS
+    if (typeof event.webkitCompassHeading === "number") {
+      // @ts-ignore
+      compass = event.webkitCompassHeading;
+    } else if (typeof event.alpha === "number") {
+      compass = normalizeDegrees(360 - event.alpha);
+    }
+    
+    if (compass !== null) {
+      setHeading(compass);
+    }
+  }, []);
+
+  const startCompass = async () => {
     if (!navigator.geolocation) {
       setError(t('compass_error'));
       return;
+    }
+
+    // iOS 13+ requires permission request from user gesture
+    // @ts-ignore - requestPermission is iOS-specific
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        // @ts-ignore
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission !== 'granted') {
+          setError(t('device_error'));
+          return;
+        }
+      } catch (err) {
+        setError(t('device_error'));
+        return;
+      }
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -43,11 +84,10 @@ export function QiblahFinder() {
         const bearing = calculateQiblah(latitude, longitude);
         setQiblahBearing(bearing);
 
-        // Request device orientation if available (mobile)
         if (window.DeviceOrientationEvent) {
-          window.addEventListener("deviceorientationabsolute", handleOrientation as any, true);
-          // Fallback for some browsers
-          window.addEventListener("deviceorientation", handleOrientation, true);
+          window.addEventListener("deviceorientationabsolute", handleOrientation as EventListener, { capture: true, passive: true });
+          window.addEventListener("deviceorientation", handleOrientation as EventListener, { capture: true, passive: true });
+          setIsListening(true);
         } else {
           setError(t('device_error'));
         }
@@ -55,42 +95,28 @@ export function QiblahFinder() {
       (err) => {
         setError(t('gps_error'));
         console.error(err);
-      }
+      },
+      { enableHighAccuracy: true }
     );
   };
 
-  const handleOrientation = (event: DeviceOrientationEvent) => {
-    let compass = 0;
-    // @ts-ignore - webkitCompassHeading is non-standard but common on iOS
-    if (event.webkitCompassHeading) {
-      // @ts-ignore
-      compass = event.webkitCompassHeading;
-    } else if (event.alpha) {
-      compass = 360 - event.alpha;
-    }
-    setHeading(compass);
-  };
-
-  // Clean up
   useEffect(() => {
     return () => {
-      window.removeEventListener("deviceorientationabsolute", handleOrientation as any);
-      window.removeEventListener("deviceorientation", handleOrientation);
+      if (isListening) {
+        window.removeEventListener("deviceorientationabsolute", handleOrientation as EventListener, { capture: true });
+        window.removeEventListener("deviceorientation", handleOrientation as EventListener, { capture: true });
+      }
     };
-  }, []);
+  }, [isListening, handleOrientation]);
 
-  // Calculate rotation for the Qiblah arrow
-  // If we have heading (compass), arrow points to Qiblah relative to North
-  // Rotation = Qiblah Bearing - Current Heading
-  const arrowRotation = (qiblahBearing || 0) - (heading || 0);
+  const arrowRotation = qiblahBearing !== null && heading !== null 
+    ? normalizeDegrees(qiblahBearing - heading)
+    : 0;
 
-  // Check if phone is pointing toward Qiblah (within tolerance)
-  const TOLERANCE = 15; // degrees
+  const TOLERANCE = 15;
   const isAligned = heading !== null && qiblahBearing !== null && 
-    Math.abs(arrowRotation) <= TOLERANCE || 
-    Math.abs(arrowRotation) >= (360 - TOLERANCE);
+    getAngleDifference(heading, qiblahBearing) <= TOLERANCE;
 
-  // Haptic feedback when aligned
   useEffect(() => {
     if (isAligned && navigator.vibrate) {
       navigator.vibrate(200);
@@ -114,18 +140,15 @@ export function QiblahFinder() {
 
         <CardContent className="flex flex-col items-center pt-8 pb-12 space-y-8 relative">
           
-          {/* Compass Visualization */}
           <div className="relative w-64 h-64 flex items-center justify-center">
-            {/* Outer Ring - Glows when aligned */}
             <div 
-              className={`absolute inset-0 rounded-full border-4 shadow-inner transition-all duration-500 ${
+              className={`absolute inset-0 rounded-full border-4 shadow-inner transition-colors duration-300 ${
                 isAligned 
-                  ? 'border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] bg-green-500/10' 
+                  ? 'border-green-500 bg-green-500/10' 
                   : 'border-muted/30 bg-background/50'
               }`} 
             />
             
-            {/* Degree Marks */}
             {[0, 90, 180, 270].map((deg) => (
               <div 
                 key={deg} 
@@ -138,7 +161,6 @@ export function QiblahFinder() {
               </div>
             ))}
 
-            {/* Qiblah Arrow (Kaaba Direction) */}
             {qiblahBearing !== null && (
               <motion.div 
                 className="absolute w-full h-full flex items-center justify-center z-20"
@@ -146,41 +168,39 @@ export function QiblahFinder() {
                 transition={{ type: "spring", damping: 20 }}
               >
                 <div 
-                  className={`w-2 h-32 rounded-full absolute -top-4 origin-bottom transition-all duration-500 ${
+                  className={`w-2 h-32 rounded-full absolute -top-4 origin-bottom transition-colors duration-300 ${
                     isAligned 
-                      ? 'bg-gradient-to-t from-transparent to-green-500 shadow-[0_0_25px_rgba(34,197,94,0.8)]' 
-                      : 'bg-gradient-to-t from-transparent to-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]'
+                      ? 'bg-gradient-to-t from-transparent to-green-500' 
+                      : 'bg-gradient-to-t from-transparent to-primary'
                   }`} 
                 />
                 <div 
-                  className={`w-4 h-4 rounded-full absolute top-0 shadow-lg transition-all duration-500 ${
-                    isAligned ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.8)]' : 'bg-primary'
+                  className={`w-4 h-4 rounded-full absolute top-0 shadow-lg transition-colors duration-300 ${
+                    isAligned ? 'bg-green-500' : 'bg-primary'
                   }`} 
                 />
                 
-                {/* Kaaba Icon at tip */}
                 <div 
-                  className={`absolute top-[-30px] text-white p-1 rounded-sm shadow-md border transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center transition-all duration-500 ${
+                  className={`absolute top-[-30px] text-white p-1 rounded-sm shadow-md border transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center transition-colors duration-300 ${
                     isAligned 
-                      ? 'bg-green-600 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.8)]' 
+                      ? 'bg-green-600 border-green-400' 
                       : 'bg-black border-[#D4AF37]'
                   }`}
                 >
-                  <div className={`w-full h-1 absolute top-2 transition-colors duration-500 ${
+                  <div className={`w-full h-1 absolute top-2 transition-colors duration-300 ${
                     isAligned ? 'bg-green-200' : 'bg-[#D4AF37]'
                   }`} />
                 </div>
               </motion.div>
             )}
 
-            {/* Center Point */}
             <div className="w-4 h-4 bg-foreground rounded-full z-30 ring-4 ring-background" />
           </div>
 
           <div className="text-center space-y-2">
             {qiblahBearing !== null ? (
               <>
-                <div className={`text-4xl font-mono font-black transition-colors duration-500 ${
+                <div className={`text-4xl font-mono font-black transition-colors duration-300 ${
                   isAligned ? 'text-green-500' : 'text-foreground'
                 }`}>
                   {Math.round(qiblahBearing)}°
@@ -201,7 +221,7 @@ export function QiblahFinder() {
               <Button 
                 onClick={startCompass} 
                 size="lg" 
-                className="rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-primary/20 transition-all gap-2"
+                className="rounded-full px-8 py-6 text-lg shadow-md gap-2"
               >
                 <Navigation className="w-5 h-5" />
                 {t('locate_direction')}
