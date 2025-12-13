@@ -52,11 +52,19 @@ export default function Home() {
 
   const formatTime = (time: string) => {
     if (!time) return "--:--";
-    if (timeFormat === '24') return time;
     
-    const [hoursStr, minutesStr] = time.split(':');
+    // Remove any timezone info or seconds
+    const timeOnly = time.replace(/\s*\(.*\)$/, '').split(' ')[0];
+    const [hoursStr, minutesStr] = timeOnly.split(':');
+    
+    if (!hoursStr || !minutesStr) return time;
+
+    if (timeFormat === '24') {
+      return `${hoursStr.padStart(2, '0')}:${minutesStr.padStart(2, '0')}`;
+    }
+    
     const hours = parseInt(hoursStr, 10);
-    const suffix = hours >= 12 ? 'PM' : 'AM';
+    const suffix = hours >= 12 ? 'pm' : 'am';
     const h = hours % 12 || 12;
     return `${h}:${minutesStr} ${suffix}`;
   };
