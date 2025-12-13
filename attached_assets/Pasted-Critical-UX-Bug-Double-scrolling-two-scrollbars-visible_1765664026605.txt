@@ -1,0 +1,124 @@
+Critical UX Bug — Double scrolling / two scrollbars visible
+
+On desktop (and some mobile views), the website shows two vertical scrollbars (one at the far right and another inner scroll). This makes it feel like there are two pages or two scrolling areas, which is very confusing and breaks UX.
+
+You should have ONE scroll only (the browser window).
+
+What’s causing this (very likely)
+
+One of these is happening:
+
+An inner container (layout / page wrapper / main) has:
+
+height: 100vh and
+
+overflow-y: auto or overflow: scroll
+
+Both body and an inner wrapper are scrollable.
+
+A layout component (AppLayout / Page / Main) is creating its own scroll context.
+
+This is why the far-right scrollbar appears.
+
+Required Fix (must do)
+1) Enforce single scroll source
+
+Only ONE element should scroll: body
+
+✅ Do this globally:
+
+html,
+body {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+
+🚫 Do NOT allow scrolling on:
+
+#root
+
+main
+
+page wrappers
+
+cards
+
+layout containers
+
+2) Remove inner scroll containers
+
+Search the project for:
+
+overflow-y: auto
+
+overflow: auto
+
+overflow: scroll
+
+h-screen
+
+height: 100vh
+
+If used on a page-level container, remove them.
+
+✅ Page wrapper should be:
+
+main {
+  min-height: 100%;
+  overflow: visible;
+}
+
+
+🚫 Avoid:
+
+height: 100vh;
+overflow-y: auto;
+
+
+This is the #1 cause of “two scrollbars”.
+
+3) Fix layout height logic (important)
+
+If you need full-height layouts, use min-height, not height:
+
+✅ Correct:
+
+min-height: 100vh;
+
+
+🚫 Wrong (causes double scroll):
+
+height: 100vh;
+
+4) Check sticky / fixed elements
+
+If you have:
+
+sticky headers
+
+fixed nav bars
+
+tab bars
+
+Make sure they do NOT sit inside a scrollable container.
+They must be inside the normal document flow.
+
+Acceptance criteria
+
+Only one scrollbar visible (browser scrollbar).
+
+No inner scrolling anywhere.
+
+Scrolling feels continuous and natural.
+
+No “second page” feeling on the right.
+
+UX principle (important)
+
+Users should never choose where to scroll.
+The page should scroll the same way everywhere.
+
+This fix is high priority because double scrolling kills perceived quality immediately.
