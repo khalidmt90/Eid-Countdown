@@ -109,8 +109,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "وَاللَّهِ لاَ يُؤْمِنُ... الَّذِي لاَ يَأْمَنُ جَارُهُ بَوَائِقَهُ",
           narrator: "أبو هريرة",
-          title: "حق الجار",
-          story: `أقسم النبي ﷺ ثلاثاً بنفي الإيمان عمن لا يأمن جاره شروره. هذا الحديث يؤسس لقاعدة الأمان الاجتماعي، فالجار المطلع على أسرار جاره يجب أن يكون مصدر أمان لا مصدر قلق وخوف.`,
+          title: "المرأة التي تؤذي جيرانها",
+          story: `ذكر للنبي ﷺ امرأة تكثر من صلاتها وصيامها وصدقتها، غير أنها تؤذي جيرانها بلسانها. فقال ﷺ: "هي في النار".
+          
+وذكر له امرأة أخرى لا تزيد على المكتوبة وتتصدق بالأثوار (الشيء القليل) ولا تؤذي جيرانها. فقال: "هي في الجنة".
+
+هذه القصة توضح أن العبادة ليست مجرد طقوس، بل هي معاملة وأخلاق. إيذاء الجار قد يحبط العمل الصالح ويذهب ثواب العبادة.`,
           source: "ابن باز",
           sourceUrl: "https://binbaz.org.sa"
         },
@@ -137,8 +141,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "He whose neighbor is not safe from his harm does not believe.",
           narrator: "Abu Hurairah",
-          title: "Rights of Neighbors",
-          story: `The Prophet ﷺ swore three times that a person is not a true believer if their neighbor fears their harm. Safety and trust are the foundations of a good neighborhood in Islam.`,
+          title: "The Woman Who Harmed Her Neighbor",
+          story: `The Prophet ﷺ was told about a woman who prayed and fasted a lot but harmed her neighbors with her speech. He said: "She is in the Fire."
+          
+Then he was told about another woman who only performed the obligatory prayers and gave little in charity, but did not harm her neighbors. He said: "She is in Paradise."
+
+This story teaches that worship is not just rituals; it is also about character. Harming neighbors can nullify good deeds.`,
           source: "BinBaz.org.sa",
           sourceUrl: "https://binbaz.org.sa"
         },
@@ -171,8 +179,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "الدِّينُ النَّصِيحَةُ",
           narrator: "تميم الداري",
-          title: "الدين النصيحة",
-          story: `لخص النبي ﷺ الدين كله في كلمة واحدة: النصيحة. وهي تعني إرادة الخير للمنصوح. لله بالإيمان به، ولكتابه بالعمل به، ولرسوله باتباعه، ولأئمة المسلمين بمعاونتهم على الحق، ولعامتهم بتعليمهم وكف الأذى عنهم.`,
+          title: "نصيحة جرير في البيع",
+          story: `أرسل جرير بن عبد الله خادمه ليشتري له فرساً، فاشترى له فرساً بثلاثمئة درهم. رأى جرير أن الفرس يساوي أكثر، فذهب للبائع وقال: "فرسك خير من ثلاثمئة، أتبيعه بأربعمئة؟" فوافق.
+          
+ولم يزل جرير يزيده في السعر حتى اشتراه بثمانمئة درهم، وهو أضعف السعر الذي طلبه البائع.
+
+ولما سئل عن ذلك قال: "بايعت رسول الله ﷺ على النصح لكل مسلم". هذا هو التطبيق العملي للنصيحة، أن تحب لأخيك ما تحب لنفسك ولا تغشه.`,
           source: "مسلم",
           sourceUrl: "https://sunnah.com"
         },
@@ -199,8 +211,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "Religion is sincerity (Nasihah).",
           narrator: "Tamim Ad-Dari",
-          title: "Sincerity",
-          story: `The Prophet ﷺ summarized the entire religion as Nasihah (sincerity/good will). To Allah, His Book, His Messenger, the leaders of Muslims, and their common folk. It means wishing good for all and acting upon it.`,
+          title: "Jarir's Honest Bargain",
+          story: `Jarir ibn Abdullah sent his servant to buy a horse. The servant found one for 300 dirhams. Jarir realized the horse was worth much more. He went to the seller and asked, "Would you sell it for 400?" The seller agreed.
+          
+Jarir kept raising the price until he paid 800 dirhams.
+
+When asked why he did this, he replied: "I pledged allegiance to the Prophet ﷺ to give sincere advice to every Muslim." This is true sincerity: wanting for your brother what you want for yourself.`,
           source: "Muslim",
           sourceUrl: "https://sunnah.com"
         },
@@ -233,8 +249,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "لا تغضب",
           narrator: "أبو هريرة",
-          title: "وصية نبوية",
-          story: `جاء رجل يطلب الوصية من النبي ﷺ، فقال له: "لا تغضب"، وكررها مراراً. الغضب مفتاح كل شر، وضبط النفس عند الغضب دليل القوة الحقيقية.`,
+          title: "الرجل الذي طلب الوصية",
+          story: `جاء رجل إلى النبي ﷺ وقال: "أوصني". قال: "لا تغضب". فردد الرجل طلبه مراراً، وفي كل مرة يقول له النبي ﷺ: "لا تغضب".
+
+يقول الرجل متأملاً: "ففكرت حين قال النبي ﷺ ما قال، فإذا الغضب يجمع الشر كله".
+
+وفي موقف آخر، سُبَّ رجل عند النبي ﷺ حتى احمر وجهه وانتفخت أوداجه، فقال النبي ﷺ: "إني لأعلم كلمة لو قالها لذهب عنه ما يجد: أعوذ بالله من الشيطان الرجيم".`,
           source: "البخاري",
           sourceUrl: "https://sunnah.com"
         },
@@ -261,8 +281,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "Do not get angry.",
           narrator: "Abu Hurairah",
-          title: "Prophetic Advice",
-          story: `A man asked the Prophet ﷺ for advice. He said, "Do not get angry," repeating it several times. Anger is the key to evil, and controlling it is true strength.`,
+          title: "The Man Who Asked for Advice",
+          story: `A man came to the Prophet ﷺ and said, "Advise me." The Prophet said, "Do not get angry." The man repeated his request several times, and every time the Prophet said, "Do not get angry."
+
+The man later reflected: "I thought about what the Prophet said, and I realized that anger combines all evil."
+
+In another incident, two men argued in front of the Prophet until one's face became red. The Prophet said: "I know a phrase that if he were to say it, his anger would go away: I seek refuge in Allah from Satan."`,
           source: "Bukhari",
           sourceUrl: "https://sunnah.com"
         },
@@ -295,8 +319,12 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "المسلم من سلم المسلمون من لسانه ويده",
           narrator: "عبد الله بن عمرو",
-          title: "المسلم الحقيقي",
-          story: `الإسلام ليس مجرد شعائر، بل هو أيضاً سلوك وأخلاق. المسلم الكامل هو الذي يأمن الناس شر لسانه (من غيبة وشتم) وشر يده (من بطش وسرقة).`,
+          title: "المفلس الحقيقي",
+          story: `سأل النبي ﷺ أصحابه يوماً: "أتدرون من المفلس؟" قالوا: "المفلس فينا من لا درهم له ولا متاع".
+
+فقال: "إن المفلس من أمتي يأتي يوم القيامة بصلاة وصيام وزكاة، ويأتي قد شتم هذا، وقذف هذا، وأكل مال هذا، وسفك دم هذا، وضرب هذا. فيعطى هذا من حسناته، وهذا من حسناته، فإن فنيت حسناته قبل أن يقضى ما عليه أخذ من خطاياهم فطرحت عليه ثم طرح في النار".
+
+هذا الحديث يرسم قصة مرعبة لمن يظن أن الإسلام مجرد شعائر دون أخلاق.`,
           source: "متفق عليه",
           sourceUrl: "https://sunnah.com"
         },
@@ -323,8 +351,14 @@ Through all this, Joseph remained patient and trusted Allah. Eventually, he beca
         hadith: {
           text: "The Muslim is the one from whose tongue and hand the Muslims are safe.",
           narrator: "Abdullah ibn Amr",
-          title: "True Muslim",
-          story: `Islam is behavior. The true Muslim is one from whom others are safe - safe from his verbal harm (backbiting, insults) and physical harm.`,
+          title: "The Truly Bankrupt",
+          story: `The Prophet ﷺ asked his companions: "Do you know who is the bankrupt?" They said: "The one who has no money or property."
+
+He said: "The bankrupt of my Ummah is the one who comes on Judgment Day with prayers, fasting, and charity, but he had insulted this one, slandered that one, ate the wealth of this one, shed the blood of that one, and beat this one.
+
+So his good deeds will be given to them. If his good deeds run out, their sins will be cast upon him, and he will be thrown into the Fire."
+
+This story serves as a stern warning that bad character towards people destroys one's religious investments.`,
           source: "Muttafaq Alaihi",
           sourceUrl: "https://sunnah.com"
         },
