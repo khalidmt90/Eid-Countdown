@@ -6,6 +6,8 @@ import confetti from "canvas-confetti";
 import { Moon, Calendar, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+// Import the image directly to ensure Vite processes it correctly
+import eidLogo from "@assets/Gemini_Generated_Image_y967fby967fby967_1765655598070.png";
 
 export default function Home() {
   const [nextEid, setNextEid] = useState<EidDate | null>(null);
@@ -42,47 +44,46 @@ export default function Home() {
   if (!nextEid) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <p className="text-xl">جاري تحميل مواعيد العيد...</p>
+        <p className="text-xl font-bold animate-pulse">جاري تحميل مواعيد العيد...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+    <div className="min-h-screen bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col font-sans" dir="rtl">
+      {/* Decorative Elements - made darker for visibility */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-      <main className="flex-1 flex flex-col items-center justify-center p-4 py-12 md:py-24 relative z-10">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 py-12 md:py-24 relative z-10 w-full max-w-7xl mx-auto">
         
         {/* Header / Logo Section */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12 space-y-6"
+          className="text-center mb-12 space-y-6 flex flex-col items-center"
         >
-          <div className="mx-auto w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 p-1 shadow-2xl shadow-primary/20 flex items-center justify-center relative overflow-hidden group hover:scale-105 transition-transform duration-500">
+          <div className="mx-auto w-32 h-32 md:w-48 md:h-48 rounded-full bg-card p-2 shadow-2xl shadow-primary/20 flex items-center justify-center relative overflow-hidden group hover:scale-105 transition-transform duration-500 border-4 border-primary/20">
              <img 
-               src="/attached_assets/Gemini_Generated_Image_y967fby967fby967_1765655598070.png" 
+               src={eidLogo} 
                alt="شعار العيد" 
-               className="w-full h-full object-cover"
+               className="w-full h-full object-contain"
              />
-             <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500" />
           </div>
           
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-bold font-serif text-primary drop-shadow-sm">
+          <div className="space-y-3">
+            <h1 className="text-5xl md:text-7xl font-bold font-serif text-primary drop-shadow-sm tracking-wide">
               {nextEid.nameAr}
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground font-light">
+            <p className="text-2xl md:text-3xl text-foreground/80 font-light">
               {formatArabicDate(nextEid.date)}
             </p>
           </div>
         </motion.div>
 
         {/* Primary Countdown */}
-        <div className="w-full max-w-5xl mb-16">
+        <div className="w-full max-w-5xl mb-16 px-4">
           <CountdownTimer 
             targetDate={nextEid.date} 
             onComplete={handleCelebration}
@@ -95,27 +96,29 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="w-full max-w-md mx-auto"
+            className="w-full max-w-md mx-auto px-4"
           >
-            <div className="bg-card/50 backdrop-blur-sm border border-border p-6 rounded-2xl shadow-sm hover:shadow-md transition-all">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-card/80 backdrop-blur-md border border-primary/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+              <div className="flex items-center justify-between mb-4 pb-4 border-b border-border/50">
                 <div className="flex items-center gap-3 text-primary">
-                  <Calendar className="w-5 h-5" />
+                  <Calendar className="w-6 h-6" />
                   <span className="font-bold text-lg">العيد القادم</span>
                 </div>
-                <span className="text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                <span className="text-xs font-bold text-primary-foreground bg-primary/90 px-3 py-1.5 rounded-full shadow-sm">
                   بعد {nextEid.nameAr}
                 </span>
               </div>
               
               <div className="flex justify-between items-end">
                 <div>
-                  <h3 className="text-xl font-bold">{followingEid.nameAr}</h3>
-                  <p className="text-muted-foreground text-sm mt-1">
+                  <h3 className="text-2xl font-bold text-foreground">{followingEid.nameAr}</h3>
+                  <p className="text-muted-foreground font-medium mt-1 text-base">
                     {formatArabicDate(followingEid.date)}
                   </p>
                 </div>
-                <Moon className="w-8 h-8 text-primary/20" />
+                <div className="bg-secondary p-3 rounded-full text-secondary-foreground">
+                  <Moon className="w-6 h-6" />
+                </div>
               </div>
             </div>
           </motion.div>
@@ -124,25 +127,27 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 text-center text-muted-foreground text-sm relative z-10 border-t border-border/40 bg-background/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© 2025 عد تنازلي للعيد. جميع الحقوق محفوظة.</p>
+      <footer className="py-8 text-center text-muted-foreground text-sm relative z-10 border-t border-border bg-card/30 backdrop-blur-md">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="font-medium">© 2025 عد تنازلي للعيد. تم التطوير بحب.</p>
           
           <div className="flex items-center gap-4">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 hover:text-primary">
+                <Button variant="outline" size="sm" className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors border-primary/20">
                   <Info className="w-4 h-4" />
                   عن الموقع
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md text-right" dir="rtl">
-                <DialogHeader className="text-right space-y-3">
-                  <DialogTitle className="text-2xl font-serif text-primary">عن عداد العيد</DialogTitle>
-                  <DialogDescription className="text-base leading-relaxed">
-                    تم تصميم هذا الموقع لمتابعة الوقت المتبقي لأعياد المسلمين (عيد الفطر وعيد الأضحى).
+              <DialogContent className="sm:max-w-md text-right bg-card border-primary/10" dir="rtl">
+                <DialogHeader className="text-right space-y-4">
+                  <DialogTitle className="text-2xl font-serif text-primary border-b border-border pb-2">عن عداد العيد</DialogTitle>
+                  <DialogDescription className="text-base leading-relaxed text-foreground/80">
+                    تم تصميم هذا الموقع لمتابعة الوقت المتبقي لأعياد المسلمين (عيد الفطر وعيد الأضحى) بدقة وجمال.
                     <br/><br/>
-                    <strong>ملاحظة هامة:</strong> التواريخ المعروضة هي تقديرات فلكية. الموعد الفعلي يعتمد على رؤية الهلال في بلدك.
+                    <div className="bg-secondary/20 p-3 rounded-lg border border-secondary/20 text-secondary-foreground text-sm">
+                      <strong>ملاحظة هامة:</strong> التواريخ المعروضة هي تقديرات فلكية. الموعد الفعلي يعتمد على رؤية الهلال في بلدك.
+                    </div>
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>

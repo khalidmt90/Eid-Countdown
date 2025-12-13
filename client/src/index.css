@@ -33,57 +33,66 @@
 }
 
 :root {
-  /* Elegant Gold & Deep Blue/Green Theme - Light Mode */
-  --background: 40 20% 97%; /* Soft Cream */
-  --foreground: 220 40% 20%; /* Deep Blue-Grey */
+  /* High Contrast Elegant Theme - Light Mode */
   
+  /* Rich Cream Background - Darker than before to let white cards pop */
+  --background: 40 20% 95%; 
+  
+  /* Very Dark Blue-Grey for primary text - High Contrast */
+  --foreground: 222 47% 11%; 
+  
+  /* White cards */
   --card: 0 0% 100%;
-  --card-foreground: 220 40% 20%;
+  --card-foreground: 222 47% 11%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 220 40% 20%;
+  --popover-foreground: 222 47% 11%;
   
-  --primary: 43 74% 49%; /* Islamic Gold */
+  /* Darker Goldenrod/Bronze for better visibility on white */
+  --primary: 35 90% 35%; 
   --primary-foreground: 0 0% 100%;
   
-  --secondary: 165 40% 94%; /* Soft Greenish Tint */
-  --secondary-foreground: 165 60% 25%; /* Deep Emerald */
+  /* Soft Emerald Green for secondary accents */
+  --secondary: 160 30% 90%; 
+  --secondary-foreground: 165 80% 20%; 
   
+  /* Darker muted text for readability */
   --muted: 40 20% 90%;
-  --muted-foreground: 40 10% 40%;
+  --muted-foreground: 220 15% 40%;
   
-  --accent: 43 74% 90%; /* Light Gold */
-  --accent-foreground: 43 80% 30%;
+  --accent: 43 74% 90%;
+  --accent-foreground: 35 90% 30%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 40 20% 85%;
-  --input: 40 20% 85%;
-  --ring: 43 74% 49%;
+  --border: 220 15% 85%;
+  --input: 220 15% 85%;
+  --ring: 35 90% 35%;
   
   --radius: 0.75rem;
 }
 
 .dark {
-  /* Midnight & Gold Theme - Dark Mode */
-  --background: 222 47% 11%; /* Deep Midnight Blue */
-  --foreground: 40 20% 95%; /* Soft Cream Text */
+  /* Midnight & Bright Gold Theme - Dark Mode */
+  --background: 222 47% 8%; /* Darker Midnight */
+  --foreground: 40 20% 98%; 
   
-  --card: 222 47% 14%;
-  --card-foreground: 40 20% 95%;
+  --card: 222 47% 12%;
+  --card-foreground: 40 20% 98%;
   
-  --popover: 222 47% 14%;
-  --popover-foreground: 40 20% 95%;
+  --popover: 222 47% 12%;
+  --popover-foreground: 40 20% 98%;
   
-  --primary: 43 74% 49%; /* Islamic Gold */
-  --primary-foreground: 0 0% 100%;
+  /* Bright Gold for dark backgrounds */
+  --primary: 45 90% 55%; 
+  --primary-foreground: 222 47% 10%;
   
-  --secondary: 222 40% 20%;
-  --secondary-foreground: 40 20% 95%;
+  --secondary: 222 40% 18%;
+  --secondary-foreground: 40 20% 98%;
   
-  --muted: 222 40% 20%;
-  --muted-foreground: 215 20% 65%;
+  --muted: 222 40% 18%;
+  --muted-foreground: 215 20% 70%;
   
   --accent: 43 74% 20%;
   --accent-foreground: 43 74% 80%;
@@ -91,9 +100,9 @@
   --destructive: 0 62% 30%;
   --destructive-foreground: 0 0% 98%;
   
-  --border: 222 40% 25%;
-  --input: 222 40% 25%;
-  --ring: 43 74% 49%;
+  --border: 222 40% 20%;
+  --input: 222 40% 20%;
+  --ring: 45 90% 55%;
 }
 
 @layer base {
@@ -107,7 +116,7 @@
   /* Geometric Pattern Background */
   .bg-pattern {
     background-image: radial-gradient(var(--color-primary) 1px, transparent 1px);
-    background-size: 30px 30px;
-    opacity: 0.05;
+    background-size: 32px 32px;
+    opacity: 0.15; /* Increased opacity for visibility */
   }
 }
