@@ -99,7 +99,7 @@ export default function Home() {
               >
                 <Clock className="w-4 h-4 md:w-5 md:h-5 mx-1" />
                 <span className="hidden md:inline">{t('prayer_times')}</span>
-                <span className="md:hidden">الصلاة</span>
+                <span className="md:hidden">{t('prayer_times')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
@@ -107,7 +107,7 @@ export default function Home() {
               >
                 <Compass className="w-4 h-4 md:w-5 md:h-5 mx-1" />
                 <span className="hidden md:inline">{t('qiblah')}</span>
-                <span className="md:hidden">القبلة</span>
+                <span className="md:hidden">{t('qiblah')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
@@ -115,7 +115,7 @@ export default function Home() {
               >
                 <BookOpen className="w-4 h-4 md:w-5 md:h-5 mx-1" />
                 <span className="hidden md:inline">{t('daily_content')}</span>
-                <span className="md:hidden">يوميات</span>
+                <span className="md:hidden">{t('daily_content')}</span>
               </TabsTrigger>
             </TabsList>
           </div>
