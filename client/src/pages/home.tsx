@@ -44,6 +44,23 @@ export default function Home() {
   // Location Sheet State
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
 
+  const [timeFormat, setTimeFormat] = useState<'12' | '24'>('12');
+
+  const toggleTimeFormat = () => {
+    setTimeFormat(prev => prev === '12' ? '24' : '12');
+  };
+
+  const formatTime = (time: string) => {
+    if (!time) return "--:--";
+    if (timeFormat === '24') return time;
+    
+    const [hoursStr, minutesStr] = time.split(':');
+    const hours = parseInt(hoursStr, 10);
+    const suffix = hours >= 12 ? 'PM' : 'AM';
+    const h = hours % 12 || 12;
+    return `${h}:${minutesStr} ${suffix}`;
+  };
+
   // Set page direction based on language
   useEffect(() => {
     document.documentElement.dir = i18n.dir();
@@ -187,31 +204,42 @@ ${t('isha')}: ${prayerData.timings.Isha}
           <TabsContent value="home" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             
             {/* Slim Header: Location & Date */}
-            <div 
-              onClick={() => setIsLocationSheetOpen(true)}
-              className="w-full max-w-4xl mx-auto bg-card hover:bg-card/80 transition-colors cursor-pointer border border-border rounded-xl p-3 flex items-center justify-between shadow-sm group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 p-2 rounded-full text-primary group-hover:scale-110 transition-transform">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col items-start">
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-lg text-foreground leading-none">
-                      {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-medium">
-                      • {i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn}
-                    </span>
+            <div className="flex items-center justify-between w-full max-w-4xl mx-auto gap-3">
+              <div 
+                onClick={() => setIsLocationSheetOpen(true)}
+                className="flex-1 bg-card hover:bg-card/80 transition-colors cursor-pointer border border-border rounded-xl p-3 flex items-center justify-between shadow-sm group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full text-primary group-hover:scale-110 transition-transform">
+                    <MapPin className="w-5 h-5" />
                   </div>
-                  {prayerData && (
-                     <span className="text-xs font-bold text-muted-foreground/80 mt-1">
-                       {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}
-                     </span>
-                  )}
+                  <div className="flex flex-col items-start">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-lg text-foreground leading-none">
+                        {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        • {i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn}
+                      </span>
+                    </div>
+                    {prayerData && (
+                       <span className="text-xs font-bold text-muted-foreground/80 mt-1">
+                         {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}
+                       </span>
+                    )}
+                  </div>
                 </div>
+                <ChevronDown className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
               </div>
-              <ChevronDown className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
+
+              <Button
+                onClick={toggleTimeFormat}
+                variant="outline"
+                className="h-[68px] w-[68px] rounded-xl flex flex-col items-center justify-center gap-1 border-border bg-card hover:bg-card/80 p-0"
+              >
+                <Clock className="w-5 h-5 text-primary" />
+                <span className="text-xs font-black text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
+              </Button>
             </div>
 
             {/* HERO: Next Prayer Countdown */}
@@ -264,7 +292,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
                     <div className="flex items-center gap-2 text-sm font-medium bg-muted/50 px-4 py-1.5 rounded-full">
                        <Clock className="w-4 h-4 text-muted-foreground" />
-                       <span>{t('next_prayer')}: {nextPrayer.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                       <span>{t('next_prayer')}: {formatTime(nextPrayer.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}))}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -273,7 +301,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
             {/* Prayer Times Grid - Compact */}
             <div className="w-full max-w-4xl mx-auto">
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {prayerData && Object.entries(prayerData.timings)
                   .filter(([key]) => ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].includes(key))
                   .map(([name, time]) => {
@@ -282,16 +310,18 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     
                     return (
                       <div key={name} className={cn(
-                        "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 border hover:shadow-md cursor-default",
+                        "flex flex-col items-center justify-center p-4 rounded-2xl transition-all duration-300 border hover:shadow-md cursor-default",
                         isNext 
                           ? "bg-primary text-primary-foreground border-primary shadow-lg scale-105 z-10" 
                           : "bg-card text-foreground border-border hover:border-primary/30"
                       )}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Icon className={cn("w-4 h-4", isNext ? "text-primary-foreground" : "text-muted-foreground")} />
-                          <span className="text-xs font-bold opacity-90">{t(name.toLowerCase())}</span>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Icon className={cn("w-5 h-5", isNext ? "text-primary-foreground" : "text-muted-foreground")} />
+                          <span className={cn("text-lg font-bold opacity-90", isNext ? "text-primary-foreground" : "text-foreground")}>
+                            {t(name.toLowerCase())}
+                          </span>
                         </div>
-                        <span className="text-lg font-black font-mono tracking-tight">{time}</span>
+                        <span className="text-3xl font-black font-mono tracking-tight">{formatTime(time)}</span>
                       </div>
                     );
                   })}

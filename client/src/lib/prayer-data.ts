@@ -15,6 +15,7 @@ export interface PrayerData {
     readable: string;
     hijri: {
       date: string;
+      day: string;
       month: {
         en: string;
         ar: string;
