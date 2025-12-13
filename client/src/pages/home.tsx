@@ -161,8 +161,8 @@ ${t('isha')}: ${prayerData.timings.Isha}
         
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <div className="flex justify-center mb-8 sticky top-4 z-40">
-            <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-card/95 backdrop-blur-xl border-2 border-primary/20 shadow-xl rounded-full px-1.5">
+          <div className="flex justify-center mb-8 sticky top-2 z-50">
+            <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl rounded-full px-1.5">
               <TabsTrigger 
                 value="home" 
                 className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-all"
