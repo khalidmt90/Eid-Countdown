@@ -335,12 +335,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
                    <BookOpen className="w-4 h-4 text-accent" />
                    <span className="text-xs font-bold text-accent uppercase tracking-wider">{t('ayah_of_day')}</span>
                 </div>
-                <CardContent className="p-6 text-center space-y-4">
-                  <p className="text-xl md:text-2xl leading-relaxed font-serif text-foreground font-bold">
+                <CardContent className="p-8 md:p-10 text-center space-y-6">
+                  <p className="text-3xl md:text-5xl leading-[1.8] md:leading-[1.6] font-serif text-foreground font-black drop-shadow-sm">
                     {dailyAyah.text}
                   </p>
-                  <p className="text-sm text-muted-foreground italic">"{dailyAyah.translation}"</p>
-                  <span className="inline-block text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full">{dailyAyah.source}</span>
+                  <div className="pt-2">
+                    <span className="inline-block text-sm font-bold text-accent bg-accent/10 px-4 py-1.5 rounded-full border border-accent/20">{dailyAyah.source}</span>
+                  </div>
                 </CardContent>
               </Card>
             </div>
