@@ -84,6 +84,19 @@ export function QiblahFinder() {
   // Rotation = Qiblah Bearing - Current Heading
   const arrowRotation = (qiblahBearing || 0) - (heading || 0);
 
+  // Check if phone is pointing toward Qiblah (within tolerance)
+  const TOLERANCE = 15; // degrees
+  const isAligned = heading !== null && qiblahBearing !== null && 
+    Math.abs(arrowRotation) <= TOLERANCE || 
+    Math.abs(arrowRotation) >= (360 - TOLERANCE);
+
+  // Haptic feedback when aligned
+  useEffect(() => {
+    if (isAligned && navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+  }, [isAligned]);
+
   return (
     <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in duration-500">
       <Card className="w-full max-w-md border-2 border-primary/20 shadow-2xl overflow-hidden bg-card/50 backdrop-blur-sm relative">
@@ -103,8 +116,14 @@ export function QiblahFinder() {
           
           {/* Compass Visualization */}
           <div className="relative w-64 h-64 flex items-center justify-center">
-            {/* Outer Ring */}
-            <div className="absolute inset-0 rounded-full border-4 border-muted/30 shadow-inner bg-background/50" />
+            {/* Outer Ring - Glows when aligned */}
+            <div 
+              className={`absolute inset-0 rounded-full border-4 shadow-inner transition-all duration-500 ${
+                isAligned 
+                  ? 'border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] bg-green-500/10' 
+                  : 'border-muted/30 bg-background/50'
+              }`} 
+            />
             
             {/* Degree Marks */}
             {[0, 90, 180, 270].map((deg) => (
@@ -126,12 +145,30 @@ export function QiblahFinder() {
                 animate={{ rotate: arrowRotation }}
                 transition={{ type: "spring", damping: 20 }}
               >
-                <div className="w-2 h-32 bg-gradient-to-t from-transparent to-primary rounded-full absolute -top-4 shadow-[0_0_15px_rgba(var(--primary),0.6)] origin-bottom" />
-                <div className="w-4 h-4 bg-primary rounded-full absolute top-0 shadow-lg" />
+                <div 
+                  className={`w-2 h-32 rounded-full absolute -top-4 origin-bottom transition-all duration-500 ${
+                    isAligned 
+                      ? 'bg-gradient-to-t from-transparent to-green-500 shadow-[0_0_25px_rgba(34,197,94,0.8)]' 
+                      : 'bg-gradient-to-t from-transparent to-primary shadow-[0_0_15px_rgba(var(--primary),0.6)]'
+                  }`} 
+                />
+                <div 
+                  className={`w-4 h-4 rounded-full absolute top-0 shadow-lg transition-all duration-500 ${
+                    isAligned ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.8)]' : 'bg-primary'
+                  }`} 
+                />
                 
                 {/* Kaaba Icon at tip */}
-                <div className="absolute top-[-30px] bg-black text-white p-1 rounded-sm shadow-md border border-gold transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center">
-                  <div className="w-full h-1 bg-[#D4AF37] absolute top-2" />
+                <div 
+                  className={`absolute top-[-30px] text-white p-1 rounded-sm shadow-md border transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center transition-all duration-500 ${
+                    isAligned 
+                      ? 'bg-green-600 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.8)]' 
+                      : 'bg-black border-[#D4AF37]'
+                  }`}
+                >
+                  <div className={`w-full h-1 absolute top-2 transition-colors duration-500 ${
+                    isAligned ? 'bg-green-200' : 'bg-[#D4AF37]'
+                  }`} />
                 </div>
               </motion.div>
             )}
@@ -143,14 +180,22 @@ export function QiblahFinder() {
           <div className="text-center space-y-2">
             {qiblahBearing !== null ? (
               <>
-                <div className="text-4xl font-mono font-black text-foreground">
+                <div className={`text-4xl font-mono font-black transition-colors duration-500 ${
+                  isAligned ? 'text-green-500' : 'text-foreground'
+                }`}>
                   {Math.round(qiblahBearing)}°
                 </div>
-                <p className="text-sm text-muted-foreground font-medium">
-                  {heading !== null 
-                    ? t('rotate_phone') 
-                    : t('degree_from_north')}
-                </p>
+                {isAligned ? (
+                  <div className="text-sm font-bold text-green-500 animate-pulse flex items-center justify-center gap-2 bg-green-500/10 px-4 py-2 rounded-full">
+                    ✓ {t('qiblah_aligned')}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground font-medium">
+                    {heading !== null 
+                      ? t('rotate_phone') 
+                      : t('degree_from_north')}
+                  </p>
+                )}
               </>
             ) : (
               <Button 
