@@ -83,6 +83,12 @@ export default function Home() {
             <SelectItem value="en">English</SelectItem>
             <SelectItem value="ur">اردو</SelectItem>
             <SelectItem value="fa">فارسی</SelectItem>
+            <SelectItem value="id">Bahasa Indonesia</SelectItem>
+            <SelectItem value="tr">Türkçe</SelectItem>
+            <SelectItem value="fr">Français</SelectItem>
+            <SelectItem value="bn">বাংলা</SelectItem>
+            <SelectItem value="ru">Русский</SelectItem>
+            <SelectItem value="es">Español</SelectItem>
           </SelectContent>
         </Select>
       </div>
