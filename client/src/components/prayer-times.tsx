@@ -229,10 +229,10 @@ export function PrayerTimesSection() {
         <div className="flex items-center gap-3">
           <MapPin className="text-primary w-6 h-6" />
           <Select onValueChange={handleCityChange} defaultValue={selectedCity.nameEn}>
-            <SelectTrigger className="w-[180px] bg-background border-border text-foreground font-bold">
+            <SelectTrigger className="w-[180px] bg-background border-border text-foreground font-bold z-50 relative">
               <SelectValue placeholder="اختر المدينة" />
             </SelectTrigger>
-            <SelectContent className="bg-popover text-popover-foreground border-border">
+            <SelectContent className="bg-popover text-popover-foreground border-border z-[100]">
               {CITIES.map(city => (
                 <SelectItem key={city.nameEn} value={city.nameEn} className="font-sans">
                   {city.nameAr}
