@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Compass, Navigation } from "lucide-react";
+import { Compass, Navigation, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -14,16 +14,26 @@ function shortestSignedDelta(target: number, heading: number): number {
   return diff > 180 ? diff - 360 : diff;
 }
 
+const SMOOTHING_FACTOR = 0.15;
+const ALIGNED_TOLERANCE = 5;
+const NEAR_THRESHOLD = 20;
+const STABLE_DURATION_MS = 800;
+
 export function QiblahFinder() {
   const { t, i18n } = useTranslation();
-  const [heading, setHeading] = useState<number | null>(null);
+  const [rawHeading, setRawHeading] = useState<number | null>(null);
+  const [smoothedHeading, setSmoothedHeading] = useState<number | null>(null);
   const [qiblahBearing, setQiblahBearing] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isStableAligned, setIsStableAligned] = useState(false);
   
   const cumulativeRotation = useRef(0);
   const lastDelta = useRef<number | null>(null);
+  const prevSmoothed = useRef<number | null>(null);
+  const alignedSince = useRef<number | null>(null);
+  const hasVibrated = useRef(false);
 
   const MECCA_LAT = 21.4225;
   const MECCA_LNG = 39.8262;
@@ -54,9 +64,27 @@ export function QiblahFinder() {
     }
     
     if (compass !== null) {
-      setHeading(compass);
+      setRawHeading(compass);
     }
   }, []);
+
+  useEffect(() => {
+    if (rawHeading === null) return;
+    
+    if (prevSmoothed.current === null) {
+      prevSmoothed.current = rawHeading;
+      setSmoothedHeading(rawHeading);
+      return;
+    }
+    
+    let diff = rawHeading - prevSmoothed.current;
+    if (diff > 180) diff -= 360;
+    else if (diff < -180) diff += 360;
+    
+    const newSmoothed = normalize360(prevSmoothed.current + SMOOTHING_FACTOR * diff);
+    prevSmoothed.current = newSmoothed;
+    setSmoothedHeading(newSmoothed);
+  }, [rawHeading]);
 
   const startCompass = async () => {
     if (!navigator.geolocation) {
@@ -111,14 +139,41 @@ export function QiblahFinder() {
     };
   }, [isListening, handleOrientation]);
 
-  const delta = qiblahBearing !== null && heading !== null 
-    ? shortestSignedDelta(qiblahBearing, heading)
+  const delta = qiblahBearing !== null && smoothedHeading !== null 
+    ? shortestSignedDelta(qiblahBearing, smoothedHeading)
     : 0;
 
+  const degreesRemaining = Math.abs(Math.round(delta));
+  const isWithinAlignedRange = degreesRemaining <= ALIGNED_TOLERANCE;
+
   useEffect(() => {
-    if (heading === null || qiblahBearing === null) return;
+    const now = Date.now();
     
-    const newDelta = shortestSignedDelta(qiblahBearing, heading);
+    if (isWithinAlignedRange) {
+      if (alignedSince.current === null) {
+        alignedSince.current = now;
+      } else if (now - alignedSince.current >= STABLE_DURATION_MS) {
+        if (!isStableAligned) {
+          setIsStableAligned(true);
+          if (!hasVibrated.current && navigator.vibrate) {
+            navigator.vibrate(200);
+            hasVibrated.current = true;
+          }
+        }
+      }
+    } else {
+      alignedSince.current = null;
+      if (isStableAligned) {
+        setIsStableAligned(false);
+      }
+      hasVibrated.current = false;
+    }
+  }, [isWithinAlignedRange, isStableAligned]);
+
+  useEffect(() => {
+    if (smoothedHeading === null || qiblahBearing === null) return;
+    
+    const newDelta = shortestSignedDelta(qiblahBearing, smoothedHeading);
     
     if (lastDelta.current === null) {
       cumulativeRotation.current = newDelta;
@@ -130,25 +185,20 @@ export function QiblahFinder() {
       cumulativeRotation.current += shortChange;
     }
     lastDelta.current = newDelta;
-  }, [heading, qiblahBearing]);
+  }, [smoothedHeading, qiblahBearing]);
 
   const arrowRotation = cumulativeRotation.current;
-  const degreesRemaining = Math.abs(Math.round(delta));
   
   const isArabic = i18n.language === 'ar' || i18n.language === 'ur' || i18n.language === 'fa';
   const directionText = delta > 0 
     ? (isArabic ? 'يمين' : t('turn_right')) 
     : (isArabic ? 'يسار' : t('turn_left'));
 
-  const TOLERANCE = 15;
-  const NEAR_THRESHOLD = 45;
-  
-  const isAligned = degreesRemaining <= TOLERANCE;
-  const isNear = degreesRemaining > TOLERANCE && degreesRemaining <= NEAR_THRESHOLD;
-  const isFar = degreesRemaining > NEAR_THRESHOLD;
+  const isNear = degreesRemaining > ALIGNED_TOLERANCE && degreesRemaining <= NEAR_THRESHOLD;
 
   const getColorClass = () => {
-    if (isAligned) return 'green';
+    if (isStableAligned) return 'green';
+    if (isWithinAlignedRange) return 'yellow';
     if (isNear) return 'yellow';
     return 'red';
   };
@@ -191,16 +241,14 @@ export function QiblahFinder() {
     red: 'text-red-500'
   };
 
-  useEffect(() => {
-    if (isAligned && navigator.vibrate) {
-      navigator.vibrate(200);
-    }
-  }, [isAligned]);
+  const calibrationTip = isArabic 
+    ? "إذا الاتجاه غير دقيق، حرّك الجوال بشكل رقم ٨ لإعادة معايرة البوصلة"
+    : t('accuracy_tip');
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in duration-500">
       <Card className="w-full max-w-md border-2 border-primary/20 shadow-lg overflow-hidden bg-card relative">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 pointer-events-none" />
         
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-[38px] tracking-tight font-black font-serif text-primary flex items-center justify-center gap-2">
@@ -217,14 +265,14 @@ export function QiblahFinder() {
           <div className="relative w-64 h-64 flex items-center justify-center">
             <div 
               className={`absolute inset-0 rounded-full border-4 shadow-inner transition-colors duration-300 ${
-                heading !== null ? ringColors[colorState] : 'border-muted/30 bg-background/50'
+                smoothedHeading !== null ? ringColors[colorState] : 'border-muted/30 bg-background/50'
               }`} 
             />
             
             {[0, 90, 180, 270].map((deg) => (
               <div 
                 key={deg} 
-                className="absolute text-xs font-bold text-muted-foreground"
+                className="absolute text-xs font-bold text-muted-foreground pointer-events-none"
                 style={{ 
                   transform: `rotate(${deg}deg) translate(0, -110px) rotate(-${deg}deg)` 
                 }}
@@ -233,11 +281,11 @@ export function QiblahFinder() {
               </div>
             ))}
 
-            {qiblahBearing !== null && heading !== null && (
+            {qiblahBearing !== null && smoothedHeading !== null && (
               <motion.div 
-                className="absolute w-full h-full flex items-center justify-center z-20"
+                className="absolute w-full h-full flex items-center justify-center z-20 pointer-events-none"
                 animate={{ rotate: arrowRotation }}
-                transition={{ type: "spring", damping: 25, stiffness: 120 }}
+                transition={{ type: "spring", damping: 30, stiffness: 150 }}
               >
                 <div 
                   className={`w-2 h-32 rounded-full absolute -top-4 origin-bottom transition-colors duration-300 bg-gradient-to-t ${arrowGradients[colorState]}`} 
@@ -254,25 +302,27 @@ export function QiblahFinder() {
               </motion.div>
             )}
 
-            <div className="w-4 h-4 bg-foreground rounded-full z-30 ring-4 ring-background" />
+            <div className="w-4 h-4 bg-foreground rounded-full z-30 ring-4 ring-background pointer-events-none" />
           </div>
 
           <div className="text-center space-y-3">
             {qiblahBearing !== null ? (
               <>
                 <div className={`text-4xl font-mono font-black transition-colors duration-300 ${
-                  heading !== null ? textColors[colorState] : 'text-foreground'
+                  smoothedHeading !== null ? textColors[colorState] : 'text-foreground'
                 }`}>
                   {Math.round(qiblahBearing)}°
                 </div>
                 
-                {heading !== null && (
-                  isAligned ? (
+                {smoothedHeading !== null && (
+                  isStableAligned ? (
                     <div className="text-lg font-bold text-green-500 animate-pulse flex items-center justify-center gap-2 bg-green-500/10 px-4 py-2 rounded-full">
                       ✓ {t('qiblah_aligned')}
                     </div>
                   ) : (
-                    <div className={`text-xl font-bold transition-colors duration-300 ${textColors[colorState]} bg-${colorState === 'yellow' ? 'yellow' : colorState}-500/10 px-4 py-2 rounded-full`}>
+                    <div className={`text-xl font-bold transition-colors duration-300 ${textColors[colorState]} px-4 py-2 rounded-full`}
+                      style={{ backgroundColor: colorState === 'yellow' ? 'rgba(234, 179, 8, 0.1)' : colorState === 'red' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }}
+                    >
                       <span dir="rtl">
                         {isArabic ? (
                           <>باقي {degreesRemaining}° {directionText}</>
@@ -284,7 +334,7 @@ export function QiblahFinder() {
                   )
                 )}
                 
-                {heading === null && (
+                {smoothedHeading === null && (
                   <p className="text-sm text-muted-foreground font-medium">
                     {t('degree_from_north')}
                   </p>
@@ -310,9 +360,22 @@ export function QiblahFinder() {
           
         </CardContent>
       </Card>
-      <div className="text-center max-w-sm text-muted-foreground text-sm px-4">
-        <p className="text-[20px]">{t('accuracy_tip')}</p>
-      </div>
+      
+      {smoothedHeading !== null && !isStableAligned && (
+        <div className="text-center max-w-sm text-muted-foreground text-sm px-4 bg-muted/30 p-3 rounded-xl border border-border/50">
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <RotateCcw className="w-4 h-4" />
+            <span className="font-bold">{isArabic ? "تلميح" : "Tip"}</span>
+          </div>
+          <p className="text-[18px]">{calibrationTip}</p>
+        </div>
+      )}
+      
+      {(!smoothedHeading || isStableAligned) && (
+        <div className="text-center max-w-sm text-muted-foreground text-sm px-4">
+          <p className="text-[20px]">{t('accuracy_tip')}</p>
+        </div>
+      )}
     </div>
   );
 }

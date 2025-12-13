@@ -1,0 +1,86 @@
+Replit comment — Global mobile scroll issue (drag doesn’t scroll on many content areas)
+
+On mobile, scrolling is inconsistent: when my finger starts on many content areas (cards, tables, sections), the page sometimes doesn’t scroll. This is a global UX problem — users should be able to scroll from anywhere.
+
+Expected
+
+Vertical scroll works no matter where the user swipes (any card/section/component).
+
+No “dead zones” that capture touch and block scrolling.
+
+Likely root causes
+
+Global or component-level handlers doing preventDefault() on touchmove / pointermove
+
+Incorrect touch-action CSS on wrappers (e.g., touch-action: none)
+
+Nested scroll containers (overflow: auto / fixed heights) capturing gestures
+
+Framer-motion drag/gesture config capturing pointer events
+
+An invisible overlay (absolute div) sitting on top of the page
+
+Required fixes (global)
+1) Remove scroll-blocking event code
+
+Search project for:
+
+preventDefault()
+
+touchmove
+
+touchstart
+
+pointermove
+
+onPointerDown, onTouchMove, onWheel
+If used, make sure we are not preventing default scroll on normal content.
+
+2) Set safe global CSS
+
+Apply globally:
+
+html, body { height: 100%; overflow-x: hidden; }
+
+body { margin: 0; }
+
+* { box-sizing: border-box; }
+
+And for touch:
+
+body { touch-action: pan-y; }
+
+3) Avoid nested vertical scrolling
+
+Do not set overflow-y: auto on inner cards/containers unless intentional.
+If a component needs horizontal scroll:
+
+Use overflow-x: auto; overflow-y: visible;
+
+Add -webkit-overflow-scrolling: touch;
+
+4) Framer Motion / draggable elements
+
+If any motion components use drag (even accidentally), they can hijack scrolling.
+
+Ensure drag={false} unless needed
+
+Or set dragListener={false}
+
+Avoid onPan handlers on main containers
+
+5) Overlay check
+
+If there’s any full-screen absolute element (gradient, decoration, animation layer), it can block scroll:
+
+Set decorative overlays to pointer-events: none;
+
+Verify no element has position: fixed covering the screen.
+
+Acceptance criteria
+
+Swiping anywhere on the page scrolls smoothly (iOS Safari + Android Chrome).
+
+No section/card/table blocks vertical scroll.
+
+Horizontal scroll works only where intended, without breaking vertical scroll.
