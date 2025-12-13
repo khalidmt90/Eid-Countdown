@@ -1,23 +1,48 @@
 import { useEffect, useState } from "react";
 import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
-import { PrayerTimesSection } from "@/components/prayer-times";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen, Compass, Languages } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass, Languages, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QiblahFinder } from "@/components/qiblah-finder";
-import "@/lib/i18n"; // Import i18n config
+import { usePrayerTimes } from "@/hooks/use-prayer-times";
+import { LocationSheet } from "@/components/location-sheet";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import "@/lib/i18n";
 
 export default function Home() {
   const { t, i18n } = useTranslation();
+  
+  // Eid Events State
   const [nextEvent, setNextEvent] = useState<EidDate | null>(null);
   const [followingEvent, setFollowingEvent] = useState<EidDate | null>(null);
+
+  // Prayer Times Hook
+  const {
+    loading,
+    prayerData,
+    selectedCountry,
+    selectedCity,
+    usingExactLocation,
+    nextPrayer,
+    timeRemaining,
+    dailyAyah,
+    handleCountryChange,
+    handleCityChange,
+    handleUseCurrentLocation,
+    setUsingExactLocation,
+    formatTimeRemaining
+  } = usePrayerTimes();
+
+  // Location Sheet State
+  const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
 
   // Set page direction based on language
   useEffect(() => {
@@ -37,15 +62,11 @@ export default function Home() {
     const duration = 5 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
     const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
     const interval: any = setInterval(function() {
       const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
+      if (timeLeft <= 0) return clearInterval(interval);
 
       const particleCount = 50 * (timeLeft / duration);
       confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
@@ -55,6 +76,49 @@ export default function Home() {
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+  };
+
+  const { hours, minutes, seconds } = formatTimeRemaining(timeRemaining);
+
+  const prayerIcons: Record<string, any> = {
+    Fajr: Moon,
+    Sunrise: Sunrise,
+    Dhuhr: Sun,
+    Asr: Sun,
+    Maghrib: Sunset,
+    Isha: Moon
+  };
+
+  const handleShare = () => {
+    if (!prayerData || !nextPrayer) return;
+    
+    const cityName = i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn;
+    const countryName = i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn;
+    const prayerName = t(nextPrayer.name.toLowerCase());
+
+    const text = `
+🕌 ${t('prayer_times_in')} ${cityName}, ${countryName}
+📅 ${prayerData.date.hijri.date} ${prayerData.date.hijri.month.ar} ${prayerData.date.hijri.year}
+
+${t('fajr')}: ${prayerData.timings.Fajr}
+${t('sunrise')}: ${prayerData.timings.Sunrise}
+${t('dhuhr')}: ${prayerData.timings.Dhuhr}
+${t('asr')}: ${prayerData.timings.Asr}
+${t('maghrib')}: ${prayerData.timings.Maghrib}
+${t('isha')}: ${prayerData.timings.Isha}
+
+⏳ ${t('next_prayer')}: ${prayerName}
+`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: t('prayer_times'),
+        text: text,
+      });
+    } else {
+      navigator.clipboard.writeText(text);
+      alert(t('copied'));
+    }
   };
 
   if (!nextEvent) {
@@ -72,10 +136,10 @@ export default function Home() {
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
       {/* Language Switcher */}
-      <div className="absolute top-4 left-4 z-50">
+      <div className="absolute top-3 left-4 z-50">
          <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
-          <SelectTrigger className="w-[120px] bg-card/80 backdrop-blur-sm border-border">
-            <Languages className="w-4 h-4 mr-2" />
+          <SelectTrigger className="w-[100px] h-8 text-xs bg-card/80 backdrop-blur-sm border-border">
+            <Languages className="w-3 h-3 mr-2" />
             <SelectValue placeholder="Language" />
           </SelectTrigger>
           <SelectContent>
@@ -93,105 +157,189 @@ export default function Home() {
         </Select>
       </div>
 
-      <main className="flex-1 flex flex-col items-center justify-start p-4 py-16 relative z-10 w-full max-w-7xl mx-auto space-y-8">
+      <main className="flex-1 flex flex-col items-center justify-start p-4 pt-16 relative z-10 w-full max-w-7xl mx-auto space-y-6">
         
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
-          <div className="flex justify-center mb-8 sticky top-4 z-40">
-            <TabsList className="grid w-full max-w-md grid-cols-3 h-14 bg-card/90 backdrop-blur-md border border-border shadow-lg rounded-full px-1">
+          <div className="flex justify-center mb-6 sticky top-2 z-40">
+            <TabsList className="grid w-full max-w-sm grid-cols-3 h-12 bg-card/90 backdrop-blur-md border border-border shadow-md rounded-full px-1">
               <TabsTrigger 
                 value="home" 
-                className="rounded-full text-sm md:text-lg font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-all"
+                className="rounded-full text-xs md:text-sm font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-10 transition-all"
               >
-                <Clock className="w-4 h-4 md:w-5 md:h-5 mx-1" />
-                <span className="hidden md:inline">{t('prayer_times')}</span>
-                <span className="md:hidden">{t('prayer_times')}</span>
+                <Clock className="w-4 h-4 mx-1" />
+                <span className="hidden sm:inline">{t('prayer_times')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
-                className="rounded-full text-sm md:text-lg font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-all"
+                className="rounded-full text-xs md:text-sm font-bold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-10 transition-all"
               >
-                <Compass className="w-4 h-4 md:w-5 md:h-5 mx-1" />
-                <span className="hidden md:inline">{t('qiblah')}</span>
-                <span className="md:hidden">{t('qiblah')}</span>
+                <Compass className="w-4 h-4 mx-1" />
+                <span className="hidden sm:inline">{t('qiblah')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
-                className="rounded-full text-sm md:text-lg font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-all"
+                className="rounded-full text-xs md:text-sm font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-10 transition-all"
               >
-                <BookOpen className="w-4 h-4 md:w-5 md:h-5 mx-1" />
-                <span className="hidden md:inline">{t('daily_content')}</span>
-                <span className="md:hidden">{t('daily_content')}</span>
+                <BookOpen className="w-4 h-4 mx-1" />
+                <span className="hidden sm:inline">{t('daily_content')}</span>
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="home" className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Prayer Times Section */}
-            <div className="w-full">
-              <PrayerTimesSection />
+          <TabsContent value="home" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            
+            {/* Slim Header: Location & Date */}
+            <div 
+              onClick={() => setIsLocationSheetOpen(true)}
+              className="w-full max-w-4xl mx-auto bg-card hover:bg-card/80 transition-colors cursor-pointer border border-border rounded-xl p-3 flex items-center justify-between shadow-sm group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 p-2 rounded-full text-primary group-hover:scale-110 transition-transform">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-lg text-foreground leading-none">
+                      {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
+                    </span>
+                    <span className="text-xs text-muted-foreground font-medium">
+                      • {i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn}
+                    </span>
+                  </div>
+                  {prayerData && (
+                     <span className="text-xs font-bold text-muted-foreground/80 mt-1">
+                       {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}
+                     </span>
+                  )}
+                </div>
+              </div>
+              <ChevronDown className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
             </div>
 
-            <div className="w-full h-px bg-border/50" />
-
-            {/* Countdown Section */}
-            <section className="w-full flex flex-col items-center space-y-8">
+            {/* HERO: Next Prayer Countdown */}
+            {nextPrayer && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="text-center space-y-4"
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-full max-w-4xl mx-auto"
               >
-                <h1 className="text-4xl md:text-6xl font-black font-serif text-accent drop-shadow-md tracking-wide">
-                  {t(nextEvent.nameKey)}
-                </h1>
-                <p className="text-2xl md:text-3xl text-foreground font-bold">
-                  {formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}
-                </p>
-              </motion.div>
-
-              <div className="w-full max-w-5xl px-4">
-                <CountdownTimer 
-                  targetDate={nextEvent.date} 
-                  onComplete={handleCelebration}
-                />
-              </div>
-
-              {followingEvent && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2, duration: 0.8 }}
-                  className="w-full max-w-md mx-auto px-4 mt-8"
-                >
-                  <div className="bg-card border-2 border-accent/20 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all">
-                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
-                      <div className="flex items-center gap-3 text-accent">
-                        <Calendar className="w-6 h-6" />
-                        <span className="font-black text-xl">{t('next_event')}</span>
-                      </div>
-                      <span className="text-xs font-bold text-white bg-accent px-3 py-1.5 rounded-full shadow-sm">
-                        {t('remaining_to')} {t(nextEvent.nameKey)}
-                      </span>
-                    </div>
+                <Card className={cn(
+                  "overflow-hidden border-2 shadow-2xl transition-all relative",
+                  nextPrayer.name === 'Fajr' ? "border-primary/50 shadow-primary/20" : 
+                  nextPrayer.name === 'Maghrib' ? "border-secondary/50 shadow-secondary/20" : 
+                  "border-border"
+                )}>
+                  <div className={cn(
+                    "absolute top-0 inset-x-0 h-1.5",
+                    nextPrayer.name === 'Fajr' ? "bg-primary" : 
+                    nextPrayer.name === 'Maghrib' ? "bg-secondary" : 
+                    "bg-muted-foreground"
+                  )} />
+                  
+                  <CardContent className="flex flex-col items-center justify-center py-8 md:py-12 bg-gradient-to-b from-card to-background">
+                    <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                      {t('remaining_to')} {t(nextPrayer.name.toLowerCase())}
+                    </span>
                     
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <h3 className="text-2xl font-black text-foreground">{t(followingEvent.nameKey)}</h3>
-                        <p className="text-muted-foreground font-bold mt-1 text-base">
-                          {formatDate(followingEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}
-                        </p>
+                    <div className="flex items-baseline justify-center gap-1 md:gap-2 mb-4" dir="ltr">
+                      <div className="flex flex-col items-center">
+                        <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-foreground leading-none">
+                          {String(hours).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">{t('hours')}</span>
                       </div>
-                      <div className="bg-accent/10 p-3 rounded-full text-accent border border-accent/20">
-                        <Moon className="w-6 h-6" />
+                      <span className="text-3xl md:text-6xl font-black text-muted-foreground/30 -translate-y-4">:</span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-foreground leading-none">
+                          {String(minutes).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">{t('minutes')}</span>
+                      </div>
+                      <span className="text-3xl md:text-6xl font-black text-muted-foreground/30 -translate-y-4">:</span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-primary leading-none">
+                          {String(seconds).padStart(2, '0')}
+                        </span>
+                        <span className="text-[10px] md:text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">{t('seconds')}</span>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              )}
-            </section>
+
+                    <div className="flex items-center gap-2 text-sm font-medium bg-muted/50 px-4 py-1.5 rounded-full">
+                       <Clock className="w-4 h-4 text-muted-foreground" />
+                       <span>{t('next_prayer')}: {nextPrayer.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* Prayer Times Grid - Compact */}
+            <div className="w-full max-w-4xl mx-auto">
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                {prayerData && Object.entries(prayerData.timings)
+                  .filter(([key]) => ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].includes(key))
+                  .map(([name, time]) => {
+                    const Icon = prayerIcons[name] || Clock;
+                    const isNext = nextPrayer?.name === name;
+                    
+                    return (
+                      <div key={name} className={cn(
+                        "flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-300 border hover:shadow-md cursor-default",
+                        isNext 
+                          ? "bg-primary text-primary-foreground border-primary shadow-lg scale-105 z-10" 
+                          : "bg-card text-foreground border-border hover:border-primary/30"
+                      )}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Icon className={cn("w-4 h-4", isNext ? "text-primary-foreground" : "text-muted-foreground")} />
+                          <span className="text-xs font-bold opacity-90">{t(name.toLowerCase())}</span>
+                        </div>
+                        <span className="text-lg font-black font-mono tracking-tight">{time}</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* Ayah of the Day - Compact */}
+            <div className="w-full max-w-4xl mx-auto">
+               <Card className="bg-card border border-accent/20 shadow-sm">
+                <div className="bg-accent/5 px-4 py-2 flex items-center gap-2 border-b border-accent/10">
+                   <BookOpen className="w-4 h-4 text-accent" />
+                   <span className="text-xs font-bold text-accent uppercase tracking-wider">{t('ayah_of_day')}</span>
+                </div>
+                <CardContent className="p-6 text-center space-y-4">
+                  <p className="text-xl md:text-2xl leading-relaxed font-serif text-foreground font-bold">
+                    {dailyAyah.text}
+                  </p>
+                  <p className="text-sm text-muted-foreground italic">"{dailyAyah.translation}"</p>
+                  <span className="inline-block text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full">{dailyAyah.source}</span>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Secondary: Eid Countdown */}
+             <div className="w-full h-px bg-border/50 max-w-4xl mx-auto" />
+             
+             <section className="w-full max-w-4xl mx-auto pt-4 pb-8 opacity-90 hover:opacity-100 transition-opacity">
+               <div className="flex items-center gap-2 mb-4">
+                 <Calendar className="w-5 h-5 text-muted-foreground" />
+                 <h3 className="text-lg font-bold text-muted-foreground">{t('upcoming_events')}</h3>
+               </div>
+               
+               <div className="bg-card border border-border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                 <div className="text-center md:text-start">
+                   <h4 className="text-xl font-black text-foreground">{t(nextEvent.nameKey)}</h4>
+                   <p className="text-sm text-muted-foreground font-medium">{formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
+                 </div>
+                 
+                 <div className="w-full md:w-auto">
+                    {/* Simplified Eid Timer for secondary view */}
+                    <CountdownTimer targetDate={nextEvent.date} className="gap-2" />
+                 </div>
+               </div>
+             </section>
+
           </TabsContent>
 
           <TabsContent value="qiblah">
@@ -206,7 +354,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-muted-foreground text-sm relative z-10 border-t border-border bg-card">
+      <footer className="py-8 text-center text-muted-foreground text-sm relative z-10 border-t border-border bg-card mt-auto">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="font-medium">{t('copyright')}</p>
           
@@ -239,6 +387,31 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Location Sheet */}
+      <LocationSheet 
+        isOpen={isLocationSheetOpen}
+        onClose={() => setIsLocationSheetOpen(false)}
+        selectedCountry={selectedCountry}
+        selectedCity={selectedCity}
+        usingExactLocation={usingExactLocation}
+        onCountryChange={handleCountryChange}
+        onCityChange={handleCityChange}
+        onUseCurrentLocation={handleUseCurrentLocation}
+        onCancelLocation={() => setUsingExactLocation(false)}
+      />
+
+      {/* WhatsApp Share Button */}
+      <div className="fixed bottom-6 left-6 z-50">
+        <Button 
+          onClick={handleShare}
+          className="rounded-full w-14 h-14 bg-[#25D366] hover:bg-[#128C7E] text-white shadow-2xl flex items-center justify-center transition-transform hover:scale-110"
+        >
+          <Share2 className="w-6 h-6" />
+        </Button>
+      </div>
+
     </div>
   );
 }
+
