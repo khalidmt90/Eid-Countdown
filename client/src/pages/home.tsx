@@ -62,11 +62,11 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 space-y-6 flex flex-col items-center"
         >
-          <div className="space-y-3">
-            <h1 className="text-5xl md:text-7xl font-bold font-serif text-primary drop-shadow-sm tracking-wide">
+          <div className="space-y-4">
+            <h1 className="text-6xl md:text-8xl font-black font-serif text-primary drop-shadow-md tracking-wide">
               {nextEid.nameAr}
             </h1>
-            <p className="text-2xl md:text-3xl text-foreground/80 font-light">
+            <p className="text-3xl md:text-4xl text-foreground font-bold">
               {formatArabicDate(nextEid.date)}
             </p>
           </div>
@@ -88,26 +88,26 @@ export default function Home() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="w-full max-w-md mx-auto px-4"
           >
-            <div className="bg-card/80 backdrop-blur-md border border-primary/10 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
-              <div className="flex items-center justify-between mb-4 pb-4 border-b border-border/50">
+            <div className="bg-card border-2 border-primary/20 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-border">
                 <div className="flex items-center gap-3 text-primary">
-                  <Calendar className="w-6 h-6" />
-                  <span className="font-bold text-lg">العيد القادم</span>
+                  <Calendar className="w-8 h-8" />
+                  <span className="font-black text-2xl">العيد القادم</span>
                 </div>
-                <span className="text-xs font-bold text-primary-foreground bg-primary/90 px-3 py-1.5 rounded-full shadow-sm">
+                <span className="text-sm font-bold text-primary-foreground bg-primary px-4 py-2 rounded-full shadow-md">
                   بعد {nextEid.nameAr}
                 </span>
               </div>
               
               <div className="flex justify-between items-end">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground">{followingEid.nameAr}</h3>
-                  <p className="text-muted-foreground font-medium mt-1 text-base">
+                  <h3 className="text-3xl font-black text-foreground">{followingEid.nameAr}</h3>
+                  <p className="text-muted-foreground font-bold mt-2 text-lg">
                     {formatArabicDate(followingEid.date)}
                   </p>
                 </div>
-                <div className="bg-secondary p-3 rounded-full text-secondary-foreground">
-                  <Moon className="w-6 h-6" />
+                <div className="bg-secondary p-4 rounded-full text-secondary-foreground border-2 border-secondary-foreground/10">
+                  <Moon className="w-8 h-8" />
                 </div>
               </div>
             </div>
