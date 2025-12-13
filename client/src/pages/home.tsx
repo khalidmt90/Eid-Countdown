@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { getNextEid, getFollowingEid, formatArabicDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { PrayerTimesSection } from "@/components/prayer-times";
+import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   const [nextEid, setNextEid] = useState<EidDate | null>(null);
@@ -50,77 +52,105 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col font-sans" dir="rtl">
-      {/* Decorative Elements - made darker for visibility */}
+      {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-      <main className="flex-1 flex flex-col items-center justify-start p-4 py-8 relative z-10 w-full max-w-7xl mx-auto space-y-12">
+      <main className="flex-1 flex flex-col items-center justify-start p-4 py-8 relative z-10 w-full max-w-7xl mx-auto space-y-8">
         
-        {/* Prayer Times Section - Top Priority */}
-        <div className="w-full">
-          <PrayerTimesSection />
-        </div>
-
-        <div className="w-full h-px bg-border/50" />
-
-        {/* Eid Countdown Section */}
-        <section className="w-full flex flex-col items-center space-y-8">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center space-y-4"
-          >
-            <h1 className="text-4xl md:text-6xl font-black font-serif text-accent drop-shadow-md tracking-wide">
-              {nextEid.nameAr}
-            </h1>
-            <p className="text-2xl md:text-3xl text-foreground font-bold">
-              {formatArabicDate(nextEid.date)}
-            </p>
-          </motion.div>
-
-          <div className="w-full max-w-5xl px-4">
-            <CountdownTimer 
-              targetDate={nextEid.date} 
-              onComplete={handleCelebration}
-            />
+        {/* Main Navigation Tabs */}
+        <Tabs defaultValue="home" className="w-full">
+          <div className="flex justify-center mb-8">
+            <TabsList className="grid w-full max-w-md grid-cols-2 h-14 bg-card border border-border shadow-lg">
+              <TabsTrigger 
+                value="home" 
+                className="text-lg font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-all"
+              >
+                <Clock className="w-5 h-5 ml-2" />
+                المواقيت
+              </TabsTrigger>
+              <TabsTrigger 
+                value="daily" 
+                className="text-lg font-bold data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-all"
+              >
+                <BookOpen className="w-5 h-5 ml-2" />
+                يوميات
+              </TabsTrigger>
+            </TabsList>
           </div>
 
-          {followingEid && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="w-full max-w-md mx-auto px-4 mt-8"
-            >
-              <div className="bg-card border-2 border-accent/20 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all">
-                <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
-                  <div className="flex items-center gap-3 text-accent">
-                    <Calendar className="w-6 h-6" />
-                    <span className="font-black text-xl">العيد القادم</span>
-                  </div>
-                  <span className="text-xs font-bold text-white bg-accent px-3 py-1.5 rounded-full shadow-sm">
-                    بعد {nextEid.nameAr}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-end">
-                  <div>
-                    <h3 className="text-2xl font-black text-foreground">{followingEid.nameAr}</h3>
-                    <p className="text-muted-foreground font-bold mt-1 text-base">
-                      {formatArabicDate(followingEid.date)}
-                    </p>
-                  </div>
-                  <div className="bg-accent/10 p-3 rounded-full text-accent border border-accent/20">
-                    <Moon className="w-6 h-6" />
-                  </div>
-                </div>
+          <TabsContent value="home" className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Prayer Times Section */}
+            <div className="w-full">
+              <PrayerTimesSection />
+            </div>
+
+            <div className="w-full h-px bg-border/50" />
+
+            {/* Eid Countdown Section */}
+            <section className="w-full flex flex-col items-center space-y-8">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="text-center space-y-4"
+              >
+                <h1 className="text-4xl md:text-6xl font-black font-serif text-accent drop-shadow-md tracking-wide">
+                  {nextEid.nameAr}
+                </h1>
+                <p className="text-2xl md:text-3xl text-foreground font-bold">
+                  {formatArabicDate(nextEid.date)}
+                </p>
+              </motion.div>
+
+              <div className="w-full max-w-5xl px-4">
+                <CountdownTimer 
+                  targetDate={nextEid.date} 
+                  onComplete={handleCelebration}
+                />
               </div>
-            </motion.div>
-          )}
-        </section>
+
+              {followingEid && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2, duration: 0.8 }}
+                  className="w-full max-w-md mx-auto px-4 mt-8"
+                >
+                  <div className="bg-card border-2 border-accent/20 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all">
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
+                      <div className="flex items-center gap-3 text-accent">
+                        <Calendar className="w-6 h-6" />
+                        <span className="font-black text-xl">العيد القادم</span>
+                      </div>
+                      <span className="text-xs font-bold text-white bg-accent px-3 py-1.5 rounded-full shadow-sm">
+                        بعد {nextEid.nameAr}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <h3 className="text-2xl font-black text-foreground">{followingEid.nameAr}</h3>
+                        <p className="text-muted-foreground font-bold mt-1 text-base">
+                          {formatArabicDate(followingEid.date)}
+                        </p>
+                      </div>
+                      <div className="bg-accent/10 p-3 rounded-full text-accent border border-accent/20">
+                        <Moon className="w-6 h-6" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </section>
+          </TabsContent>
+
+          <TabsContent value="daily">
+            <DailyContentView />
+          </TabsContent>
+        </Tabs>
 
       </main>
 
@@ -141,10 +171,10 @@ export default function Home() {
                 <DialogHeader className="text-right space-y-4">
                   <DialogTitle className="text-2xl font-serif text-primary border-b border-border pb-2">عن الموقع</DialogTitle>
                   <DialogDescription className="text-base leading-relaxed text-foreground/80">
-                    تطبيق شامل لمواقيت الصلاة، اتجاه القبلة، والعد التنازلي للأعياد.
+                    تطبيق شامل لمواقيت الصلاة، اتجاه القبلة، والعد التنازلي للأعياد، والمحتوى الإسلامي اليومي.
                     <br/><br/>
                     <div className="bg-primary/10 p-3 rounded-lg border border-primary/20 text-foreground text-sm">
-                      <strong>ملاحظة:</strong> مواقيت الصلاة تعتمد على تقويم أم القرى. تواريخ الأعياد فلكية وقد تختلف حسب رؤية الهلال.
+                      <strong>ملاحظة:</strong> مواقيت الصلاة تعتمد على تقويم أم القرى. جميع المحتويات الدينية مراجعة من مصادر موثوقة.
                     </div>
                   </DialogDescription>
                 </DialogHeader>
