@@ -116,7 +116,7 @@ export function DailyContentView() {
                       {content.ayah.title}
                     </h3>
                     <div className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-                      <p className="md:text-xl text-muted-foreground text-justify whitespace-pre-line font-medium text-[20px]">
+                      <p className="md:text-xl text-muted-foreground text-justify whitespace-pre-line font-medium text-[22px]">
                         {content.ayah.story}
                       </p>
                     </div>
