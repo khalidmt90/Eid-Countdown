@@ -119,4 +119,25 @@
   .rounded-xl {
     overflow: visible;
   }
+  
+  /* Ensure all interactive elements allow scroll passthrough */
+  button, a, [role="button"], [role="tab"], [role="tablist"], [role="tabpanel"] {
+    touch-action: pan-y !important;
+  }
+  
+  /* Force scroll passthrough on tab components */
+  [data-radix-collection-item],
+  [data-state] {
+    touch-action: pan-y !important;
+  }
+  
+  /* Global touch action fix - allow vertical scroll everywhere */
+  * {
+    touch-action: pan-y pinch-zoom;
+  }
+  
+  /* Prevent any element from being a scroll container except html */
+  div, section, article, aside, nav, header, footer, main {
+    overflow: visible;
+  }
 }

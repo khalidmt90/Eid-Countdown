@@ -155,10 +155,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground bg-pattern overflow-x-hidden relative flex flex-col font-sans w-full max-w-[100vw]">
+    <div className="min-h-[100dvh] bg-background text-foreground bg-pattern relative flex flex-col font-sans w-full" style={{ overflow: 'visible' }}>
       {/* Decorative Elements - Simplified for mobile performance */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" style={{ zIndex: -1 }} />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" style={{ zIndex: -1 }} />
 
       {/* Language Switcher */}
       <div className="absolute top-3 left-4 z-50">
@@ -182,7 +182,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
         </Select>
       </div>
 
-      <main className="flex-1 flex flex-col items-center justify-start p-4 pt-16 relative z-10 w-full max-w-7xl mx-auto space-y-6">
+      <main className="flex-1 flex flex-col items-center justify-start p-4 pt-16 relative z-10 w-full max-w-7xl mx-auto space-y-6" style={{ overflow: 'visible' }}>
         
         {/* Main Navigation Tabs */}
         <Tabs defaultValue="home" className="w-full">
