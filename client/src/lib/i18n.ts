@@ -69,7 +69,9 @@ i18n
           "device_error": "Device does not support compass",
           "gps_error": "Could not access location. Enable GPS.",
           "accuracy_tip": "For best accuracy, move your phone in a figure-8 and ensure GPS is on.",
-          "loading": "Loading..."
+          "loading": "Loading...",
+          "turn_right": "Right",
+          "turn_left": "Left"
         }
       },
       ar: {
@@ -129,7 +131,9 @@ i18n
           "device_error": "الجهاز لا يدعم البوصلة",
           "gps_error": "تعذر الوصول للموقع. تأكد من تفعيل الـ GPS",
           "accuracy_tip": "للحصول على أفضل دقة، حرك هاتفك على شكل رقم 8 وتأكد من تفعيل خدمة الموقع.",
-          "loading": "جاري التحميل..."
+          "loading": "جاري التحميل...",
+          "turn_right": "يمين",
+          "turn_left": "يسار"
         }
       },
       ur: {
@@ -187,7 +191,9 @@ i18n
           "device_error": "آلہ کمپاس کی حمایت نہیں کرتا ہے",
           "gps_error": "مقام تک رسائی حاصل نہیں ہو سکی۔ GPS کو فعال کریں۔",
           "accuracy_tip": "بہترین درستگی کے لیے، اپنے فون کو 8 کے ہندسے کی شکل میں گھمائیں اور یقینی بنائیں کہ GPS آن ہے۔",
-          "loading": "لوڈ ہو رہا ہے..."
+          "loading": "لوڈ ہو رہا ہے...",
+          "turn_right": "دائیں",
+          "turn_left": "بائیں"
         }
       },
       fa: {
@@ -245,7 +251,9 @@ i18n
           "device_error": "دستگاه از قطب‌نما پشتیبانی نمی‌کند",
           "gps_error": "دسترسی به مکان امکان‌پذیر نیست. GPS را فعال کنید.",
           "accuracy_tip": "برای بهترین دقت، تلفن خود را به شکل عدد 8 حرکت دهید و از روشن بودن GPS اطمینان حاصل کنید.",
-          "loading": "در حال بارگذاری..."
+          "loading": "در حال بارگذاری...",
+          "turn_right": "راست",
+          "turn_left": "چپ"
         }
       },
       id: {
@@ -303,7 +311,9 @@ i18n
           "device_error": "Perangkat tidak mendukung kompas",
           "gps_error": "Tidak dapat mengakses lokasi. Aktifkan GPS.",
           "accuracy_tip": "Untuk akurasi terbaik, gerakkan ponsel Anda membentuk angka 8 dan pastikan GPS aktif.",
-          "loading": "Memuat..."
+          "loading": "Memuat...",
+          "turn_right": "Kanan",
+          "turn_left": "Kiri"
         }
       },
       tr: {
@@ -361,7 +371,9 @@ i18n
           "device_error": "Cihaz pusulayı desteklemiyor",
           "gps_error": "Konuma erişilemedi. GPS'i etkinleştirin.",
           "accuracy_tip": "En iyi doğruluk için telefonunuzu 8 şeklinde hareket ettirin ve GPS'in açık olduğundan emin olun.",
-          "loading": "Yükleniyor..."
+          "loading": "Yükleniyor...",
+          "turn_right": "Sağ",
+          "turn_left": "Sol"
         }
       },
       fr: {
@@ -419,7 +431,9 @@ i18n
           "device_error": "L'appareil ne supporte pas la boussole",
           "gps_error": "Impossible d'accéder à la localisation. Activez le GPS.",
           "accuracy_tip": "Pour une meilleure précision, faites un mouvement en 8 avec votre téléphone et assurez-vous que le GPS est activé.",
-          "loading": "Chargement..."
+          "loading": "Chargement...",
+          "turn_right": "Droite",
+          "turn_left": "Gauche"
         }
       },
       bn: {
@@ -477,7 +491,9 @@ i18n
           "device_error": "ডিভাইস কম্পাস সমর্থন করে না",
           "gps_error": "অবস্থান অ্যাক্সেস করা যায়নি। জিপিএস চালু করুন।",
           "accuracy_tip": "সেরা নির্ভুলতার জন্য, আপনার ফোনটি ৮ আকৃতিতে সরান এবং জিপিএস চালু আছে কিনা নিশ্চিত করুন।",
-          "loading": "লোড হচ্ছে..."
+          "loading": "লোড হচ্ছে...",
+          "turn_right": "ডানে",
+          "turn_left": "বামে"
         }
       },
       ru: {
@@ -535,7 +551,9 @@ i18n
           "device_error": "Устройство не поддерживает компас",
           "gps_error": "Не удалось получить доступ к местоположению. Включите GPS.",
           "accuracy_tip": "Для лучшей точности перемещайте телефон по восьмерке и убедитесь, что GPS включен.",
-          "loading": "Загрузка..."
+          "loading": "Загрузка...",
+          "turn_right": "Направо",
+          "turn_left": "Налево"
         }
       },
       es: {
@@ -593,7 +611,9 @@ i18n
           "device_error": "El dispositivo no soporta brújula",
           "gps_error": "No se pudo acceder a la ubicación. Habilita el GPS.",
           "accuracy_tip": "Para mayor precisión, mueve tu teléfono en forma de 8 y asegúrate de que el GPS esté activado.",
-          "loading": "Cargando..."
+          "loading": "Cargando...",
+          "turn_right": "Derecha",
+          "turn_left": "Izquierda"
         }
       }
     }

@@ -1,26 +1,29 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Compass, Navigation } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-function normalizeDegrees(deg: number): number {
+function normalize360(deg: number): number {
   return ((deg % 360) + 360) % 360;
 }
 
-function getAngleDifference(angle1: number, angle2: number): number {
-  const diff = normalizeDegrees(angle1 - angle2);
-  return diff > 180 ? 360 - diff : diff;
+function shortestSignedDelta(target: number, heading: number): number {
+  const diff = normalize360(target - heading);
+  return diff > 180 ? diff - 360 : diff;
 }
 
 export function QiblahFinder() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [heading, setHeading] = useState<number | null>(null);
   const [qiblahBearing, setQiblahBearing] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isListening, setIsListening] = useState(false);
+  
+  const cumulativeRotation = useRef(0);
+  const lastDelta = useRef<number | null>(null);
 
   const MECCA_LAT = 21.4225;
   const MECCA_LNG = 39.8262;
@@ -36,7 +39,7 @@ export function QiblahFinder() {
       Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda)
     );
     
-    return Math.round(normalizeDegrees(psi));
+    return Math.round(normalize360(psi));
   };
 
   const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
@@ -47,7 +50,7 @@ export function QiblahFinder() {
       // @ts-ignore
       compass = event.webkitCompassHeading;
     } else if (typeof event.alpha === "number") {
-      compass = normalizeDegrees(360 - event.alpha);
+      compass = normalize360(360 - event.alpha);
     }
     
     if (compass !== null) {
@@ -61,7 +64,6 @@ export function QiblahFinder() {
       return;
     }
 
-    // iOS 13+ requires permission request from user gesture
     // @ts-ignore - requestPermission is iOS-specific
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
       try {
@@ -109,13 +111,85 @@ export function QiblahFinder() {
     };
   }, [isListening, handleOrientation]);
 
-  const arrowRotation = qiblahBearing !== null && heading !== null 
-    ? normalizeDegrees(qiblahBearing - heading)
+  const delta = qiblahBearing !== null && heading !== null 
+    ? shortestSignedDelta(qiblahBearing, heading)
     : 0;
 
+  useEffect(() => {
+    if (heading === null || qiblahBearing === null) return;
+    
+    const newDelta = shortestSignedDelta(qiblahBearing, heading);
+    
+    if (lastDelta.current === null) {
+      cumulativeRotation.current = newDelta;
+    } else {
+      const change = newDelta - lastDelta.current;
+      let shortChange = change;
+      if (change > 180) shortChange = change - 360;
+      else if (change < -180) shortChange = change + 360;
+      cumulativeRotation.current += shortChange;
+    }
+    lastDelta.current = newDelta;
+  }, [heading, qiblahBearing]);
+
+  const arrowRotation = cumulativeRotation.current;
+  const degreesRemaining = Math.abs(Math.round(delta));
+  
+  const isArabic = i18n.language === 'ar' || i18n.language === 'ur' || i18n.language === 'fa';
+  const directionText = delta > 0 
+    ? (isArabic ? 'يمين' : t('turn_right')) 
+    : (isArabic ? 'يسار' : t('turn_left'));
+
   const TOLERANCE = 15;
-  const isAligned = heading !== null && qiblahBearing !== null && 
-    getAngleDifference(heading, qiblahBearing) <= TOLERANCE;
+  const NEAR_THRESHOLD = 45;
+  
+  const isAligned = degreesRemaining <= TOLERANCE;
+  const isNear = degreesRemaining > TOLERANCE && degreesRemaining <= NEAR_THRESHOLD;
+  const isFar = degreesRemaining > NEAR_THRESHOLD;
+
+  const getColorClass = () => {
+    if (isAligned) return 'green';
+    if (isNear) return 'yellow';
+    return 'red';
+  };
+  
+  const colorState = getColorClass();
+
+  const ringColors = {
+    green: 'border-green-500 bg-green-500/10',
+    yellow: 'border-yellow-500 bg-yellow-500/10',
+    red: 'border-red-500 bg-red-500/10'
+  };
+
+  const arrowGradients = {
+    green: 'from-transparent to-green-500',
+    yellow: 'from-transparent to-yellow-500',
+    red: 'from-transparent to-red-500'
+  };
+
+  const dotColors = {
+    green: 'bg-green-500',
+    yellow: 'bg-yellow-500',
+    red: 'bg-red-500'
+  };
+
+  const kaabaColors = {
+    green: 'bg-green-600 border-green-400',
+    yellow: 'bg-yellow-600 border-yellow-400',
+    red: 'bg-red-600 border-red-400'
+  };
+
+  const kaabaInnerColors = {
+    green: 'bg-green-200',
+    yellow: 'bg-yellow-200',
+    red: 'bg-red-200'
+  };
+
+  const textColors = {
+    green: 'text-green-500',
+    yellow: 'text-yellow-500',
+    red: 'text-red-500'
+  };
 
   useEffect(() => {
     if (isAligned && navigator.vibrate) {
@@ -143,9 +217,7 @@ export function QiblahFinder() {
           <div className="relative w-64 h-64 flex items-center justify-center">
             <div 
               className={`absolute inset-0 rounded-full border-4 shadow-inner transition-colors duration-300 ${
-                isAligned 
-                  ? 'border-green-500 bg-green-500/10' 
-                  : 'border-muted/30 bg-background/50'
+                heading !== null ? ringColors[colorState] : 'border-muted/30 bg-background/50'
               }`} 
             />
             
@@ -161,35 +233,23 @@ export function QiblahFinder() {
               </div>
             ))}
 
-            {qiblahBearing !== null && (
+            {qiblahBearing !== null && heading !== null && (
               <motion.div 
                 className="absolute w-full h-full flex items-center justify-center z-20"
                 animate={{ rotate: arrowRotation }}
-                transition={{ type: "spring", damping: 20 }}
+                transition={{ type: "spring", damping: 25, stiffness: 120 }}
               >
                 <div 
-                  className={`w-2 h-32 rounded-full absolute -top-4 origin-bottom transition-colors duration-300 ${
-                    isAligned 
-                      ? 'bg-gradient-to-t from-transparent to-green-500' 
-                      : 'bg-gradient-to-t from-transparent to-primary'
-                  }`} 
+                  className={`w-2 h-32 rounded-full absolute -top-4 origin-bottom transition-colors duration-300 bg-gradient-to-t ${arrowGradients[colorState]}`} 
                 />
                 <div 
-                  className={`w-4 h-4 rounded-full absolute top-0 shadow-lg transition-colors duration-300 ${
-                    isAligned ? 'bg-green-500' : 'bg-primary'
-                  }`} 
+                  className={`w-4 h-4 rounded-full absolute top-0 shadow-lg transition-colors duration-300 ${dotColors[colorState]}`} 
                 />
                 
                 <div 
-                  className={`absolute top-[-30px] text-white p-1 rounded-sm shadow-md border transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center transition-colors duration-300 ${
-                    isAligned 
-                      ? 'bg-green-600 border-green-400' 
-                      : 'bg-black border-[#D4AF37]'
-                  }`}
+                  className={`absolute top-[-30px] text-white p-1 rounded-sm shadow-md border transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center transition-colors duration-300 ${kaabaColors[colorState]}`}
                 >
-                  <div className={`w-full h-1 absolute top-2 transition-colors duration-300 ${
-                    isAligned ? 'bg-green-200' : 'bg-[#D4AF37]'
-                  }`} />
+                  <div className={`w-full h-1 absolute top-2 transition-colors duration-300 ${kaabaInnerColors[colorState]}`} />
                 </div>
               </motion.div>
             )}
@@ -197,23 +257,36 @@ export function QiblahFinder() {
             <div className="w-4 h-4 bg-foreground rounded-full z-30 ring-4 ring-background" />
           </div>
 
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             {qiblahBearing !== null ? (
               <>
                 <div className={`text-4xl font-mono font-black transition-colors duration-300 ${
-                  isAligned ? 'text-green-500' : 'text-foreground'
+                  heading !== null ? textColors[colorState] : 'text-foreground'
                 }`}>
                   {Math.round(qiblahBearing)}°
                 </div>
-                {isAligned ? (
-                  <div className="text-sm font-bold text-green-500 animate-pulse flex items-center justify-center gap-2 bg-green-500/10 px-4 py-2 rounded-full">
-                    ✓ {t('qiblah_aligned')}
-                  </div>
-                ) : (
+                
+                {heading !== null && (
+                  isAligned ? (
+                    <div className="text-lg font-bold text-green-500 animate-pulse flex items-center justify-center gap-2 bg-green-500/10 px-4 py-2 rounded-full">
+                      ✓ {t('qiblah_aligned')}
+                    </div>
+                  ) : (
+                    <div className={`text-xl font-bold transition-colors duration-300 ${textColors[colorState]} bg-${colorState === 'yellow' ? 'yellow' : colorState}-500/10 px-4 py-2 rounded-full`}>
+                      <span dir="rtl">
+                        {isArabic ? (
+                          <>باقي {degreesRemaining}° {directionText}</>
+                        ) : (
+                          <>{degreesRemaining}° {directionText}</>
+                        )}
+                      </span>
+                    </div>
+                  )
+                )}
+                
+                {heading === null && (
                   <p className="text-sm text-muted-foreground font-medium">
-                    {heading !== null 
-                      ? t('rotate_phone') 
-                      : t('degree_from_north')}
+                    {t('degree_from_north')}
                   </p>
                 )}
               </>
