@@ -16,7 +16,7 @@ i18n
         translation: {
           "prayer_times": "Prayer Times",
           "qiblah": "Qiblah",
-          "daily_content": "Daily Content",
+          "daily_content": "Stories",
           "next_event": "Next Event",
           "ramadan": "Ramadan",
           "eid_al_fitr": "Eid al-Fitr",
@@ -72,7 +72,7 @@ i18n
         translation: {
           "prayer_times": "المواقيت",
           "qiblah": "القبلة",
-          "daily_content": "يوميات",
+          "daily_content": "قصص",
           "next_event": "الحدث القادم",
           "ramadan": "رمضان",
           "eid_al_fitr": "عيد الفطر",
@@ -128,7 +128,7 @@ i18n
         translation: {
           "prayer_times": "نماز کے اوقات",
           "qiblah": "قبلہ",
-          "daily_content": "روزانہ کا مواد",
+          "daily_content": "قصے",
           "next_event": "اگلا واقعہ",
           "ramadan": "رمضان",
           "eid_al_fitr": "عید الفطر",
@@ -184,7 +184,7 @@ i18n
         translation: {
           "prayer_times": "اوقات شرعی",
           "qiblah": "قبله",
-          "daily_content": "محتوای روزانه",
+          "daily_content": "داستان‌ها",
           "next_event": "رویداد بعدی",
           "ramadan": "رمضان",
           "eid_al_fitr": "عید فطر",
@@ -240,7 +240,7 @@ i18n
         translation: {
           "prayer_times": "Waktu Sholat",
           "qiblah": "Kiblat",
-          "daily_content": "Konten Harian",
+          "daily_content": "Kisah",
           "next_event": "Acara Berikutnya",
           "ramadan": "Ramadhan",
           "eid_al_fitr": "Idul Fitri",
@@ -296,7 +296,7 @@ i18n
         translation: {
           "prayer_times": "Namaz Vakitleri",
           "qiblah": "Kıble",
-          "daily_content": "Günlük İçerik",
+          "daily_content": "Hikayeler",
           "next_event": "Sonraki Etkinlik",
           "ramadan": "Ramazan",
           "eid_al_fitr": "Ramazan Bayramı",
@@ -352,7 +352,7 @@ i18n
         translation: {
           "prayer_times": "Heures de Prière",
           "qiblah": "Qibla",
-          "daily_content": "Contenu Quotidien",
+          "daily_content": "Histoires",
           "next_event": "Prochain Événement",
           "ramadan": "Ramadan",
           "eid_al_fitr": "Aïd el-Fitr",
@@ -408,7 +408,7 @@ i18n
         translation: {
           "prayer_times": "নামাজের সময়",
           "qiblah": "কিবলা",
-          "daily_content": "দৈনিক বিষয়বস্তু",
+          "daily_content": "কাহিনী",
           "next_event": "পরবর্তী ইভেন্ট",
           "ramadan": "রমজান",
           "eid_al_fitr": "ঈদুল ফিতর",
@@ -464,7 +464,7 @@ i18n
         translation: {
           "prayer_times": "Время намаза",
           "qiblah": "Кибла",
-          "daily_content": "Ежедневный контент",
+          "daily_content": "Истории",
           "next_event": "Следующее событие",
           "ramadan": "Рамадан",
           "eid_al_fitr": "Ид аль-Фитр",
@@ -520,7 +520,7 @@ i18n
         translation: {
           "prayer_times": "Horarios de Oración",
           "qiblah": "Alquibla",
-          "daily_content": "Contenido Diario",
+          "daily_content": "Historias",
           "next_event": "Próximo Evento",
           "ramadan": "Ramadán",
           "eid_al_fitr": "Eid al-Fitr",
