@@ -6,8 +6,6 @@ import confetti from "canvas-confetti";
 import { Moon, Calendar, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-// Import the image directly to ensure Vite processes it correctly
-import eidLogo from "@assets/Gemini_Generated_Image_y967fby967fby967_1765655598070.png";
 
 export default function Home() {
   const [nextEid, setNextEid] = useState<EidDate | null>(null);
@@ -64,14 +62,6 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 space-y-6 flex flex-col items-center"
         >
-          <div className="mx-auto w-32 h-32 md:w-48 md:h-48 rounded-full bg-card p-2 shadow-2xl shadow-primary/20 flex items-center justify-center relative overflow-hidden group hover:scale-105 transition-transform duration-500 border-4 border-primary/20">
-             <img 
-               src={eidLogo} 
-               alt="شعار العيد" 
-               className="w-full h-full object-contain"
-             />
-          </div>
-          
           <div className="space-y-3">
             <h1 className="text-5xl md:text-7xl font-bold font-serif text-primary drop-shadow-sm tracking-wide">
               {nextEid.nameAr}
