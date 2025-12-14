@@ -102,7 +102,16 @@ export function getDailyContent(lang: string = 'ar'): DailyContentBundle {
   return enrichBundle(bundle);
 }
 
-export function getRandomContent(lang: string = 'ar'): DailyContentBundle {
+export function getCurrentContentIndex(): number | null {
+  const storedIndex = localStorage.getItem('dailyContentIndex');
+  if (storedIndex) {
+    const index = parseInt(storedIndex, 10);
+    return isNaN(index) ? null : index;
+  }
+  return null;
+}
+
+export function getRandomContent(lang: string = 'ar', excludeIndex?: number): DailyContentBundle {
   const validIndices = getValidContentIndices(lang);
   
   if (validIndices.length === 0) {
@@ -111,16 +120,13 @@ export function getRandomContent(lang: string = 'ar'): DailyContentBundle {
     return enrichBundle(bundle);
   }
   
-  const storedIndex = localStorage.getItem('dailyContentIndex');
-  let randomValidIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
+  let availableIndices = validIndices;
   
-  if (storedIndex && validIndices.length > 1) {
-    const currentIdx = parseInt(storedIndex, 10);
-    if (randomValidIndex === currentIdx) {
-      const filteredIndices = validIndices.filter(i => i !== currentIdx);
-      randomValidIndex = filteredIndices[Math.floor(Math.random() * filteredIndices.length)];
-    }
+  if (excludeIndex !== undefined && validIndices.length > 1) {
+    availableIndices = validIndices.filter(i => i !== excludeIndex);
   }
+  
+  const randomValidIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
   
   localStorage.setItem('dailyContentIndex', randomValidIndex.toString());
   
