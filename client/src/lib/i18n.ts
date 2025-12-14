@@ -7,9 +7,14 @@ i18n
   .use(initReactI18next)
   .init({
     debug: false,
+    lng: 'ar',
     fallbackLng: 'ar',
     interpolation: {
       escapeValue: false,
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
     },
     resources: {
       en: {
