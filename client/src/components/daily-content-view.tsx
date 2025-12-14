@@ -23,13 +23,16 @@ export function DailyContentView() {
   const { t, i18n } = useTranslation();
   const [content, setContent] = useState<DailyContentBundle | null>(null);
   const [activeTab, setActiveTab] = useState("ayah");
+  const [contentKey, setContentKey] = useState(0);
 
   useEffect(() => {
     setContent(getDailyContent(i18n.language));
   }, [i18n.language]);
 
   const handleGenerateNew = () => {
-    setContent(getRandomContent(i18n.language));
+    const newContent = getRandomContent(i18n.language);
+    setContent(newContent);
+    setContentKey(prev => prev + 1);
   };
 
   if (!content) return null;
@@ -73,7 +76,7 @@ export function DailyContentView() {
 
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeTab + content.ayah.title} // Change key to trigger animation on refresh
+            key={`${activeTab}-${contentKey}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
