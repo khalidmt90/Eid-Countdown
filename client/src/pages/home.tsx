@@ -155,39 +155,38 @@ ${t('isha')}: ${prayerData.timings.Isha}
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground bg-pattern relative flex flex-col font-sans w-full" style={{ overflow: 'visible' }}>
-      {/* Decorative Elements - Simplified for mobile performance */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" style={{ zIndex: -1 }} />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" style={{ zIndex: -1 }} />
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50 py-3 px-4">
+        <div className="max-w-7xl mx-auto flex justify-start">
+          <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
+            <SelectTrigger className="w-[100px] h-8 text-xs bg-card border-border">
+              <Languages className="w-3 h-3 mr-2" />
+              <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ar">العربية</SelectItem>
+              <SelectItem value="en">English</SelectItem>
+              <SelectItem value="ur">اردو</SelectItem>
+              <SelectItem value="fa">فارسی</SelectItem>
+              <SelectItem value="id">Bahasa Indonesia</SelectItem>
+              <SelectItem value="tr">Türkçe</SelectItem>
+              <SelectItem value="fr">Français</SelectItem>
+              <SelectItem value="bn">বাংলা</SelectItem>
+              <SelectItem value="ru">Русский</SelectItem>
+              <SelectItem value="es">Español</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </header>
 
-      {/* Language Switcher */}
-      <div className="absolute top-3 left-4 z-50">
-         <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
-          <SelectTrigger className="w-[100px] h-8 text-xs bg-card border-border">
-            <Languages className="w-3 h-3 mr-2" />
-            <SelectValue placeholder="Language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ar">العربية</SelectItem>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="ur">اردو</SelectItem>
-            <SelectItem value="fa">فارسی</SelectItem>
-            <SelectItem value="id">Bahasa Indonesia</SelectItem>
-            <SelectItem value="tr">Türkçe</SelectItem>
-            <SelectItem value="fr">Français</SelectItem>
-            <SelectItem value="bn">বাংলা</SelectItem>
-            <SelectItem value="ru">Русский</SelectItem>
-            <SelectItem value="es">Español</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <main className="flex-1 flex flex-col items-center justify-start p-4 pt-16 relative z-10 w-full max-w-7xl mx-auto space-y-6" style={{ overflow: 'visible' }}>
-        
-        {/* Main Navigation Tabs */}
+      {/* Main Content */}
+      <main className="p-4 max-w-7xl mx-auto">
         <Tabs defaultValue="home" className="w-full">
-          <div className="flex justify-center mb-8 sticky top-2 z-50">
-            <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-black/90 border border-white/10 shadow-lg rounded-full px-1.5">
+          {/* Sticky Tab Navigation */}
+          <div className="sticky top-[52px] z-40 bg-background/95 backdrop-blur-sm py-4 -mx-4 px-4 mb-6">
+            <div className="flex justify-center">
+              <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-black/90 border border-white/10 shadow-lg rounded-full px-1.5">
               <TabsTrigger 
                 value="home" 
                 className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-colors"
@@ -207,6 +206,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 {t('daily_content')}
               </TabsTrigger>
             </TabsList>
+            </div>
           </div>
 
           <TabsContent value="home" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -368,7 +368,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
             <DailyContentView />
           </TabsContent>
         </Tabs>
-
       </main>
 
       {/* Footer */}
