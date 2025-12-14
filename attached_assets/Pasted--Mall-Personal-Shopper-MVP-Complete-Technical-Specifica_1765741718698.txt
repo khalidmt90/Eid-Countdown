@@ -1,0 +1,865 @@
+# Mall Personal Shopper MVP - Complete Technical Specification for Replit
+
+## Project Overview
+Build a full-stack Mall Personal Shopper service where users can request shopping assistance from personal shoppers who are physically present inside shopping malls. This is NOT a city-wide delivery app - shoppers must be checked into specific malls to receive requests.
+
+---
+
+## Tech Stack (Non-Negotiable)
+
+### Frontend & Backend
+- **Next.js 14+** (App Router preferred)
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Arabic RTL support with `dir="rtl"` attribute
+
+### Backend Services (Supabase)
+- **Authentication**: Phone OTP (Supabase Auth)
+- **Database**: PostgreSQL (Supabase)
+- **Storage**: Images and voice notes (Supabase Storage)
+- **Realtime**: Chat functionality (Supabase Realtime)
+
+### Environment Setup
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+---
+
+## Database Schema (MUST IMPLEMENT EXACTLY)
+
+### 1. users
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  phone VARCHAR(20) UNIQUE NOT NULL,
+  name VARCHAR(100),
+  role VARCHAR(20) NOT NULL CHECK (role IN ('user', 'shopper', 'admin')),
+  language VARCHAR(2) DEFAULT 'ar' CHECK (language IN ('ar', 'en')),
+  city VARCHAR(50),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 2. malls
+```sql
+CREATE TABLE malls (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name_ar VARCHAR(200) NOT NULL,
+  name_en VARCHAR(200) NOT NULL,
+  city VARCHAR(50) NOT NULL,
+  lat DECIMAL(10, 8) NOT NULL,
+  lng DECIMAL(11, 8) NOT NULL,
+  radius_m INTEGER DEFAULT 200,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 3. stores (Optional for MVP, but include structure)
+```sql
+CREATE TABLE stores (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name_ar VARCHAR(200) NOT NULL,
+  name_en VARCHAR(200) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 4. store_branches (Optional for MVP)
+```sql
+CREATE TABLE store_branches (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  store_id UUID REFERENCES stores(id),
+  mall_id UUID REFERENCES malls(id),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 5. shoppers
+```sql
+CREATE TABLE shoppers (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  gender VARCHAR(10) CHECK (gender IN ('male', 'female')),
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'suspended')),
+  active_jobs_limit INTEGER DEFAULT 3,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 6. shopper_presence (CRITICAL for auto-assignment)
+```sql
+CREATE TABLE shopper_presence (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  shopper_id UUID REFERENCES shoppers(user_id) ON DELETE CASCADE,
+  mall_id UUID REFERENCES malls(id),
+  checked_in_at TIMESTAMP DEFAULT NOW(),
+  checked_in_until TIMESTAMP NOT NULL,
+  last_lat DECIMAL(10, 8),
+  last_lng DECIMAL(11, 8),
+  is_active BOOLEAN DEFAULT true,
+  UNIQUE(shopper_id, mall_id)
+);
+```
+
+### 7. requests (Core Business Logic)
+```sql
+CREATE TABLE requests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id),
+  mall_id UUID REFERENCES malls(id),
+  store_branch_id UUID REFERENCES store_branches(id) NULL,
+  category VARCHAR(50) NULL,
+  description TEXT NOT NULL,
+  voice_note_url VARCHAR(500) NULL,
+  preferred_shopper_gender VARCHAR(10) CHECK (preferred_shopper_gender IN ('male', 'female', 'no_preference')),
+  budget_min DECIMAL(10, 2),
+  budget_max DECIMAL(10, 2),
+  status VARCHAR(30) DEFAULT 'new' CHECK (status IN (
+    'new', 'assigned', 'accepted', 'options_sent', 
+    'approved', 'purchased', 'courier_offline', 'delivered', 'closed'
+  )),
+  assigned_shopper_id UUID REFERENCES shoppers(user_id) NULL,
+  commission_rate DECIMAL(5, 2) DEFAULT 0,
+  service_fee DECIMAL(10, 2) DEFAULT 0,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5) NULL,
+  review TEXT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 8. messages (Chat)
+```sql
+CREATE TABLE messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  request_id UUID REFERENCES requests(id) ON DELETE CASCADE,
+  sender_id UUID REFERENCES users(id),
+  text TEXT,
+  attachment_url VARCHAR(500),
+  attachment_type VARCHAR(20) CHECK (attachment_type IN ('image', 'voice', 'receipt') OR attachment_type IS NULL),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 9. options (Shopper sends product options)
+```sql
+CREATE TABLE options (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  request_id UUID REFERENCES requests(id) ON DELETE CASCADE,
+  shopper_id UUID REFERENCES shoppers(user_id),
+  image_urls TEXT[] NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  notes TEXT,
+  approved BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 10. activity_log (Audit trail)
+```sql
+CREATE TABLE activity_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  request_id UUID REFERENCES requests(id) ON DELETE CASCADE,
+  actor_id UUID REFERENCES users(id),
+  action VARCHAR(100) NOT NULL,
+  metadata JSONB,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+---
+
+## Critical Business Logic (MUST IMPLEMENT)
+
+### 1. Shopper Check-in System
+**File: `/lib/shopper-checkin.ts`**
+
+```typescript
+// Pseudo-code logic
+async function checkInShopper(shopperId, mallId, userLat, userLng) {
+  // 1. Get mall coordinates and radius
+  const mall = await getMall(mallId);
+  
+  // 2. Verify shopper is within mall radius
+  const distance = calculateDistance(userLat, userLng, mall.lat, mall.lng);
+  if (distance > mall.radius_m) {
+    throw new Error("You must be inside the mall to check in");
+  }
+  
+  // 3. Set check-in expiry (90 minutes from now)
+  const checkedInUntil = new Date(Date.now() + 90 * 60 * 1000);
+  
+  // 4. Upsert shopper_presence
+  await upsertShopperPresence({
+    shopper_id: shopperId,
+    mall_id: mallId,
+    checked_in_until: checkedInUntil,
+    last_lat: userLat,
+    last_lng: userLng,
+    is_active: true
+  });
+  
+  return { success: true, expiresAt: checkedInUntil };
+}
+```
+
+### 2. Auto-Assignment Logic
+**File: `/lib/auto-assign.ts`**
+
+```typescript
+// Pseudo-code logic
+async function autoAssignRequest(requestId) {
+  // 1. Get request details
+  const request = await getRequest(requestId);
+  
+  // 2. Find eligible shoppers
+  const eligibleShoppers = await db.query(`
+    SELECT sp.shopper_id, s.gender, COUNT(r.id) as active_requests
+    FROM shopper_presence sp
+    JOIN shoppers s ON s.user_id = sp.shopper_id
+    LEFT JOIN requests r ON r.assigned_shopper_id = s.user_id 
+      AND r.status IN ('assigned', 'accepted', 'options_sent', 'approved', 'purchased')
+    WHERE sp.mall_id = $1
+      AND sp.checked_in_until > NOW()
+      AND sp.is_active = true
+      AND s.status = 'approved'
+      AND (
+        $2 = 'no_preference' 
+        OR s.gender = $2
+      )
+    GROUP BY sp.shopper_id, s.gender, s.active_jobs_limit
+    HAVING COUNT(r.id) < s.active_jobs_limit
+    ORDER BY COUNT(r.id) ASC, sp.checked_in_at ASC
+    LIMIT 1
+  `, [request.mall_id, request.preferred_shopper_gender]);
+  
+  // 3. If no shopper found
+  if (eligibleShoppers.length === 0) {
+    if (request.preferred_shopper_gender !== 'no_preference') {
+      // Suggest relaxing gender preference
+      return { 
+        success: false, 
+        reason: 'no_shoppers_available',
+        suggestion: 'relax_gender_preference'
+      };
+    }
+    return { success: false, reason: 'no_shoppers_available' };
+  }
+  
+  // 4. Assign to best shopper
+  const selectedShopper = eligibleShoppers[0];
+  await updateRequest(requestId, {
+    assigned_shopper_id: selectedShopper.shopper_id,
+    status: 'assigned'
+  });
+  
+  // 5. Log activity
+  await logActivity(requestId, null, 'request_auto_assigned', {
+    shopper_id: selectedShopper.shopper_id
+  });
+  
+  return { success: true, shopper_id: selectedShopper.shopper_id };
+}
+```
+
+### 3. Location-based Mall Sorting
+**File: `/lib/location.ts`**
+
+```typescript
+// Haversine formula for distance calculation
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371000; // Earth radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+}
+
+async function getMallsByLocation(userLat, userLng, city) {
+  let malls = await getAllMalls(city);
+  
+  if (userLat && userLng) {
+    malls = malls.map(mall => ({
+      ...mall,
+      distance: calculateDistance(userLat, userLng, mall.lat, mall.lng)
+    })).sort((a, b) => a.distance - b.distance);
+  }
+  
+  return malls;
+}
+```
+
+---
+
+## API Routes Structure
+
+### Authentication Routes
+- `POST /api/auth/send-otp` - Send OTP to phone
+- `POST /api/auth/verify-otp` - Verify OTP and create session
+- `GET /api/auth/session` - Get current session
+- `POST /api/auth/logout` - Logout
+
+### Mall Routes
+- `GET /api/malls?city=Dammam&lat=26.4207&lng=50.0888` - Get malls (sorted by distance if lat/lng provided)
+- `GET /api/malls/:id` - Get single mall
+
+### Request Routes (End User)
+- `POST /api/requests` - Create new request
+- `GET /api/requests` - Get user's requests
+- `GET /api/requests/:id` - Get request detail
+- `PATCH /api/requests/:id/approve-option` - Approve a product option
+- `POST /api/requests/:id/rate` - Rate completed request
+- `PATCH /api/requests/:id/cancel` - Cancel request
+
+### Shopper Routes
+- `POST /api/shopper/checkin` - Check in to mall
+- `GET /api/shopper/presence` - Get current check-in status
+- `GET /api/shopper/requests` - Get assigned requests
+- `PATCH /api/shopper/requests/:id/accept` - Accept assigned request
+- `PATCH /api/shopper/requests/:id/status` - Update request status
+- `POST /api/shopper/requests/:id/options` - Send product options
+
+### Message Routes
+- `GET /api/requests/:id/messages` - Get chat messages
+- `POST /api/requests/:id/messages` - Send message
+- `POST /api/upload` - Upload image/voice note
+
+### Admin Routes
+- `GET /api/admin/malls` - List all malls
+- `POST /api/admin/malls` - Create mall
+- `PATCH /api/admin/malls/:id` - Update mall
+- `GET /api/admin/shoppers` - List all shoppers
+- `PATCH /api/admin/shoppers/:id/approve` - Approve shopper
+- `GET /api/admin/requests` - Monitor all requests
+
+---
+
+## Page Structure (with Routes)
+
+### End User Pages
+1. **`/` or `/location`** - Location permission / city selection
+2. **`/malls`** - Browse nearby malls
+3. **`/request/new?mallId=xxx`** - Create new request
+4. **`/requests`** - My requests list
+5. **`/requests/:id`** - Request detail + chat
+6. **`/profile`** - User profile
+
+### Shopper Pages
+1. **`/shopper/checkin`** - Check in to mall
+2. **`/shopper/requests`** - Assigned requests
+3. **`/shopper/requests/:id`** - Request detail + chat + send options
+4. **`/shopper/profile`** - Shopper profile
+
+### Admin Pages
+1. **`/admin/dashboard`** - Overview
+2. **`/admin/malls`** - Manage malls
+3. **`/admin/shoppers`** - Approve shoppers
+4. **`/admin/requests`** - Monitor requests
+
+---
+
+## Language & Localization (CRITICAL)
+
+### File: `/lib/i18n.ts`
+```typescript
+export const translations = {
+  ar: {
+    // Navigation
+    'nav.malls': 'المولات',
+    'nav.requests': 'طلباتي',
+    'nav.profile': 'الملف الشخصي',
+    
+    // Mall selection
+    'malls.title': 'اختر المول',
+    'malls.nearby': 'المولات القريبة',
+    'malls.all': 'جميع المولات',
+    
+    // Request creation
+    'request.create': 'طلب جديد',
+    'request.description': 'اكتب طلبك',
+    'request.budget': 'الميزانية التقريبية',
+    'request.gender_preference': 'تفضيل جنس المتسوق',
+    'request.male': 'ذكر',
+    'request.female': 'أنثى',
+    'request.no_preference': 'لا يهم',
+    'request.category': 'الفئة',
+    'request.submit': 'إرسال الطلب',
+    
+    // Categories
+    'category.fashion': 'أزياء',
+    'category.perfume': 'عطور',
+    'category.gifts': 'هدايا',
+    'category.electronics': 'إلكترونيات',
+    'category.other': 'أخرى',
+    
+    // Request status
+    'status.new': 'جديد',
+    'status.assigned': 'تم التعيين',
+    'status.accepted': 'مقبول',
+    'status.options_sent': 'تم إرسال الخيارات',
+    'status.approved': 'تمت الموافقة',
+    'status.purchased': 'تم الشراء',
+    'status.courier_offline': 'مع خدمة التوصيل',
+    'status.delivered': 'تم التوصيل',
+    'status.closed': 'مكتمل',
+    
+    // Shopper
+    'shopper.checkin': 'تسجيل الحضور',
+    'shopper.checkout': 'تسجيل المغادرة',
+    'shopper.send_options': 'إرسال الخيارات',
+    'shopper.price': 'السعر',
+    'shopper.notes': 'ملاحظات',
+    
+    // Common
+    'common.loading': 'جاري التحميل...',
+    'common.error': 'حدث خطأ',
+    'common.success': 'تمت العملية بنجاح',
+    'common.cancel': 'إلغاء',
+    'common.confirm': 'تأكيد',
+    'common.save': 'حفظ',
+  },
+  en: {
+    // Navigation
+    'nav.malls': 'Malls',
+    'nav.requests': 'My Requests',
+    'nav.profile': 'Profile',
+    
+    // Mall selection
+    'malls.title': 'Select Mall',
+    'malls.nearby': 'Nearby Malls',
+    'malls.all': 'All Malls',
+    
+    // Request creation
+    'request.create': 'New Request',
+    'request.description': 'Write your request',
+    'request.budget': 'Approximate Budget',
+    'request.gender_preference': 'Shopper Gender Preference',
+    'request.male': 'Male',
+    'request.female': 'Female',
+    'request.no_preference': 'No Preference',
+    'request.category': 'Category',
+    'request.submit': 'Submit Request',
+    
+    // Categories
+    'category.fashion': 'Fashion',
+    'category.perfume': 'Perfume',
+    'category.gifts': 'Gifts',
+    'category.electronics': 'Electronics',
+    'category.other': 'Other',
+    
+    // Request status
+    'status.new': 'New',
+    'status.assigned': 'Assigned',
+    'status.accepted': 'Accepted',
+    'status.options_sent': 'Options Sent',
+    'status.approved': 'Approved',
+    'status.purchased': 'Purchased',
+    'status.courier_offline': 'With Courier',
+    'status.delivered': 'Delivered',
+    'status.closed': 'Closed',
+    
+    // Shopper
+    'shopper.checkin': 'Check In',
+    'shopper.checkout': 'Check Out',
+    'shopper.send_options': 'Send Options',
+    'shopper.price': 'Price',
+    'shopper.notes': 'Notes',
+    
+    // Common
+    'common.loading': 'Loading...',
+    'common.error': 'An error occurred',
+    'common.success': 'Success',
+    'common.cancel': 'Cancel',
+    'common.confirm': 'Confirm',
+    'common.save': 'Save',
+  }
+};
+
+export function useTranslation(language: 'ar' | 'en') {
+  return {
+    t: (key: string) => translations[language][key] || key,
+    language,
+    isRTL: language === 'ar'
+  };
+}
+```
+
+### RTL Support
+- Add `dir="rtl"` to `<html>` tag when language is Arabic
+- Use Tailwind's RTL plugin or conditional classes
+- Mirror layouts for Arabic (e.g., `ml-4` becomes `mr-4` in RTL)
+
+---
+
+## Realtime Chat Implementation
+
+### Supabase Realtime Setup
+```typescript
+// Subscribe to messages for a request
+const channel = supabase
+  .channel(`request_${requestId}`)
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: `request_id=eq.${requestId}`
+    },
+    (payload) => {
+      setMessages(prev => [...prev, payload.new]);
+    }
+  )
+  .subscribe();
+```
+
+---
+
+## File Upload System
+
+### Supabase Storage Buckets
+1. **`request-voices`** - Voice notes
+2. **`request-images`** - Product photos
+3. **`option-images`** - Product option photos
+4. **`receipts`** - Purchase receipts
+
+### Upload Function
+```typescript
+async function uploadFile(file: File, bucket: string) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random()}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file);
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+}
+```
+
+---
+
+## Operational Rules (MUST ENFORCE)
+
+### 1. Purchase Approval Rule
+- **CRITICAL**: Shopper CANNOT mark request as "purchased" unless user has approved an option
+- Enforce in API: Check that `options.approved = true` exists before allowing status change to "purchased"
+
+### 2. Active Request Limit
+- Each shopper has `active_jobs_limit` (default: 3)
+- Count requests in statuses: `assigned`, `accepted`, `options_sent`, `approved`, `purchased`
+- Block assignment if limit reached
+
+### 3. Check-in Expiry
+- Auto-expire check-ins after 90 minutes
+- Prevent request assignment to expired shoppers
+- Show warning to shopper when check-in is about to expire (10 min before)
+
+### 4. Request Cancellation
+- User can cancel if status is `new`, `assigned`, or `accepted`
+- Cannot cancel after `options_sent`
+- Log cancellation in activity_log
+
+### 5. Rating System
+- Rating required when status changes to `closed`
+- 1-5 stars
+- Optional review text
+
+---
+
+## Security & Row Level Security (RLS)
+
+### Enable RLS on all tables
+```sql
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+-- ... etc for all tables
+```
+
+### Example RLS Policies
+
+**Users can read their own data:**
+```sql
+CREATE POLICY "Users can read own data"
+  ON users FOR SELECT
+  USING (auth.uid() = id);
+```
+
+**Users can read requests they created or are assigned to:**
+```sql
+CREATE POLICY "Users can read their requests"
+  ON requests FOR SELECT
+  USING (
+    auth.uid() = user_id 
+    OR auth.uid() = assigned_shopper_id
+    OR EXISTS (
+      SELECT 1 FROM users WHERE users.id = auth.uid() AND users.role = 'admin'
+    )
+  );
+```
+
+**Only assigned shopper can send options:**
+```sql
+CREATE POLICY "Shoppers can send options for assigned requests"
+  ON options FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM requests 
+      WHERE requests.id = request_id 
+      AND requests.assigned_shopper_id = auth.uid()
+    )
+  );
+```
+
+---
+
+## MVP Development Phases (for Replit)
+
+### Phase 1: Foundation (Days 1-2)
+- [ ] Initialize Next.js project with TypeScript
+- [ ] Set up Supabase client
+- [ ] Implement phone OTP authentication
+- [ ] Create user role system (user/shopper/admin)
+- [ ] Set up protected routes based on role
+- [ ] Implement language toggle (Arabic/English)
+- [ ] Set up RTL layout for Arabic
+
+### Phase 2: Mall System (Days 3-4)
+- [ ] Create malls table and seed sample data (Dammam malls)
+- [ ] Implement location permission request
+- [ ] Build mall list page with location-based sorting
+- [ ] Add city fallback selection
+- [ ] Display mall cards with distance
+
+### Phase 3: Request System (Days 5-7)
+- [ ] Create all database tables
+- [ ] Build request creation form
+- [ ] Implement voice note recording/upload
+- [ ] Build shopper check-in flow with GPS verification
+- [ ] Implement auto-assignment logic
+- [ ] Create request status tracking
+- [ ] Build request list and detail pages
+
+### Phase 4: Chat & Options (Days 8-10)
+- [ ] Implement Supabase Realtime chat
+- [ ] Build chat UI (with RTL support)
+- [ ] Add image upload in chat
+- [ ] Create "Send Options" form for shoppers
+- [ ] Build option approval UI for users
+- [ ] Implement activity logging
+
+### Phase 5: Admin Dashboard (Days 11-12)
+- [ ] Build admin authentication check
+- [ ] Create mall management interface
+- [ ] Build shopper approval system
+- [ ] Create requests monitoring dashboard
+- [ ] Add basic analytics
+
+### Phase 6: Polish (Days 13-14)
+- [ ] Add loading states
+- [ ] Implement error handling
+- [ ] Add success notifications
+- [ ] Test all user flows
+- [ ] Add receipt upload feature
+- [ ] Implement rating system
+- [ ] Final Arabic translation check
+
+---
+
+## Sample Data Seeds (for Testing)
+
+### Malls in Dammam
+```sql
+INSERT INTO malls (name_ar, name_en, city, lat, lng, radius_m) VALUES
+('الراشد مول', 'Al Rashed Mall', 'Dammam', 26.4207, 50.0888, 250),
+('مجمع الظهران', 'Dhahran Mall', 'Dhahran', 26.2961, 50.1537, 300),
+('مارينا مول', 'Marina Mall', 'Dammam', 26.4611, 50.1068, 200),
+('الخبر مول', 'Al Khobar Mall', 'Al Khobar', 26.2789, 50.1997, 250);
+```
+
+### Categories
+```typescript
+const CATEGORIES = [
+  { value: 'fashion', label_ar: 'أزياء', label_en: 'Fashion' },
+  { value: 'perfume', label_ar: 'عطور', label_en: 'Perfume' },
+  { value: 'gifts', label_ar: 'هدايا', label_en: 'Gifts' },
+  { value: 'electronics', label_ar: 'إلكترونيات', label_en: 'Electronics' },
+  { value: 'jewelry', label_ar: 'مجوهرات', label_en: 'Jewelry' },
+  { value: 'cosmetics', label_ar: 'مستحضرات تجميل', label_en: 'Cosmetics' },
+  { value: 'sports', label_ar: 'رياضة', label_en: 'Sports' },
+  { value: 'toys', label_ar: 'ألعاب', label_en: 'Toys' },
+  { value: 'books', label_ar: 'كتب', label_en: 'Books' },
+  { value: 'other', label_ar: 'أخرى', label_en: 'Other' }
+];
+```
+
+---
+
+## Key Features Checklist
+
+### Must-Have for MVP
+- [x] Phone OTP authentication
+- [x] Role-based access (user/shopper/admin)
+- [x] Arabic/English language support with RTL
+- [x] Location-based mall sorting
+- [x] Request creation with voice notes
+- [x] GPS-verified shopper check-in
+- [x] Auto-assignment algorithm
+- [x] Real-time chat
+- [x] Image upload (products & receipts)
+- [x] Option approval workflow
+- [x] Request status tracking
+- [x] Rating system
+- [x] Admin dashboard
+
+### Nice-to-Have (Post-MVP)
+- [ ] Push notifications
+- [ ] In-app calling
+- [ ] Shopper earnings dashboard
+- [ ] Commission calculation
+- [ ] Payment integration
+- [ ] Advanced analytics
+
+---
+
+## Testing Scenarios
+
+### End User Flow
+1. Sign up with phone OTP
+2. Allow location / select city
+3. Browse nearby malls
+4. Create request with voice note
+5. Chat with assigned shopper
+6. Receive product options
+7. Approve one option
+8. Track delivery status
+9. Rate the service
+
+### Shopper Flow
+1. Sign up as shopper (pending approval)
+2. Admin approves shopper
+3. Check in to a mall (GPS verified)
+4. Receive auto-assigned request
+5. Accept request
+6. Chat with user
+7. Send product options with photos
+8. Wait for approval
+9. Mark as purchased (with receipt)
+10. Update to delivered
+
+### Admin Flow
+1. Log in as admin
+2. Create/edit malls
+3. Approve pending shoppers
+4. Monitor active requests
+5. View request history
+
+---
+
+## Performance Considerations
+
+1. **Database Indexes** (add these after creating tables):
+```sql
+CREATE INDEX idx_requests_user_id ON requests(user_id);
+CREATE INDEX idx_requests_assigned_shopper_id ON requests(assigned_shopper_id);
+CREATE INDEX idx_requests_status ON requests(status);
+CREATE INDEX idx_shopper_presence_mall_id ON shopper_presence(mall_id);
+CREATE INDEX idx_shopper_presence_expires ON shopper_presence(checked_in_until);
+CREATE INDEX idx_messages_request_id ON messages(request_id);
+```
+
+2. **Realtime Subscriptions**: Unsubscribe when component unmounts
+3. **Image Optimization**: Resize images before upload (max 1920px width)
+4. **Voice Notes**: Limit to 2 minutes, compress audio
+
+---
+
+## Deployment Checklist
+
+### Before Going Live
+- [ ] Set up production Supabase project
+- [ ] Configure storage buckets with proper permissions
+- [ ] Enable RLS on all tables
+- [ ] Add database indexes
+- [ ] Set up proper CORS policies
+- [ ] Test on mobile devices (iOS + Android)
+- [ ] Test RTL layout thoroughly
+- [ ] Verify OTP delivery works
+- [ ] Test file uploads on mobile
+- [ ] Load test with multiple concurrent users
+- [ ] Add error logging (e.g., Sentry)
+
+---
+
+## Environment Variables Needed
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Optional: For future features
+# TWILIO_ACCOUNT_SID=
+# TWILIO_AUTH_TOKEN=
+# TWILIO_PHONE_NUMBER=
+```
+
+---
+
+## Common Pitfalls to Avoid
+
+1. **Don't skip GPS verification** - Shoppers must be physically in mall
+2. **Don't allow purchase without approval** - Enforce this in API
+3. **Don't forget check-in expiry** - Auto-expire after 90 min
+4. **Don't let Arabic text break layout** - Test RTL thoroughly
+5. **Don't ignore active request limit** - Enforce in auto-assignment
+6. **Don't allow direct status jumps** - Enforce status lifecycle
+7. **Don't forget activity logging** - Track all important actions
+8. **Don't skip RLS policies** - Security is critical
+
+---
+
+## Success Metrics to Track
+
+1. Time from request creation to shopper assignment
+2. Average response time in chat
+3. Option approval rate
+4. Completion rate
+5. Average rating
+6. Shopper utilization (% of time checked in)
+7. Peak mall hours
+
+---
+
+## Final Notes
+
+This MVP should be production-ready with:
+- Solid architecture for scaling
+- Security best practices (RLS)
+- Clean user experience
+- Arabic-first design
+- Real business logic (check-in, auto-assign, approval workflow)
+
+Focus on getting the core loop right:
+**User requests → Auto-assign to mall shopper → Chat → Send options → Approve → Purchase → Deliver → Rate**
+
+Everything else is secondary.
