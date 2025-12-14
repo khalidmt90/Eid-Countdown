@@ -30,6 +30,10 @@ export function DailyContentView() {
   }, [i18n.language]);
 
   const handleGenerateNew = () => {
+    // Clear the stored index first to ensure we get a fresh random selection
+    localStorage.removeItem('dailyContentIndex');
+    
+    // Get new content
     const newContent = getRandomContent(i18n.language);
     setContent(newContent);
     setContentKey(prev => prev + 1);
