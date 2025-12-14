@@ -1,6 +1,6 @@
 const ARABIC_WPM = 180;
-const MIN_WORDS = 180;  // 1 minute minimum
-const MAX_WORDS = 1260; // 7 minutes maximum
+const MIN_WORDS = 50;   // Lower threshold to include more stories
+const MAX_WORDS = 2000; // Allow longer stories
 
 export function countWords(text: string): number {
   if (!text || !text.trim()) return 0;
