@@ -31,6 +31,7 @@ export default function Home() {
     selectedCountry,
     selectedCity,
     usingExactLocation,
+    locationSelected,
     nextPrayer,
     timeRemaining,
     dailyAyah,
@@ -41,8 +42,15 @@ export default function Home() {
     formatTimeRemaining
   } = usePrayerTimes();
 
-  // Location Sheet State
+  // Location Sheet State - open automatically if no location saved
   const [isLocationSheetOpen, setIsLocationSheetOpen] = useState(false);
+  
+  // Auto-open location sheet on first visit if no location saved
+  useEffect(() => {
+    if (!locationSelected) {
+      setIsLocationSheetOpen(true);
+    }
+  }, [locationSelected]);
 
   const [timeFormat, setTimeFormat] = useState<'12' | '24'>('12');
 

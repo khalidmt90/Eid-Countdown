@@ -26,39 +26,41 @@ function findNearestCity(lat: number, lng: number): { country: Country; city: Ci
   return null;
 }
 
+function getInitialLocation(): { country: Country; city: City; hasStoredLocation: boolean } {
+  const savedCountryName = localStorage.getItem("selectedCountry");
+  const savedCityName = localStorage.getItem("selectedCity");
+
+  if (savedCountryName && savedCityName) {
+    const country = COUNTRIES.find(c => c.nameEn === savedCountryName);
+    if (country) {
+      const city = country.cities.find(c => c.nameEn === savedCityName);
+      if (city) {
+        return { country, city, hasStoredLocation: true };
+      }
+      return { country, city: country.cities[0], hasStoredLocation: true };
+    }
+  }
+  
+  return { country: COUNTRIES[0], city: COUNTRIES[0].cities[0], hasStoredLocation: false };
+}
+
 export function usePrayerTimes() {
   const { t, i18n } = useTranslation();
+  
+  const initialLocation = getInitialLocation();
+  
   const [loading, setLoading] = useState(true);
   const [prayerData, setPrayerData] = useState<PrayerData | null>(null);
+  const [locationSelected, setLocationSelected] = useState(initialLocation.hasStoredLocation);
   
-  // State for Country and City
-  const [selectedCountry, setSelectedCountry] = useState<Country>(COUNTRIES[0]);
-  const [selectedCity, setSelectedCity] = useState<City>(COUNTRIES[0].cities[0]);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(initialLocation.country);
+  const [selectedCity, setSelectedCity] = useState<City>(initialLocation.city);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [usingExactLocation, setUsingExactLocation] = useState(false);
 
   const [nextPrayer, setNextPrayer] = useState<{name: string, time: Date} | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [dailyAyah] = useState(getDailyAyah());
-
-  // Load saved country and city preference
-  useEffect(() => {
-    const savedCountryName = localStorage.getItem("selectedCountry");
-    const savedCityName = localStorage.getItem("selectedCity");
-
-    if (savedCountryName && savedCityName) {
-      const country = COUNTRIES.find(c => c.nameEn === savedCountryName);
-      if (country) {
-        setSelectedCountry(country);
-        const city = country.cities.find(c => c.nameEn === savedCityName);
-        if (city) {
-          setSelectedCity(city);
-        } else {
-          setSelectedCity(country.cities[0]);
-        }
-      }
-    }
-  }, []);
 
   const handleUseCurrentLocation = () => {
     setLoading(true);
@@ -67,11 +69,14 @@ export function usePrayerTimes() {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
         setUsingExactLocation(true);
+        setLocationSelected(true);
         
         const nearest = findNearestCity(latitude, longitude);
         if (nearest) {
           setSelectedCountry(nearest.country);
           setSelectedCity(nearest.city);
+          localStorage.setItem("selectedCountry", nearest.country.nameEn);
+          localStorage.setItem("selectedCity", nearest.city.nameEn);
         }
         
         setLoading(false);
@@ -167,6 +172,7 @@ export function usePrayerTimes() {
     if (country) {
       setSelectedCountry(country);
       setSelectedCity(country.cities[0]);
+      setLocationSelected(true);
       localStorage.setItem("selectedCountry", val);
       localStorage.setItem("selectedCity", country.cities[0].nameEn);
     }
@@ -176,6 +182,7 @@ export function usePrayerTimes() {
     const city = selectedCountry.cities.find(c => c.nameEn === val);
     if (city) {
       setSelectedCity(city);
+      setLocationSelected(true);
       localStorage.setItem("selectedCity", val);
     }
   };
@@ -193,6 +200,7 @@ export function usePrayerTimes() {
     selectedCountry,
     selectedCity,
     usingExactLocation,
+    locationSelected,
     nextPrayer,
     timeRemaining,
     dailyAyah,
