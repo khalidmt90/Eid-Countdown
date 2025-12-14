@@ -25,15 +25,22 @@ export function DailyContentView() {
   const [activeTab, setActiveTab] = useState("ayah");
   const [contentKey, setContentKey] = useState(0);
 
+  // Load initial content only once
   useEffect(() => {
     setContent(getDailyContent(i18n.language));
+  }, []); // Empty dependency array - runs once on mount
+
+  // Handle language changes separately
+  useEffect(() => {
+    if (content) {
+      const newContent = getRandomContent(i18n.language);
+      setContent(newContent);
+      setContentKey(prev => prev + 1);
+    }
   }, [i18n.language]);
 
   const handleGenerateNew = () => {
-    // Clear the stored index first to ensure we get a fresh random selection
     localStorage.removeItem('dailyContentIndex');
-    
-    // Get new content
     const newContent = getRandomContent(i18n.language);
     setContent(newContent);
     setContentKey(prev => prev + 1);
