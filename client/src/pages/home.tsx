@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QiblahFinder } from "@/components/qiblah-finder";
+import { QuranKhatm } from "@/components/quran-khatm";
 import { usePrayerTimes } from "@/hooks/use-prayer-times";
 import { LocationSheet } from "@/components/location-sheet";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -194,24 +195,30 @@ ${t('isha')}: ${prayerData.timings.Isha}
           {/* Sticky Tab Navigation */}
           <div className="sticky top-[52px] z-40 bg-background/95 backdrop-blur-sm py-4 -mx-4 px-4 mb-6">
             <div className="flex justify-center">
-              <TabsList className="grid w-full max-w-md grid-cols-3 h-16 bg-black/90 border border-white/10 shadow-lg rounded-full px-1.5">
+              <TabsList className="grid w-full max-w-lg grid-cols-4 h-16 bg-black/90 border border-white/10 shadow-lg rounded-full px-1.5">
               <TabsTrigger 
                 value="home" 
-                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-colors"
+                className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-colors"
               >
                 {t('prayer_times')}
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
-                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-colors"
+                className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-colors"
               >
                 {t('qiblah')}
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
-                className="rounded-full text-base md:text-lg font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-colors"
+                className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-colors"
               >
                 {t('daily_content')}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="khatm" 
+                className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-12 transition-colors"
+              >
+                {i18n.language === 'ar' ? 'الختمة' : 'Khatm'}
               </TabsTrigger>
             </TabsList>
             </div>
@@ -374,6 +381,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
           <TabsContent value="daily">
             <DailyContentView />
+          </TabsContent>
+
+          <TabsContent value="khatm">
+            <QuranKhatm />
           </TabsContent>
         </Tabs>
       </main>
