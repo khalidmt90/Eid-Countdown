@@ -1,0 +1,72 @@
+Update the "ختم القرآن في رمضان" tab requirement: it MUST show the actual Juz text/content (not just “Juz 5” planning).
+
+Build:
+- A tab: "ختم القرآن في رمضان"
+- Arabic RTL, mobile-first.
+- Shows today’s assigned Juz with the actual Quran text rendered on-screen.
+- Allows selecting any day (1..30) to view that day’s Juz text.
+- Allows marking days complete, catch-up for missed days, progress bar.
+
+Key feature: Juz content display
+Implement one of these approaches (prefer A, fallback to B if size/time is an issue):
+
+A) Offline dataset (preferred)
+- Add a local JSON file in the repo containing Quran text with metadata sufficient to extract a full Juz.
+- Minimal required structure:
+  - For each ayah: { surahNumber, ayahNumber, textArabic, juzNumber }
+- On day N => juz = N (default plan).
+- Filter dataset by juzNumber == N and render in order (surahNumber asc, ayahNumber asc).
+- Render:
+  - Surah header when surah changes (name in Arabic if available, else “سورة رقم X”).
+  - Ayah text with ayah number marker.
+- Performance:
+  - Virtualize list rendering (react-window or a simple windowed rendering) so it doesn’t lag on mobile.
+  - Lazy-load the JSON (dynamic import) only when entering this tab.
+  - Add a loading skeleton while fetching/parsing.
+
+B) Trusted API fallback (if offline dataset is too heavy)
+- Use a reliable Quran API that supports fetching a full Juz in Arabic Uthmani script.
+- Cache results in localStorage (per juz) to avoid repeated calls.
+- Must still work offline after first load (cached).
+
+UX:
+- Top “Today” card:
+  - Day number + computed Gregorian date (based on saved Ramadan start date).
+  - “جزء اليوم: X”
+  - Buttons: “اقرأ الآن” scrolls to text section, “وضع علامة تم” marks complete.
+- Day picker (1..30) with status: ✅ completed, ⏳ pending, ❗ missed.
+- Day detail panel:
+  - “الجزء X” + estimated length (number of ayat) once loaded.
+  - Controls:
+    - Mark complete / Undo complete
+    - “انتقل لأقدم يوم فاتني” (catch-up)
+- Progress:
+  - completedDays/30
+  - completedJuz/30
+
+Setup:
+- User sets Ramadan start date (Gregorian) once.
+- Day 1 date = start date, Day 30 = start+29 days.
+- Today is computed from device time + start date.
+- If today outside range, still allow browsing.
+
+Data persistence:
+- localStorage keys:
+  - ramadanStartDateISO
+  - khatmCompletion: dayNumber -> {completed:boolean, completedAt?:ISO}
+  - juzCache: juzNumber -> {fetchedAt, items[]} (for API or parsed subset)
+  - optional: lastSelectedDay
+
+Content rendering rules:
+- Arabic RTL layout.
+- Use a readable Arabic font (system or Tajawal if already used).
+- Keep lines comfortable; no tiny font.
+- No “planning-only” view: the text section must be visible and scrollable.
+- Provide quick navigation:
+  - “ابحث داخل الجزء” (simple in-page search highlighting matches) if easy.
+  - “تابع القراءة” remembers last scroll position per juz/day (optional but nice).
+
+Deliver:
+- Implement the tab end-to-end with routing/nav.
+- Include dataset loading or API integration + caching.
+- Ensure selecting any day loads and shows that Juz text.
