@@ -1,0 +1,69 @@
+Update Qiblah UI/UX in the "القبلة" tab.
+
+CURRENT PROBLEM
+- The Kaaba/qiblah icon is attached to the rotating red line. That’s wrong UX.
+- The qiblah target should be a fixed marker on the compass ring, and the phone heading line rotates until it points to that target.
+- Also the user needs clear “يمين/يسار” guidance (nearest turn direction) while not aligned, and it must disappear once aligned.
+
+TARGET UX (like a real compass)
+1) The compass circle stays centered.
+2) The phone heading indicator (red line) rotates based on device heading.
+3) The qiblah target marker (Kaaba icon) is positioned ON the compass ring at the correct bearing angle to Mecca (relative to North), independent from the phone heading line.
+4) The user rotates the phone until the red line aligns with the qiblah marker.
+5) Show a simple hint near the red line while NOT aligned:
+   - “لف يمين” or “لف يسار” (nearest direction)
+   - Optionally show degrees remaining (e.g., 12°)
+6) When aligned (within tolerance), hide the direction hint completely (no arrows, no “يمين/يسار”), and show a subtle “✅ أنت على القبلة” or a small “تم” state.
+
+MATH / LOGIC (must be correct)
+- Compute:
+  qiblahBearing = bearing from user location (lat/lng) to Kaaba (21.4225, 39.8262) in degrees 0..360
+- Get:
+  heading = device heading (0..360), where 0 = North
+- UI:
+  - Qiblah marker position is based on qiblahBearing (fixed target).
+  - Heading line rotation is based on heading.
+- Alignment:
+  delta = shortestAngleDifference(heading, qiblahBearing) => range -180..+180
+  absDelta = Math.abs(delta)
+  aligned if absDelta <= tolerance (set tolerance = 3° or 5°)
+- Nearest turn hint:
+  - If not aligned:
+    - If delta > 0 => user should rotate RIGHT (clockwise) to reduce delta => show "لف يمين"
+    - If delta < 0 => show "لف يسار"
+  - Also show "متبقي X°" where X = absDelta rounded.
+  - Once aligned: hide the hint completely.
+
+UI IMPLEMENTATION DETAILS
+- Place qiblah marker on the ring:
+  - Use absolute positioning inside the compass container.
+  - Convert qiblahBearing to angle in radians relative to top (North at top):
+    angleRad = (qiblahBearing - 90) * (Math.PI/180)   // if your coordinate system uses 0° at +X, adjust accordingly
+  - Position:
+    x = centerX + radius * cos(angleRad)
+    y = centerY + radius * sin(angleRad)
+  - Use a slight offset so icon sits nicely on ring (not outside).
+- Heading line:
+  - Use CSS transform rotate(headingDeg) around center.
+  - Ensure the line points to 0° at top.
+- Direction hint placement:
+  - Render the hint near the tip of the red line or slightly above it.
+  - It must not cover the qiblah marker.
+  - When aligned, the hint is removed.
+
+UX POLISH
+- Add a subtle snap/feedback when aligned:
+  - Haptic on mobile if available (optional).
+  - Or change the ring glow color slightly when aligned.
+- Keep it readable:
+  - Large tap/visual sizes.
+  - Minimal text.
+- No clutter: only show “لف يمين/يسار + المتبقي” when needed.
+- If device orientation/heading permission is missing:
+  - Show a clear CTA: “فعّل إذن البوصلة” with steps.
+  - Don’t show wrong compass.
+
+DELIVERABLE
+- Refactor the Qiblah compass so Kaaba marker is a fixed target on the ring, red line rotates with heading.
+- Add smart left/right guidance (nearest turn) that disappears when aligned.
+- Ensure alignment math uses shortest angle difference (no wrong direction near 0/360 wrap).
