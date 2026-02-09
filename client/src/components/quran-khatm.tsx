@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { FixedSizeList as List } from "react-window";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,12 +9,14 @@ import {
   CheckCircle2,
   Circle,
   AlertCircle,
-  ChevronUp,
   Calendar,
   Search,
   X,
   ArrowUp,
   Settings,
+  Plus,
+  Minus,
+  Type,
 } from "lucide-react";
 
 interface Ayah {
@@ -47,7 +48,17 @@ const LS_KEY_START = "ramadanStartDateISO";
 const LS_KEY_COMPLETION = "khatmCompletion";
 const LS_KEY_JUZ_CACHE = "juzCache";
 const LS_KEY_LAST_DAY = "lastSelectedDay";
-const LS_KEY_SCROLL_POS = "khatmScrollPos";
+const LS_KEY_FONT_SIZE = "khatmFontSize";
+
+const FONT_SIZES = [
+  { label: "صغير", labelEn: "Small", value: 20 },
+  { label: "متوسط", labelEn: "Medium", value: 26 },
+  { label: "كبير", labelEn: "Large", value: 32 },
+  { label: "كبير جداً", labelEn: "X-Large", value: 38 },
+  { label: "ضخم", labelEn: "Huge", value: 44 },
+];
+
+const DEFAULT_FONT_SIZE = 26;
 
 function getCompletion(): CompletionMap {
   try {
@@ -76,7 +87,6 @@ function setCachedJuz(juz: number, data: JuzData) {
     cache[juz] = data;
     localStorage.setItem(LS_KEY_JUZ_CACHE, JSON.stringify(cache));
   } catch {
-    // localStorage full - clear old entries
     localStorage.setItem(LS_KEY_JUZ_CACHE, JSON.stringify({ [juz]: data }));
   }
 }
@@ -130,10 +140,11 @@ export function QuranKhatm() {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
-  const [startDate, setStartDate] = useState<string | null>(
-    localStorage.getItem(LS_KEY_START)
-  );
-  const [dateInput, setDateInput] = useState("");
+  const savedStart = localStorage.getItem(LS_KEY_START);
+
+  const [startDate, setStartDate] = useState<string | null>(savedStart);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateInput, setDateInput] = useState(savedStart || "");
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [completion, setCompletionState] = useState<CompletionMap>(getCompletion());
   const [juzData, setJuzData] = useState<JuzData | null>(null);
@@ -142,17 +153,29 @@ export function QuranKhatm() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [fontSize, setFontSize] = useState(() => {
+    const saved = localStorage.getItem(LS_KEY_FONT_SIZE);
+    return saved ? parseInt(saved) : DEFAULT_FONT_SIZE;
+  });
 
   const textContainerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<List>(null);
 
   const todayDay = startDate ? computeTodayDay(startDate) : null;
+  const isRamadanActive = todayDay !== null && todayDay >= 1 && todayDay <= 30;
 
   useEffect(() => {
     if (startDate && todayDay !== null) {
       const saved = localStorage.getItem(LS_KEY_LAST_DAY);
-      const dayToUse = saved ? parseInt(saved) : Math.max(1, Math.min(todayDay, 30));
-      setSelectedDay(Math.max(1, Math.min(dayToUse, 30)));
+      if (saved) {
+        setSelectedDay(Math.max(1, Math.min(parseInt(saved), 30)));
+      } else if (isRamadanActive) {
+        setSelectedDay(todayDay);
+      } else {
+        setSelectedDay(1);
+      }
+    } else {
+      const saved = localStorage.getItem(LS_KEY_LAST_DAY);
+      setSelectedDay(saved ? Math.max(1, Math.min(parseInt(saved), 30)) : 1);
     }
   }, [startDate]);
 
@@ -161,6 +184,10 @@ export function QuranKhatm() {
       localStorage.setItem(LS_KEY_LAST_DAY, String(selectedDay));
     }
   }, [selectedDay]);
+
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_FONT_SIZE, String(fontSize));
+  }, [fontSize]);
 
   const fetchJuz = useCallback(async (juzNumber: number) => {
     const cached = getCachedJuz(juzNumber);
@@ -204,19 +231,27 @@ export function QuranKhatm() {
   }, [isArabic]);
 
   useEffect(() => {
-    if (startDate) {
-      setJuzData(null);
-      fetchJuz(selectedDay);
-    }
-  }, [selectedDay, startDate, fetchJuz]);
+    setJuzData(null);
+    fetchJuz(selectedDay);
+  }, [selectedDay, fetchJuz]);
 
   const handleSaveDate = () => {
     if (dateInput) {
       localStorage.setItem(LS_KEY_START, dateInput);
       setStartDate(dateInput);
       const today = computeTodayDay(dateInput);
-      setSelectedDay(Math.max(1, Math.min(today, 30)));
+      if (today >= 1 && today <= 30) {
+        setSelectedDay(today);
+      }
+      setShowDatePicker(false);
     }
+  };
+
+  const handleResetDate = () => {
+    localStorage.removeItem(LS_KEY_START);
+    setStartDate(null);
+    setDateInput("");
+    setShowSettings(false);
   };
 
   const toggleComplete = (day: number) => {
@@ -281,54 +316,41 @@ export function QuranKhatm() {
     textContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleResetDate = () => {
-    localStorage.removeItem(LS_KEY_START);
-    setStartDate(null);
-    setDateInput("");
-    setShowSettings(false);
+  const increaseFontSize = () => {
+    const currentIdx = FONT_SIZES.findIndex((f) => f.value <= fontSize);
+    const nextIdx = Math.max(0, (FONT_SIZES.findIndex((f) => f.value >= fontSize) || 0) - 1);
+    const idx = FONT_SIZES.findIndex((f) => f.value === fontSize);
+    if (idx < FONT_SIZES.length - 1) {
+      setFontSize(FONT_SIZES[idx + 1].value);
+    } else if (idx === -1) {
+      const closest = FONT_SIZES.reduce((prev, curr) =>
+        Math.abs(curr.value - fontSize) < Math.abs(prev.value - fontSize) ? curr : prev
+      );
+      const ci = FONT_SIZES.indexOf(closest);
+      if (ci < FONT_SIZES.length - 1) setFontSize(FONT_SIZES[ci + 1].value);
+    }
   };
 
-  if (!startDate) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-6 py-8 animate-in fade-in duration-500" dir="rtl">
-        <Card className="w-full max-w-md border-2 border-primary/20 shadow-lg">
-          <CardContent className="flex flex-col items-center gap-6 py-8">
-            <div className="text-6xl">📖</div>
-            <h2 className="text-2xl font-black text-primary text-center font-serif">
-              ختم القرآن في رمضان
-            </h2>
-            <p className="text-muted-foreground text-center text-lg">
-              {isArabic
-                ? "حدد تاريخ بداية رمضان لبدء خطة الختمة"
-                : "Set Ramadan start date to begin your Khatm plan"}
-            </p>
+  const decreaseFontSize = () => {
+    const idx = FONT_SIZES.findIndex((f) => f.value === fontSize);
+    if (idx > 0) {
+      setFontSize(FONT_SIZES[idx - 1].value);
+    } else if (idx === -1) {
+      const closest = FONT_SIZES.reduce((prev, curr) =>
+        Math.abs(curr.value - fontSize) < Math.abs(prev.value - fontSize) ? curr : prev
+      );
+      const ci = FONT_SIZES.indexOf(closest);
+      if (ci > 0) setFontSize(FONT_SIZES[ci - 1].value);
+    }
+  };
 
-            <div className="w-full space-y-4">
-              <label className="block text-sm font-bold text-foreground">
-                {isArabic ? "تاريخ أول يوم رمضان:" : "First day of Ramadan:"}
-              </label>
-              <input
-                type="date"
-                value={dateInput}
-                onChange={(e) => setDateInput(e.target.value)}
-                className="w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-lg text-foreground focus:border-primary focus:outline-none"
-                data-testid="input-ramadan-date"
-              />
-              <Button
-                onClick={handleSaveDate}
-                disabled={!dateInput}
-                className="w-full h-14 text-lg font-black rounded-xl"
-                data-testid="button-save-date"
-              >
-                <BookOpen className="w-5 h-5 ml-2" />
-                {isArabic ? "ابدأ الختمة" : "Start Khatm"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const currentFontLabel = () => {
+    const match = FONT_SIZES.find((f) => f.value === fontSize);
+    if (match) return isArabic ? match.label : match.labelEn;
+    return `${fontSize}px`;
+  };
+
+  const ayahNumberSize = Math.max(12, Math.round(fontSize * 0.55));
 
   return (
     <div className="flex flex-col space-y-4 animate-in fade-in duration-500 pb-8" dir="rtl">
@@ -338,15 +360,61 @@ export function QuranKhatm() {
           <span className="text-3xl">📖</span>
           ختم القرآن في رمضان
         </h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowSettings(!showSettings)}
-          data-testid="button-settings"
-        >
-          <Settings className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            data-testid="button-calendar"
+            title={isArabic ? "تغيير تاريخ رمضان" : "Change Ramadan date"}
+          >
+            <Calendar className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowSettings(!showSettings)}
+            data-testid="button-settings"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
+
+      {/* Date Picker Panel */}
+      {showDatePicker && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="py-4 space-y-3">
+            <p className="text-sm font-bold text-foreground">
+              {isArabic ? "حدد تاريخ أول يوم رمضان:" : "Set first day of Ramadan:"}
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={dateInput}
+                onChange={(e) => setDateInput(e.target.value)}
+                className="flex-1 rounded-xl border-2 border-border bg-background px-3 py-2 text-base text-foreground focus:border-primary focus:outline-none"
+                data-testid="input-ramadan-date"
+              />
+              <Button
+                onClick={handleSaveDate}
+                disabled={!dateInput}
+                className="rounded-xl font-bold px-6"
+                data-testid="button-save-date"
+              >
+                {isArabic ? "حفظ" : "Save"}
+              </Button>
+            </div>
+            {startDate && (
+              <p className="text-xs text-muted-foreground">
+                {isArabic
+                  ? `التاريخ الحالي: ${new Date(startDate).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })}`
+                  : `Current: ${new Date(startDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {showSettings && (
         <Card className="border-destructive/30 bg-destructive/5">
@@ -377,8 +445,8 @@ export function QuranKhatm() {
         </CardContent>
       </Card>
 
-      {/* Today Card */}
-      {todayDay !== null && todayDay >= 1 && todayDay <= 30 && (
+      {/* Today Card - only shown during Ramadan */}
+      {isRamadanActive && todayDay !== null && (
         <Card className="border-2 border-primary/40 bg-primary/5 shadow-md">
           <CardContent className="py-5 space-y-3">
             <div className="flex items-center justify-between">
@@ -386,9 +454,11 @@ export function QuranKhatm() {
                 <div className="text-sm font-bold text-muted-foreground">
                   {isArabic ? `اليوم ${todayDay} من رمضان` : `Ramadan Day ${todayDay}`}
                 </div>
-                <div className="text-xs text-muted-foreground/70 mt-0.5">
-                  {getDayDate(startDate, todayDay)}
-                </div>
+                {startDate && (
+                  <div className="text-xs text-muted-foreground/70 mt-0.5">
+                    {getDayDate(startDate, todayDay)}
+                  </div>
+                )}
               </div>
               <div className="text-xl font-black text-primary">
                 {isArabic ? `جزء اليوم: ${todayDay}` : `Today's Juz: ${todayDay}`}
@@ -454,6 +524,7 @@ export function QuranKhatm() {
           {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => {
             const status = getDayStatus(day);
             const isSelected = selectedDay === day;
+            const isToday = todayDay === day;
             return (
               <button
                 key={day}
@@ -466,6 +537,8 @@ export function QuranKhatm() {
                     ? "bg-green-500/15 text-green-600 border-green-500/30 dark:text-green-400"
                     : status === "missed"
                     ? "bg-red-500/10 text-red-500 border-red-500/20"
+                    : isToday
+                    ? "bg-primary/10 text-primary border-primary/40 ring-2 ring-primary/30"
                     : "bg-card text-foreground border-border hover:border-primary/50"
                   }
                 `}
@@ -524,8 +597,33 @@ export function QuranKhatm() {
         </CardContent>
       </Card>
 
-      {/* Search */}
-      <div className="flex gap-2">
+      {/* Font Size Controls + Search */}
+      <div className="flex gap-2 items-center flex-wrap">
+        {/* Font Size */}
+        <div className="flex items-center gap-1 bg-card border border-border rounded-xl px-2 py-1.5">
+          <Type className="w-4 h-4 text-muted-foreground" />
+          <button
+            onClick={decreaseFontSize}
+            disabled={fontSize <= FONT_SIZES[0].value}
+            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-30 transition-colors"
+            data-testid="button-font-decrease"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <span className="text-xs font-bold text-foreground min-w-[60px] text-center">
+            {currentFontLabel()}
+          </span>
+          <button
+            onClick={increaseFontSize}
+            disabled={fontSize >= FONT_SIZES[FONT_SIZES.length - 1].value}
+            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-30 transition-colors"
+            data-testid="button-font-increase"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Search */}
         {showSearch ? (
           <div className="flex-1 flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2">
             <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -557,7 +655,7 @@ export function QuranKhatm() {
             data-testid="button-search"
           >
             <Search className="w-4 h-4 ml-1" />
-            {isArabic ? "ابحث داخل الجزء" : "Search in Juz"}
+            {isArabic ? "بحث" : "Search"}
           </Button>
         )}
       </div>
@@ -607,8 +705,12 @@ export function QuranKhatm() {
 
                 {/* Ayahs - flowing text style */}
                 <div
-                  className="leading-[2.8] text-[22px] md:text-[26px] text-foreground px-2"
-                  style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif", lineHeight: "2.8" }}
+                  className="text-foreground px-2"
+                  style={{
+                    fontFamily: "'Amiri', 'Traditional Arabic', serif",
+                    fontSize: `${fontSize}px`,
+                    lineHeight: "2.8",
+                  }}
                   dir="rtl"
                 >
                   {group.ayahs.map((ayah) => {
@@ -620,7 +722,10 @@ export function QuranKhatm() {
                         className={highlighted ? "bg-yellow-300/40 dark:bg-yellow-600/30 rounded px-1" : ""}
                       >
                         {ayah.text}{" "}
-                        <span className="inline-flex items-center justify-center text-[14px] font-bold text-primary/70 mx-1 select-none">
+                        <span
+                          className="inline-flex items-center justify-center font-bold text-primary/70 mx-1 select-none"
+                          style={{ fontSize: `${ayahNumberSize}px` }}
+                        >
                           ﴿{ayah.numberInSurah.toLocaleString("ar-SA")}﴾
                         </span>{" "}
                       </span>
