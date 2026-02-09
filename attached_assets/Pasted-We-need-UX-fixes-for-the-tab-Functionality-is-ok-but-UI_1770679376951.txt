@@ -1,0 +1,50 @@
+We need UX fixes for the “الختمة” tab. Functionality is ok but UI/UX is not mobile-friendly.
+
+ISSUE A: Calendar/day picker takes too much screen.
+- Replace the big 1..30 grid with a compact header + bottom sheet picker.
+Default view:
+  - Show a small “Selected day” bar: (اليوم/التاريخ + رقم يوم رمضان)
+  - Add a clear button: “📅 تغيير اليوم”
+On tap:
+  - Open a bottom sheet (mobile) that contains:
+    - calendar month view (compact height)
+    - optional quick chips for days 1..30
+    - close button + swipe down to close
+Constraints:
+  - the picker must not occupy most of the screen when not needed.
+
+ISSUE B: Juz text is too long; user gets lost in endless scrolling.
+- Implement pagination for Juz content in the UI.
+Split each Juz into “reading pages”:
+  Option 1: by ayah count (10–15 ayat per page)
+  Option 2: by character limit (900–1200 chars per page)
+Pick the simplest reliable method based on our data structure.
+UI:
+  - Show “Page X of Y”
+  - Buttons: “السابق” and “التالي”
+  - Add a “تابع من آخر مكان” button at top
+Persistence:
+  - Save last read position per day/juz in localStorage (pageIndex, optional scrollOffset).
+  - When user returns, load the last page automatically or offer “Continue” button.
+Also:
+  - highlight first ayah of current page or last-read ayah for orientation.
+
+ISSUE C: Font controls work but UX can be better.
+- Replace current font controls with a clear AA control in a sticky top bar:
+  - A− / A+ OR 4-step toggle: صغير / متوسط / كبير / كبير جداً
+  - Increase tap targets.
+  - Save preference in localStorage.
+Optional (recommended):
+  - “وضع القراءة” toggle: bigger line-height, padding, hides non-essential UI while reading.
+
+ISSUE D: Remove nested scrolling (“white inner scroll page inside page”).
+- Quran text area must not be an inner scroll container.
+- Remove fixed heights + overflow:auto from Quran container.
+- Let the whole page scroll naturally (single scroll).
+- Ensure mobile scrolling feels like an app (no scrollbars inside a box).
+
+Deliver:
+- Implement bottom sheet date picker
+- Implement Juz pagination + continue reading
+- Improve font controls (sticky, bigger, saved)
+- Remove nested scroll and make it fully mobile-friendly like an application
