@@ -69,6 +69,18 @@ const FONT_SIZES = [
 
 const DEFAULT_FONT_SIZE = 26;
 
+function normalizeArabicForSearch(text: string): string {
+  return (text || "")
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
+    .replace(/[أإآٱ]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ؤ/g, "و")
+    .replace(/ئ/g, "ي")
+    .replace(/ـ/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getCompletion(): CompletionMap {
   try {
     return JSON.parse(localStorage.getItem(LS_KEY_COMPLETION) || "{}");
@@ -343,15 +355,25 @@ export function QuranKhatm() {
     return "future";
   };
 
-  const allAyahs = useMemo(() => {
+  const indexedAyahs = useMemo(() => {
     if (!juzData) return [];
-    return juzData.ayahs;
+    return juzData.ayahs.map((a) => ({
+      ...a,
+      searchText: normalizeArabicForSearch(a.text),
+    }));
   }, [juzData]);
 
+  const normalizedQuery = useMemo(() => {
+    return normalizeArabicForSearch(searchQuery);
+  }, [searchQuery]);
+
   const filteredAyahs = useMemo(() => {
-    if (!searchQuery.trim()) return allAyahs;
-    return allAyahs.filter((a) => a.text.includes(searchQuery.trim()));
-  }, [allAyahs, searchQuery]);
+    if (!normalizedQuery) return indexedAyahs;
+    const words = normalizedQuery.split(" ").filter(Boolean);
+    return indexedAyahs.filter((a) =>
+      words.every((w) => a.searchText.includes(w))
+    );
+  }, [indexedAyahs, normalizedQuery]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(filteredAyahs.length / AYAHS_PER_PAGE);
@@ -706,21 +728,41 @@ export function QuranKhatm() {
 
         {/* Search Input (expandable) */}
         {showSearch && (
-          <div className="mt-2 flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2">
-            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(0);
-              }}
-              placeholder={isArabic ? "ابحث داخل الجزء..." : "Search in Juz..."}
-              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
-              dir="rtl"
-              autoFocus
-              data-testid="input-search-juz"
-            />
+          <div className="mt-2 space-y-1.5">
+            <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2">
+              <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(0);
+                }}
+                placeholder={isArabic ? "اكتب بدون تشكيل — البحث ذكي" : "Type without diacritics — smart search"}
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
+                dir="rtl"
+                autoFocus
+                data-testid="input-search-juz"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => { setSearchQuery(""); setCurrentPage(0); }}
+                  className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0"
+                  data-testid="button-clear-search"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+            {normalizedQuery && (
+              <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
+                {filteredAyahs.length > 0
+                  ? (isArabic
+                    ? `${filteredAyahs.length} نتيجة`
+                    : `${filteredAyahs.length} results`)
+                  : (isArabic ? "لا توجد نتائج" : "No results")}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -770,7 +812,7 @@ export function QuranKhatm() {
             {isArabic ? "إعادة المحاولة" : "Retry"}
           </Button>
         </div>
-      ) : filteredAyahs.length === 0 && searchQuery ? (
+      ) : filteredAyahs.length === 0 && normalizedQuery ? (
         <div className="py-8 text-center text-muted-foreground">
           {isArabic ? "لا توجد نتائج" : "No results found"}
         </div>
@@ -811,15 +853,14 @@ export function QuranKhatm() {
                   dir="rtl"
                 >
                   {group.ayahs.map((ayah, idx) => {
-                    const highlighted =
-                      searchQuery && ayah.text.includes(searchQuery.trim());
+                    const isMatch = normalizedQuery && (ayah as any).searchText?.includes(normalizedQuery);
                     const isFirstOnPage = idx === 0 && group === pageGroups[0];
                     return (
                       <span
                         key={ayah.number}
                         className={`
-                          ${highlighted ? "bg-yellow-300/40 dark:bg-yellow-600/30 rounded px-1" : ""}
-                          ${isFirstOnPage ? "text-primary" : ""}
+                          ${isMatch ? "bg-yellow-300/30 dark:bg-yellow-600/20 rounded-sm" : ""}
+                          ${isFirstOnPage && !normalizedQuery ? "text-primary" : ""}
                         `}
                       >
                         {ayah.text}{" "}

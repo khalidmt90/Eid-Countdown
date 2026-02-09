@@ -1,0 +1,62 @@
+Keep Quran text exactly as-is (with tashkeel). Do NOT modify what is displayed.
+
+But make search “smart” by building a hidden normalized search index.
+
+Implementation:
+
+1) When loading Quran data, create a new field for each verse:
+   verse.text        // original Quran text (with tashkeel) for display
+   verse.searchText  // normalized text for searching only
+
+2) Normalization function (for search only):
+- Remove diacritics (tashkeel)
+- Normalize common Arabic variants so user typing matches Quran writing
+- Keep it lightweight and predictable
+
+Use:
+
+function normalizeArabicForSearch(text) {
+  return (text || "")
+    // remove tashkeel + Quran marks
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
+    // unify alif forms
+    .replace(/[أإآٱ]/g, "ا")
+    // unify ya + alif maqsura
+    .replace(/ى/g, "ي")
+    // optional: unify hamza-on-ya/waw
+    .replace(/ؤ/g, "و")
+    .replace(/ئ/g, "ي")
+    // optional: remove tatweel
+    .replace(/ـ/g, "")
+    // collapse spaces
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+3) Build searchText once (performance):
+verse.searchText = normalizeArabicForSearch(verse.text)
+
+Do NOT normalize verses on every keystroke.
+
+4) On search:
+const q = normalizeArabicForSearch(userInput)
+Match:
+- if verse.searchText includes q => result
+- also support multi-word queries:
+  split q by spaces and require every word to match:
+  words.every(w => verse.searchText.includes(w))
+
+5) Results UI:
+- Show original verse.text (with tashkeel) exactly.
+- Highlight match visually (optional but recommended):
+  We can highlight by matching on normalized text OR just highlight by keywords without tashkeel.
+  If exact highlighting is hard due to tashkeel, just bold the verse and show surah/ayah location clearly.
+
+6) UX details:
+- Add a placeholder under search input:
+  "اكتب بدون تشكيل — البحث ذكي"
+- Add quick clear button (✕).
+- Show result count and allow tap to jump to verse.
+
+Goal:
+User can type normal Arabic (no special characters) and still find verses, while Quran display stays authentic.
