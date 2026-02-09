@@ -167,7 +167,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
     <div className="min-h-screen bg-background text-foreground">
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50 py-3 px-4">
-        <div className="max-w-7xl mx-auto flex justify-start">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg" data-testid="img-logo" />
+            <span className="text-sm font-black text-primary font-serif hidden sm:inline">
+              {i18n.language === 'ar' ? "مواقيت الصلاة والقبلة" : "Prayer Times & Qiblah"}
+            </span>
+          </div>
           <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
             <SelectTrigger className="w-[100px] h-8 text-xs bg-card border-border">
               <Languages className="w-3 h-3 mr-2" />
