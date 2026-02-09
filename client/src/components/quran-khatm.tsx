@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,12 @@ import {
   Calendar,
   Search,
   X,
-  ArrowUp,
   Settings,
-  Plus,
-  Minus,
-  Type,
+  ChevronLeft,
+  ChevronRight,
+  Bookmark,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 interface Ayah {
@@ -44,18 +45,26 @@ interface DayCompletion {
 
 type CompletionMap = Record<number, DayCompletion>;
 
+interface ReadPosition {
+  page: number;
+  timestamp: string;
+}
+
 const LS_KEY_START = "ramadanStartDateISO";
 const LS_KEY_COMPLETION = "khatmCompletion";
 const LS_KEY_JUZ_CACHE = "juzCache";
 const LS_KEY_LAST_DAY = "lastSelectedDay";
 const LS_KEY_FONT_SIZE = "khatmFontSize";
+const LS_KEY_READ_POS = "khatmReadPosition";
+const LS_KEY_READING_MODE = "khatmReadingMode";
+
+const AYAHS_PER_PAGE = 12;
 
 const FONT_SIZES = [
-  { label: "صغير", labelEn: "Small", value: 20 },
-  { label: "متوسط", labelEn: "Medium", value: 26 },
-  { label: "كبير", labelEn: "Large", value: 32 },
-  { label: "كبير جداً", labelEn: "X-Large", value: 38 },
-  { label: "ضخم", labelEn: "Huge", value: 44 },
+  { label: "صغير", labelEn: "S", value: 20 },
+  { label: "متوسط", labelEn: "M", value: 26 },
+  { label: "كبير", labelEn: "L", value: 32 },
+  { label: "كبير جداً", labelEn: "XL", value: 38 },
 ];
 
 const DEFAULT_FONT_SIZE = 26;
@@ -91,12 +100,31 @@ function setCachedJuz(juz: number, data: JuzData) {
   }
 }
 
+function getReadPosition(juz: number): ReadPosition | null {
+  try {
+    const all = JSON.parse(localStorage.getItem(LS_KEY_READ_POS) || "{}");
+    return all[juz] || null;
+  } catch {
+    return null;
+  }
+}
+
+function saveReadPosition(juz: number, page: number) {
+  try {
+    const all = JSON.parse(localStorage.getItem(LS_KEY_READ_POS) || "{}");
+    all[juz] = { page, timestamp: new Date().toISOString() };
+    localStorage.setItem(LS_KEY_READ_POS, JSON.stringify(all));
+  } catch {}
+}
+
 function computeTodayDay(startDate: string): number {
   const start = new Date(startDate);
   const now = new Date();
   start.setHours(0, 0, 0, 0);
   now.setHours(0, 0, 0, 0);
-  const diff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  const diff = Math.floor(
+    (now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+  );
   return diff + 1;
 }
 
@@ -153,12 +181,15 @@ export function QuranKhatm() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDaySheet, setShowDaySheet] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [readingMode, setReadingMode] = useState(() => {
+    return localStorage.getItem(LS_KEY_READING_MODE) === "true";
+  });
   const [fontSize, setFontSize] = useState(() => {
     const saved = localStorage.getItem(LS_KEY_FONT_SIZE);
     return saved ? parseInt(saved) : DEFAULT_FONT_SIZE;
   });
-
-  const textContainerRef = useRef<HTMLDivElement>(null);
 
   const todayDay = startDate ? computeTodayDay(startDate) : null;
   const isRamadanActive = todayDay !== null && todayDay >= 1 && todayDay <= 30;
@@ -189,51 +220,80 @@ export function QuranKhatm() {
     localStorage.setItem(LS_KEY_FONT_SIZE, String(fontSize));
   }, [fontSize]);
 
-  const fetchJuz = useCallback(async (juzNumber: number) => {
-    const cached = getCachedJuz(juzNumber);
-    if (cached) {
-      setJuzData(cached);
-      setLoading(false);
-      return;
-    }
+  useEffect(() => {
+    localStorage.setItem(LS_KEY_READING_MODE, String(readingMode));
+  }, [readingMode]);
 
-    setLoading(true);
-    setFetchError(null);
+  const fetchJuz = useCallback(
+    async (juzNumber: number) => {
+      const cached = getCachedJuz(juzNumber);
+      if (cached) {
+        setJuzData(cached);
+        setLoading(false);
+        return;
+      }
 
-    try {
-      const res = await fetch(
-        `https://api.alquran.cloud/v1/juz/${juzNumber}/quran-uthmani`
-      );
-      if (!res.ok) throw new Error("API error");
-      const json = await res.json();
-      const data: JuzData = {
-        ayahs: json.data.ayahs.map((a: any) => ({
-          number: a.number,
-          text: a.text,
-          surah: {
-            number: a.surah.number,
-            name: a.surah.name,
-            englishName: a.surah.englishName,
-            numberOfAyahs: a.surah.numberOfAyahs,
-          },
-          numberInSurah: a.numberInSurah,
-          juz: a.juz,
-        })),
-        fetchedAt: new Date().toISOString(),
-      };
-      setCachedJuz(juzNumber, data);
-      setJuzData(data);
-    } catch (err) {
-      setFetchError(isArabic ? "حدث خطأ في تحميل الجزء. تحقق من الاتصال بالإنترنت." : "Error loading Juz. Check your internet connection.");
-    } finally {
-      setLoading(false);
-    }
-  }, [isArabic]);
+      setLoading(true);
+      setFetchError(null);
+
+      try {
+        const res = await fetch(
+          `https://api.alquran.cloud/v1/juz/${juzNumber}/quran-uthmani`
+        );
+        if (!res.ok) throw new Error("API error");
+        const json = await res.json();
+        const data: JuzData = {
+          ayahs: json.data.ayahs.map((a: any) => ({
+            number: a.number,
+            text: a.text,
+            surah: {
+              number: a.surah.number,
+              name: a.surah.name,
+              englishName: a.surah.englishName,
+              numberOfAyahs: a.surah.numberOfAyahs,
+            },
+            numberInSurah: a.numberInSurah,
+            juz: a.juz,
+          })),
+          fetchedAt: new Date().toISOString(),
+        };
+        setCachedJuz(juzNumber, data);
+        setJuzData(data);
+      } catch {
+        setFetchError(
+          isArabic
+            ? "حدث خطأ في تحميل الجزء. تحقق من الاتصال بالإنترنت."
+            : "Error loading Juz. Check your internet connection."
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [isArabic]
+  );
 
   useEffect(() => {
     setJuzData(null);
+    setCurrentPage(0);
     fetchJuz(selectedDay);
   }, [selectedDay, fetchJuz]);
+
+  useEffect(() => {
+    if (juzData) {
+      const saved = getReadPosition(selectedDay);
+      if (saved && saved.page > 0) {
+        setCurrentPage(saved.page);
+      } else {
+        setCurrentPage(0);
+      }
+    }
+  }, [juzData, selectedDay]);
+
+  useEffect(() => {
+    if (juzData && currentPage > 0) {
+      saveReadPosition(selectedDay, currentPage);
+    }
+  }, [currentPage, selectedDay, juzData]);
 
   const handleSaveDate = () => {
     if (dateInput) {
@@ -283,12 +343,30 @@ export function QuranKhatm() {
     return "future";
   };
 
-  const groupedAyahs = useMemo(() => {
+  const allAyahs = useMemo(() => {
     if (!juzData) return [];
+    return juzData.ayahs;
+  }, [juzData]);
+
+  const filteredAyahs = useMemo(() => {
+    if (!searchQuery.trim()) return allAyahs;
+    return allAyahs.filter((a) => a.text.includes(searchQuery.trim()));
+  }, [allAyahs, searchQuery]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredAyahs.length / AYAHS_PER_PAGE);
+  }, [filteredAyahs]);
+
+  const currentPageAyahs = useMemo(() => {
+    const start = currentPage * AYAHS_PER_PAGE;
+    return filteredAyahs.slice(start, start + AYAHS_PER_PAGE);
+  }, [filteredAyahs, currentPage]);
+
+  const pageGroups = useMemo(() => {
     const groups: { surahNumber: number; surahName: string; ayahs: Ayah[] }[] = [];
     let currentSurah = -1;
 
-    for (const ayah of juzData.ayahs) {
+    for (const ayah of currentPageAyahs) {
       if (ayah.surah.number !== currentSurah) {
         currentSurah = ayah.surah.number;
         groups.push({
@@ -300,430 +378,453 @@ export function QuranKhatm() {
       groups[groups.length - 1].ayahs.push(ayah);
     }
     return groups;
-  }, [juzData]);
+  }, [currentPageAyahs]);
 
-  const filteredGroups = useMemo(() => {
-    if (!searchQuery.trim()) return groupedAyahs;
-    return groupedAyahs
-      .map((g) => ({
-        ...g,
-        ayahs: g.ayahs.filter((a) => a.text.includes(searchQuery.trim())),
-      }))
-      .filter((g) => g.ayahs.length > 0);
-  }, [groupedAyahs, searchQuery]);
-
-  const scrollToTop = () => {
-    textContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const increaseFontSize = () => {
-    const currentIdx = FONT_SIZES.findIndex((f) => f.value <= fontSize);
-    const nextIdx = Math.max(0, (FONT_SIZES.findIndex((f) => f.value >= fontSize) || 0) - 1);
-    const idx = FONT_SIZES.findIndex((f) => f.value === fontSize);
-    if (idx < FONT_SIZES.length - 1) {
-      setFontSize(FONT_SIZES[idx + 1].value);
-    } else if (idx === -1) {
-      const closest = FONT_SIZES.reduce((prev, curr) =>
-        Math.abs(curr.value - fontSize) < Math.abs(prev.value - fontSize) ? curr : prev
-      );
-      const ci = FONT_SIZES.indexOf(closest);
-      if (ci < FONT_SIZES.length - 1) setFontSize(FONT_SIZES[ci + 1].value);
-    }
-  };
+  const savedPos = getReadPosition(selectedDay);
+  const hasSavedPosition = savedPos !== null && savedPos.page > 0 && currentPage === 0;
 
-  const decreaseFontSize = () => {
-    const idx = FONT_SIZES.findIndex((f) => f.value === fontSize);
-    if (idx > 0) {
-      setFontSize(FONT_SIZES[idx - 1].value);
-    } else if (idx === -1) {
-      const closest = FONT_SIZES.reduce((prev, curr) =>
-        Math.abs(curr.value - fontSize) < Math.abs(prev.value - fontSize) ? curr : prev
-      );
-      const ci = FONT_SIZES.indexOf(closest);
-      if (ci > 0) setFontSize(FONT_SIZES[ci - 1].value);
-    }
-  };
-
-  const currentFontLabel = () => {
-    const match = FONT_SIZES.find((f) => f.value === fontSize);
-    if (match) return isArabic ? match.label : match.labelEn;
-    return `${fontSize}px`;
+  const selectDay = (day: number) => {
+    setSelectedDay(day);
+    setShowDaySheet(false);
+    setSearchQuery("");
+    setShowSearch(false);
   };
 
   const ayahNumberSize = Math.max(12, Math.round(fontSize * 0.55));
 
-  return (
-    <div className="flex flex-col space-y-4 animate-in fade-in duration-500 pb-8" dir="rtl">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-black text-primary font-serif flex items-center gap-2">
-          <span className="text-3xl">📖</span>
-          ختم القرآن في رمضان
-        </h2>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowDatePicker(!showDatePicker)}
-            data-testid="button-calendar"
-            title={isArabic ? "تغيير تاريخ رمضان" : "Change Ramadan date"}
-          >
-            <Calendar className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowSettings(!showSettings)}
-            data-testid="button-settings"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
+  const fontSizeIndex = FONT_SIZES.findIndex((f) => f.value === fontSize);
 
-      {/* Date Picker Panel */}
-      {showDatePicker && (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardContent className="py-4 space-y-3">
-            <p className="text-sm font-bold text-foreground">
-              {isArabic ? "حدد تاريخ أول يوم رمضان:" : "Set first day of Ramadan:"}
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="date"
-                value={dateInput}
-                onChange={(e) => setDateInput(e.target.value)}
-                className="flex-1 rounded-xl border-2 border-border bg-background px-3 py-2 text-base text-foreground focus:border-primary focus:outline-none"
-                data-testid="input-ramadan-date"
-              />
+  return (
+    <div className="flex flex-col space-y-3 animate-in fade-in duration-500 pb-24" dir="rtl">
+      {/* === HEADER === */}
+      {!readingMode && (
+        <>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-black text-primary font-serif flex items-center gap-2">
+              <span className="text-2xl">📖</span>
+              {isArabic ? "ختم القرآن في رمضان" : "Ramadan Quran Khatm"}
+            </h2>
+            <div className="flex items-center gap-1">
               <Button
-                onClick={handleSaveDate}
-                disabled={!dateInput}
-                className="rounded-xl font-bold px-6"
-                data-testid="button-save-date"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowDatePicker(!showDatePicker);
+                  setShowSettings(false);
+                }}
+                data-testid="button-calendar"
               >
-                {isArabic ? "حفظ" : "Save"}
+                <Calendar className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowSettings(!showSettings);
+                  setShowDatePicker(false);
+                }}
+                data-testid="button-settings"
+              >
+                <Settings className="w-5 h-5" />
               </Button>
             </div>
-            {startDate && (
-              <p className="text-xs text-muted-foreground">
-                {isArabic
-                  ? `التاريخ الحالي: ${new Date(startDate).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })}`
-                  : `Current: ${new Date(startDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {showSettings && (
-        <Card className="border-destructive/30 bg-destructive/5">
-          <CardContent className="py-4 flex items-center justify-between">
-            <span className="text-sm font-bold">
-              {isArabic ? "إعادة تعيين تاريخ رمضان" : "Reset Ramadan date"}
-            </span>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleResetDate}
-              data-testid="button-reset-date"
-            >
-              {isArabic ? "إعادة تعيين" : "Reset"}
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Progress Bar */}
-      <Card className="border-primary/20">
-        <CardContent className="py-4 space-y-3">
-          <div className="flex items-center justify-between text-sm font-bold">
-            <span>{isArabic ? "تقدم الختمة" : "Khatm Progress"}</span>
-            <span className="text-primary">{completedCount}/30 ({progressPercent}%)</span>
           </div>
-          <Progress value={progressPercent} className="h-3" data-testid="progress-khatm" />
-        </CardContent>
-      </Card>
 
-      {/* Today Card - only shown during Ramadan */}
-      {isRamadanActive && todayDay !== null && (
-        <Card className="border-2 border-primary/40 bg-primary/5 shadow-md">
-          <CardContent className="py-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-bold text-muted-foreground">
-                  {isArabic ? `اليوم ${todayDay} من رمضان` : `Ramadan Day ${todayDay}`}
+          {/* Date Picker (collapsed by default) */}
+          {showDatePicker && (
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="py-4 space-y-3">
+                <p className="text-sm font-bold text-foreground">
+                  {isArabic ? "حدد تاريخ أول يوم رمضان:" : "Set first day of Ramadan:"}
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={dateInput}
+                    onChange={(e) => setDateInput(e.target.value)}
+                    className="flex-1 rounded-xl border-2 border-border bg-background px-3 py-2 text-base text-foreground focus:border-primary focus:outline-none"
+                    data-testid="input-ramadan-date"
+                  />
+                  <Button
+                    onClick={handleSaveDate}
+                    disabled={!dateInput}
+                    className="rounded-xl font-bold px-6"
+                    data-testid="button-save-date"
+                  >
+                    {isArabic ? "حفظ" : "Save"}
+                  </Button>
                 </div>
                 {startDate && (
-                  <div className="text-xs text-muted-foreground/70 mt-0.5">
-                    {getDayDate(startDate, todayDay)}
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {isArabic
+                      ? `التاريخ الحالي: ${new Date(startDate).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })}`
+                      : `Current: ${new Date(startDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
+                  </p>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {showSettings && (
+            <Card className="border-destructive/30 bg-destructive/5">
+              <CardContent className="py-4 flex items-center justify-between">
+                <span className="text-sm font-bold">
+                  {isArabic ? "إعادة تعيين تاريخ رمضان" : "Reset Ramadan date"}
+                </span>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleResetDate}
+                  data-testid="button-reset-date"
+                >
+                  {isArabic ? "إعادة تعيين" : "Reset"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Progress Bar */}
+          <Card className="border-primary/20">
+            <CardContent className="py-3 space-y-2">
+              <div className="flex items-center justify-between text-sm font-bold">
+                <span>{isArabic ? "تقدم الختمة" : "Khatm Progress"}</span>
+                <span className="text-primary">
+                  {completedCount}/30 ({progressPercent}%)
+                </span>
               </div>
-              <div className="text-xl font-black text-primary">
-                {isArabic ? `جزء اليوم: ${todayDay}` : `Today's Juz: ${todayDay}`}
-              </div>
+              <Progress value={progressPercent} className="h-2.5" data-testid="progress-khatm" />
+            </CardContent>
+          </Card>
+
+          {/* Catch-up Button */}
+          {oldestMissedDay !== null && (
+            <Button
+              variant="outline"
+              onClick={() => selectDay(oldestMissedDay)}
+              className="w-full h-10 border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-bold rounded-xl text-sm"
+              data-testid="button-catchup"
+            >
+              <AlertCircle className="w-4 h-4 ml-2" />
+              {isArabic
+                ? `انتقل لأقدم يوم فاتني (يوم ${oldestMissedDay})`
+                : `Catch up: Day ${oldestMissedDay}`}
+            </Button>
+          )}
+        </>
+      )}
+
+      {/* === COMPACT DAY BAR (Issue A) === */}
+      <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2.5">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-base font-black text-foreground truncate">
+              {isArabic ? `الجزء ${selectedDay}` : `Juz ${selectedDay}`}
+            </span>
+            {isRamadanActive && todayDay === selectedDay && (
+              <span className="text-[10px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded-md">
+                {isArabic ? "اليوم" : "Today"}
+              </span>
+            )}
+          </div>
+          {startDate && (
+            <div className="text-[11px] text-muted-foreground/70 truncate">
+              {isArabic ? `يوم ${selectedDay} من رمضان` : `Ramadan Day ${selectedDay}`}
+              {" · "}
+              {getDayDate(startDate, selectedDay)}
             </div>
-            <div className="flex gap-2">
+          )}
+        </div>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowDaySheet(true)}
+          className="rounded-lg font-bold text-xs h-9 px-3 shrink-0"
+          data-testid="button-open-day-picker"
+        >
+          📅 {isArabic ? "تغيير اليوم" : "Change Day"}
+        </Button>
+
+        <Button
+          onClick={() => toggleComplete(selectedDay)}
+          variant={completion[selectedDay]?.completed ? "secondary" : "outline"}
+          size="sm"
+          className="rounded-lg font-bold text-xs h-9 px-3 shrink-0"
+          data-testid="button-mark-selected"
+        >
+          {completion[selectedDay]?.completed ? (
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
+          ) : (
+            <Circle className="w-4 h-4" />
+          )}
+        </Button>
+      </div>
+
+      {/* === BOTTOM SHEET DAY PICKER (Issue A) === */}
+      {showDaySheet && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200"
+          onClick={() => setShowDaySheet(false)}
+        >
+          <div
+            className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8 space-y-4 animate-in slide-in-from-bottom-8 duration-400"
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar */}
+            <div className="flex justify-center">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-black text-foreground">
+                {isArabic ? "اختر اليوم" : "Select Day"}
+              </h3>
+              <button
+                onClick={() => setShowDaySheet(false)}
+                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+                data-testid="button-close-day-sheet"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Today quick action */}
+            {isRamadanActive && todayDay !== null && (
               <Button
-                onClick={() => {
-                  setSelectedDay(todayDay);
-                  setTimeout(scrollToTop, 100);
-                }}
-                className="flex-1 h-12 font-bold rounded-xl"
+                onClick={() => selectDay(todayDay)}
+                className="w-full h-11 font-bold rounded-xl"
                 variant={selectedDay === todayDay ? "default" : "outline"}
                 data-testid="button-read-today"
               >
                 <BookOpen className="w-4 h-4 ml-2" />
-                {isArabic ? "اقرأ الآن" : "Read Now"}
+                {isArabic ? `اقرأ جزء اليوم (${todayDay})` : `Read Today's Juz (${todayDay})`}
               </Button>
-              <Button
-                onClick={() => toggleComplete(todayDay)}
-                variant={completion[todayDay]?.completed ? "secondary" : "outline"}
-                className="flex-1 h-12 font-bold rounded-xl"
-                data-testid="button-mark-today"
-              >
-                {completion[todayDay]?.completed ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 ml-2 text-green-500" />
-                    {isArabic ? "تم ✓" : "Done ✓"}
-                  </>
-                ) : (
-                  <>
-                    <Circle className="w-4 h-4 ml-2" />
-                    {isArabic ? "وضع علامة تم" : "Mark Complete"}
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Catch-up Button */}
-      {oldestMissedDay !== null && (
-        <Button
-          variant="outline"
-          onClick={() => setSelectedDay(oldestMissedDay)}
-          className="w-full h-11 border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-bold rounded-xl"
-          data-testid="button-catchup"
-        >
-          <AlertCircle className="w-4 h-4 ml-2" />
-          {isArabic
-            ? `انتقل لأقدم يوم فاتني (يوم ${oldestMissedDay})`
-            : `Catch up: Day ${oldestMissedDay}`}
-        </Button>
-      )}
-
-      {/* Day Picker */}
-      <div className="space-y-2">
-        <span className="text-sm font-bold text-muted-foreground">
-          {isArabic ? "اختر اليوم:" : "Select Day:"}
-        </span>
-        <div className="grid grid-cols-6 gap-1.5">
-          {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => {
-            const status = getDayStatus(day);
-            const isSelected = selectedDay === day;
-            const isToday = todayDay === day;
-            return (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className={`
-                  relative h-11 rounded-lg text-sm font-black transition-all duration-200 border
-                  ${isSelected
-                    ? "bg-primary text-primary-foreground border-primary shadow-md scale-105"
-                    : status === "completed"
-                    ? "bg-green-500/15 text-green-600 border-green-500/30 dark:text-green-400"
-                    : status === "missed"
-                    ? "bg-red-500/10 text-red-500 border-red-500/20"
-                    : isToday
-                    ? "bg-primary/10 text-primary border-primary/40 ring-2 ring-primary/30"
-                    : "bg-card text-foreground border-border hover:border-primary/50"
-                  }
-                `}
-                data-testid={`button-day-${day}`}
-              >
-                {day}
-                {status === "completed" && !isSelected && (
-                  <span className="absolute -top-1 -left-1 text-green-500 text-[10px]">✅</span>
-                )}
-                {status === "missed" && !isSelected && (
-                  <span className="absolute -top-1 -left-1 text-red-500 text-[10px]">❗</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Selected Day Info */}
-      <Card className="border-border">
-        <CardContent className="py-4 flex items-center justify-between">
-          <div>
-            <div className="text-lg font-black text-foreground">
-              {isArabic ? `الجزء ${selectedDay}` : `Juz ${selectedDay}`}
-            </div>
-            {juzData && (
-              <div className="text-xs text-muted-foreground">
-                {juzData.ayahs.length} {isArabic ? "آية" : "ayahs"}
-              </div>
             )}
-            {startDate && (
-              <div className="text-xs text-muted-foreground/70">
-                {getDayDate(startDate, selectedDay)}
-              </div>
-            )}
+
+            {/* Day chips grid */}
+            <div className="grid grid-cols-6 gap-2">
+              {Array.from({ length: 30 }, (_, i) => i + 1).map((day) => {
+                const status = getDayStatus(day);
+                const isSelected = selectedDay === day;
+                const isToday = todayDay === day;
+                return (
+                  <button
+                    key={day}
+                    onClick={() => selectDay(day)}
+                    className={`
+                      relative h-12 rounded-xl text-sm font-black transition-all duration-200 border-2 active:scale-95
+                      ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary shadow-lg"
+                          : status === "completed"
+                          ? "bg-green-500/15 text-green-600 border-green-500/30 dark:text-green-400"
+                          : status === "missed"
+                          ? "bg-red-500/10 text-red-500 border-red-500/20"
+                          : isToday
+                          ? "bg-primary/10 text-primary border-primary/40"
+                          : "bg-background text-foreground border-border"
+                      }
+                    `}
+                    data-testid={`button-day-${day}`}
+                  >
+                    {day}
+                    {status === "completed" && !isSelected && (
+                      <span className="absolute -top-1.5 -left-1.5 text-[11px]">✅</span>
+                    )}
+                    {status === "missed" && !isSelected && (
+                      <span className="absolute -top-1.5 -left-1.5 text-[11px]">❗</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <Button
-            onClick={() => toggleComplete(selectedDay)}
-            variant={completion[selectedDay]?.completed ? "secondary" : "outline"}
-            size="sm"
-            className="font-bold rounded-lg"
-            data-testid="button-mark-selected"
-          >
-            {completion[selectedDay]?.completed ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 ml-1 text-green-500" />
-                {isArabic ? "تراجع" : "Undo"}
-              </>
-            ) : (
-              <>
-                <Circle className="w-4 h-4 ml-1" />
-                {isArabic ? "تم" : "Done"}
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
-      {/* Font Size Controls + Search */}
-      <div className="flex gap-2 items-center flex-wrap">
-        {/* Font Size */}
-        <div className="flex items-center gap-1 bg-card border border-border rounded-xl px-2 py-1.5">
-          <Type className="w-4 h-4 text-muted-foreground" />
+      {/* === STICKY TOOLBAR: Font + Search + Reading Mode (Issue C) === */}
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border pb-2 pt-1 -mx-1 px-1">
+        <div className="flex items-center gap-2">
+          {/* Font Size Control */}
+          <div className="flex items-center bg-card border border-border rounded-xl overflow-hidden">
+            {FONT_SIZES.map((f, i) => (
+              <button
+                key={f.value}
+                onClick={() => setFontSize(f.value)}
+                className={`h-10 px-3 text-xs font-bold transition-colors
+                  ${fontSize === f.value
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted"
+                  }
+                  ${i < FONT_SIZES.length - 1 ? "border-l border-border" : ""}
+                `}
+                data-testid={`button-font-${f.labelEn}`}
+              >
+                {isArabic ? f.label : f.labelEn}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex-1" />
+
+          {/* Reading Mode Toggle */}
           <button
-            onClick={decreaseFontSize}
-            disabled={fontSize <= FONT_SIZES[0].value}
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-30 transition-colors"
-            data-testid="button-font-decrease"
+            onClick={() => setReadingMode(!readingMode)}
+            className={`h-10 w-10 rounded-xl flex items-center justify-center border transition-colors ${
+              readingMode
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:bg-muted"
+            }`}
+            title={isArabic ? "وضع القراءة" : "Reading Mode"}
+            data-testid="button-reading-mode"
           >
-            <Minus className="w-4 h-4" />
+            {readingMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
-          <span className="text-xs font-bold text-foreground min-w-[60px] text-center">
-            {currentFontLabel()}
-          </span>
+
+          {/* Search Toggle */}
           <button
-            onClick={increaseFontSize}
-            disabled={fontSize >= FONT_SIZES[FONT_SIZES.length - 1].value}
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-30 transition-colors"
-            data-testid="button-font-increase"
+            onClick={() => {
+              setShowSearch(!showSearch);
+              if (showSearch) setSearchQuery("");
+            }}
+            className={`h-10 w-10 rounded-xl flex items-center justify-center border transition-colors ${
+              showSearch
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card text-muted-foreground border-border hover:bg-muted"
+            }`}
+            data-testid="button-search"
           >
-            <Plus className="w-4 h-4" />
+            {showSearch ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
           </button>
         </div>
 
-        {/* Search */}
-        {showSearch ? (
-          <div className="flex-1 flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2">
+        {/* Search Input (expandable) */}
+        {showSearch && (
+          <div className="mt-2 flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2">
             <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(0);
+              }}
               placeholder={isArabic ? "ابحث داخل الجزء..." : "Search in Juz..."}
               className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
               dir="rtl"
               autoFocus
               data-testid="input-search-juz"
             />
-            <button
-              onClick={() => {
-                setShowSearch(false);
-                setSearchQuery("");
-              }}
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </button>
           </div>
-        ) : (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowSearch(true)}
-            className="rounded-xl"
-            data-testid="button-search"
-          >
-            <Search className="w-4 h-4 ml-1" />
-            {isArabic ? "بحث" : "Search"}
-          </Button>
         )}
       </div>
 
-      {/* Quran Text Area */}
-      <div
-        ref={textContainerRef}
-        className="relative bg-card border-2 border-border rounded-2xl overflow-y-auto shadow-inner"
-        style={{ maxHeight: "70vh" }}
-        data-testid="quran-text-container"
-      >
-        {loading ? (
-          <div className="p-6 space-y-4">
-            <Skeleton className="h-8 w-48 mx-auto" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-5/6" />
-            <Skeleton className="h-8 w-48 mx-auto mt-6" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-4/5" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-3/4" />
-          </div>
-        ) : fetchError ? (
-          <div className="p-8 text-center space-y-4">
-            <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
-            <p className="text-destructive font-bold">{fetchError}</p>
-            <Button onClick={() => fetchJuz(selectedDay)} variant="outline" data-testid="button-retry">
-              {isArabic ? "إعادة المحاولة" : "Retry"}
-            </Button>
-          </div>
-        ) : filteredGroups.length === 0 && searchQuery ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {isArabic ? "لا توجد نتائج" : "No results found"}
-          </div>
-        ) : (
-          <div className="p-4 md:p-6 space-y-6">
-            {filteredGroups.map((group) => (
-              <div key={`${selectedDay}-${group.surahNumber}`} className="space-y-3">
-                {/* Surah Header */}
-                <div className="sticky top-0 z-10 bg-primary/10 backdrop-blur-sm border border-primary/20 rounded-xl py-3 px-4 text-center shadow-sm">
-                  <h3 className="text-xl font-black text-primary font-serif">
+      {/* === CONTINUE READING BUTTON (Issue B) === */}
+      {hasSavedPosition && !searchQuery && (
+        <Button
+          onClick={() => {
+            const saved = getReadPosition(selectedDay);
+            if (saved) {
+              setCurrentPage(saved.page);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          variant="outline"
+          className="w-full h-11 rounded-xl font-bold border-primary/40 text-primary"
+          data-testid="button-continue-reading"
+        >
+          <Bookmark className="w-4 h-4 ml-2" />
+          {isArabic
+            ? `تابع من آخر مكان (صفحة ${(savedPos?.page || 0) + 1})`
+            : `Continue reading (page ${(savedPos?.page || 0) + 1})`}
+        </Button>
+      )}
+
+      {/* === QURAN TEXT (Issue D: no nested scroll) === */}
+      {loading ? (
+        <div className="space-y-4 py-4">
+          <Skeleton className="h-8 w-48 mx-auto" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-5/6" />
+          <Skeleton className="h-8 w-48 mx-auto mt-4" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-4/5" />
+        </div>
+      ) : fetchError ? (
+        <div className="py-8 text-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
+          <p className="text-destructive font-bold">{fetchError}</p>
+          <Button
+            onClick={() => fetchJuz(selectedDay)}
+            variant="outline"
+            data-testid="button-retry"
+          >
+            {isArabic ? "إعادة المحاولة" : "Retry"}
+          </Button>
+        </div>
+      ) : filteredAyahs.length === 0 && searchQuery ? (
+        <div className="py-8 text-center text-muted-foreground">
+          {isArabic ? "لا توجد نتائج" : "No results found"}
+        </div>
+      ) : (
+        <>
+          {/* Page indicator */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 text-sm text-muted-foreground font-bold">
+              <span>
+                {isArabic
+                  ? `صفحة ${currentPage + 1} من ${totalPages}`
+                  : `Page ${currentPage + 1} of ${totalPages}`}
+              </span>
+            </div>
+          )}
+
+          {/* Ayahs - flowing naturally in page (no scroll container) */}
+          <div
+            className={`space-y-4 ${readingMode ? "py-4" : ""}`}
+            data-testid="quran-text-container"
+          >
+            {pageGroups.map((group) => (
+              <div key={`${selectedDay}-${group.surahNumber}-${currentPage}`} className="space-y-3">
+                <div className="bg-primary/10 border border-primary/20 rounded-xl py-3 px-4 text-center">
+                  <h3 className="text-lg font-black text-primary font-serif">
                     سورة {group.surahName}
                   </h3>
                 </div>
 
-                {/* Ayahs - flowing text style */}
                 <div
-                  className="text-foreground px-2"
+                  className="text-foreground px-1"
                   style={{
                     fontFamily: "'Amiri', 'Traditional Arabic', serif",
                     fontSize: `${fontSize}px`,
-                    lineHeight: "2.8",
+                    lineHeight: readingMode ? "3.2" : "2.8",
+                    ...(readingMode ? { padding: "0 4px" } : {}),
                   }}
                   dir="rtl"
                 >
-                  {group.ayahs.map((ayah) => {
+                  {group.ayahs.map((ayah, idx) => {
                     const highlighted =
                       searchQuery && ayah.text.includes(searchQuery.trim());
+                    const isFirstOnPage = idx === 0 && group === pageGroups[0];
                     return (
                       <span
                         key={ayah.number}
-                        className={highlighted ? "bg-yellow-300/40 dark:bg-yellow-600/30 rounded px-1" : ""}
+                        className={`
+                          ${highlighted ? "bg-yellow-300/40 dark:bg-yellow-600/30 rounded px-1" : ""}
+                          ${isFirstOnPage ? "text-primary" : ""}
+                        `}
                       >
                         {ayah.text}{" "}
                         <span
-                          className="inline-flex items-center justify-center font-bold text-primary/70 mx-1 select-none"
+                          className="inline-flex items-center justify-center font-bold text-primary/70 mx-0.5 select-none"
                           style={{ fontSize: `${ayahNumberSize}px` }}
                         >
                           ﴿{ayah.numberInSurah.toLocaleString("ar-SA")}﴾
@@ -734,40 +835,72 @@ export function QuranKhatm() {
                 </div>
               </div>
             ))}
-
-            {/* End of Juz */}
-            {filteredGroups.length > 0 && !searchQuery && (
-              <div className="text-center py-6 space-y-3 border-t border-border/50">
-                <div className="text-2xl">🤲</div>
-                <p className="text-muted-foreground font-bold text-lg">
-                  {isArabic
-                    ? `انتهى الجزء ${selectedDay}`
-                    : `End of Juz ${selectedDay}`}
-                </p>
-                {!completion[selectedDay]?.completed && (
-                  <Button
-                    onClick={() => toggleComplete(selectedDay)}
-                    className="rounded-xl font-bold"
-                    data-testid="button-mark-end"
-                  >
-                    <CheckCircle2 className="w-4 h-4 ml-2" />
-                    {isArabic ? "وضع علامة تم" : "Mark Complete"}
-                  </Button>
-                )}
-              </div>
-            )}
           </div>
-        )}
 
-        {/* Scroll to top FAB */}
-        <button
-          onClick={scrollToTop}
-          className="sticky bottom-4 float-left ml-4 bg-primary text-primary-foreground w-10 h-10 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-20"
-          data-testid="button-scroll-top"
-        >
-          <ArrowUp className="w-5 h-5" />
-        </button>
-      </div>
+          {/* === PAGINATION CONTROLS (Issue B) === */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between gap-3 pt-2">
+              <Button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 0}
+                variant="outline"
+                className="flex-1 h-12 rounded-xl font-bold text-base gap-2"
+                data-testid="button-prev-page"
+              >
+                <ChevronRight className="w-5 h-5" />
+                {isArabic ? "السابق" : "Previous"}
+              </Button>
+
+              <span className="text-sm font-black text-muted-foreground whitespace-nowrap">
+                {currentPage + 1}/{totalPages}
+              </span>
+
+              <Button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage >= totalPages - 1}
+                variant="outline"
+                className="flex-1 h-12 rounded-xl font-bold text-base gap-2"
+                data-testid="button-next-page"
+              >
+                {isArabic ? "التالي" : "Next"}
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
+
+          {/* End of Juz - shown on last page */}
+          {currentPage === totalPages - 1 && !searchQuery && totalPages > 0 && (
+            <div className="text-center py-6 space-y-3 border-t border-border/50">
+              <div className="text-2xl">🤲</div>
+              <p className="text-muted-foreground font-bold text-lg">
+                {isArabic ? `انتهى الجزء ${selectedDay}` : `End of Juz ${selectedDay}`}
+              </p>
+              {!completion[selectedDay]?.completed && (
+                <Button
+                  onClick={() => toggleComplete(selectedDay)}
+                  className="rounded-xl font-bold h-12 px-8"
+                  data-testid="button-mark-end"
+                >
+                  <CheckCircle2 className="w-4 h-4 ml-2" />
+                  {isArabic ? "وضع علامة تم" : "Mark Complete"}
+                </Button>
+              )}
+              {selectedDay < 30 && (
+                <Button
+                  onClick={() => selectDay(selectedDay + 1)}
+                  variant="outline"
+                  className="rounded-xl font-bold"
+                  data-testid="button-next-juz"
+                >
+                  {isArabic
+                    ? `الانتقال للجزء ${selectedDay + 1}`
+                    : `Go to Juz ${selectedDay + 1}`}
+                </Button>
+              )}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
