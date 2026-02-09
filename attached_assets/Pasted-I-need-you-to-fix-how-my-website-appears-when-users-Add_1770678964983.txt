@@ -1,0 +1,110 @@
+I need you to fix how my website appears when users “Add to Home Screen” on iOS/Android (PWA polish). Right now iOS shows a generic “?” icon and the name isn’t ideal. Implement ALL of the following:
+
+GOALS
+1) Correct app name on iOS + Android when added to Home Screen.
+2) Correct logo/icon (no generic placeholder).
+3) Android: support installable PWA (standalone mode).
+4) Add an “Install / Add to Home Screen” button on the site:
+   - Android/Chrome: trigger the native install prompt when available.
+   - iOS/Safari: cannot auto-install, so show a clean instruction overlay guiding the user.
+5) Make it mobile-first, Arabic RTL friendly.
+
+IMPORTANT LIMITATION (respect it)
+- iOS Safari does NOT allow automatic add-to-home-screen prompts. We can only show instructions. Do NOT claim it can auto-add.
+
+IMPLEMENTATION DETAILS
+
+A) HEAD METADATA (iOS + general)
+Add/update in <head> (or framework equivalent):
+- Set a good <title> (short, Arabic).
+- Add iOS app name meta:
+  <meta name="apple-mobile-web-app-title" content="الصلاة والقبلة">
+- Enable standalone on iOS:
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+B) ICONS / FAVICONS
+Add correct icons and link tags:
+- Apple Touch Icon (required to fix iOS “?”):
+  /icons/apple-touch-icon.png (180x180 PNG)
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+- Favicons:
+  /icons/favicon-32x32.png (32x32)
+  /icons/favicon-16x16.png (16x16)
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+
+Make sure icons look good with a solid background (not transparent-only) so they render nicely on iOS.
+
+C) WEB APP MANIFEST (Android/Chrome)
+Create a manifest file and wire it:
+- Create: /site.webmanifest (or /manifest.webmanifest)
+- Link it in <head>:
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0B1220">
+
+Manifest content must include:
+- name + short_name (Arabic)
+- start_url "/"
+- display "standalone"
+- background_color + theme_color
+- icons:
+  /icons/icon-192.png (192x192)
+  /icons/icon-512.png (512x512)
+  /icons/icon-512-maskable.png (512x512, purpose "maskable")
+
+Example:
+{
+  "name": "مواقيت الصلاة واتجاه القبلة",
+  "short_name": "الصلاة والقبلة",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
+
+D) INSTALL BUTTON + LOGIC
+Add a visible button (Arabic): “إضافة للتطبيق” or “تثبيت التطبيق”
+Behavior:
+1) Android/Chrome (and any browser that supports PWA prompt):
+- Listen for beforeinstallprompt
+- Store the event
+- When user taps the button, call prompt()
+- After userChoice, clear stored event
+2) iOS/Safari:
+- If install prompt is not available, show an overlay with step-by-step instructions:
+  - “افتح زر المشاركة”
+  - “اختر Add to Home Screen”
+  - “ثم Add”
+Make the overlay RTL and include simple icons (share icon style) if available.
+
+Minimal JS logic requirement:
+- Use beforeinstallprompt to detect install availability.
+- If not available (including iOS), fall back to the instruction overlay.
+
+E) SERVICE WORKER (only if needed to qualify as PWA)
+If the project already has a SW, keep it.
+If not, add a basic service worker so the app meets PWA install criteria on Android:
+- Cache the shell assets minimally (index, css, main js, icons, manifest).
+- Make sure it doesn’t break updates (use versioned cache names).
+- Keep it simple and safe.
+
+F) CACHING / TEST NOTES (implement + ensure works)
+- Make sure site is served via HTTPS.
+- iOS caches icons aggressively: when testing, remove home screen icon, clear Safari website data, reload, then re-add.
+
+DELIVERABLES
+- Updated <head> with required meta + links
+- Added /site.webmanifest
+- Added icons in /icons/ (apple-touch-icon, favicon 16/32, icon 192/512, maskable 512)
+- Added Install/Add-to-Home button with Android prompt support + iOS instruction overlay
+- (Optional but recommended) service worker for Android PWA install eligibility
+
+Make sure everything works on:
+- iPhone Safari “Add to Home Screen” => correct name + correct icon
+- Android Chrome “Install app” => standalone launch with correct icon/name

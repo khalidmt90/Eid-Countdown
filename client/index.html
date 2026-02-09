@@ -8,14 +8,29 @@
     <meta name="description" content="مواقيت الصلاة، اتجاه القبلة، قصص وآيات قرآنية - تطبيق إسلامي شامل لمعرفة أوقات الصلاة وتحديد اتجاه القبلة وقراءة قصص الأنبياء والأحاديث النبوية" />
     <meta name="keywords" content="مواقيت الصلاة, اتجاه القبلة, قصص الأنبياء, آيات قرآنية, أحاديث نبوية, عيد الفطر, عيد الأضحى, رمضان" />
     
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-title" content="الصلاة والقبلة">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0B1220">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    
+    <!-- Open Graph -->
     <meta property="og:title" content="مواقيت الصلاة واتجاه القبلة" />
     <meta property="og:description" content="مواقيت الصلاة، اتجاه القبلة، قصص وآيات قرآنية - تطبيق إسلامي شامل" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="مواقيت الصلاة واتجاه القبلة" />
     <meta name="twitter:description" content="مواقيت الصلاة، اتجاه القبلة، قصص وآيات قرآنية - تطبيق إسلامي شامل" />
-    
-    <link rel="icon" type="image/png" href="/favicon.png" />
     
     <!-- Google Fonts: Cairo (Modern) and Amiri (Classic) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,5 +40,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
