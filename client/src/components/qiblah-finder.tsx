@@ -222,18 +222,6 @@ export function QiblahFinder() {
     red: 'bg-red-500'
   };
 
-  const kaabaColors = {
-    green: 'bg-green-600 border-green-400',
-    yellow: 'bg-yellow-600 border-yellow-400',
-    red: 'bg-red-600 border-red-400'
-  };
-
-  const kaabaInnerColors = {
-    green: 'bg-green-200',
-    yellow: 'bg-yellow-200',
-    red: 'bg-red-200'
-  };
-
   const textColors = {
     green: 'text-green-500',
     yellow: 'text-yellow-500',
@@ -294,9 +282,9 @@ export function QiblahFinder() {
                 />
                 
                 <div 
-                  className={`absolute top-[-30px] text-white p-1 rounded-sm shadow-md border transform -translate-x-1/2 left-1/2 w-8 h-8 flex items-center justify-center transition-colors duration-300 ${kaabaColors[colorState]}`}
+                  className="absolute top-[-40px] flex flex-col items-center pointer-events-none"
                 >
-                  <div className={`w-full h-1 absolute top-2 transition-colors duration-300 ${kaabaInnerColors[colorState]}`} />
+                  <span className="text-3xl drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>🕋</span>
                 </div>
               </motion.div>
             )}
