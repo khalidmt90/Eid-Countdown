@@ -916,15 +916,6 @@ export function QuranKhatm() {
           <Calendar className="w-4.5 h-4.5" />
         </button>
 
-        <button
-          onClick={() => setFocusMode(!focusMode)}
-          className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${
-            focusMode ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-          }`}
-          data-testid="button-focus-fab"
-        >
-          {focusMode ? <Minimize2 className="w-4.5 h-4.5" /> : <Maximize2 className="w-4.5 h-4.5" />}
-        </button>
       </div>
 
       {/* === DAY PICKER BOTTOM SHEET === */}
