@@ -339,33 +339,24 @@ ${t('isha')}: ${prayerData.timings.Isha}
             <div className="flex items-center gap-2 w-full max-w-4xl mx-auto">
               <div 
                 onClick={() => setIsLocationSheetOpen(true)}
-                className="flex-1 bg-card hover:bg-card/80 transition-colors cursor-pointer border border-border rounded-xl px-3 py-2.5 flex items-center justify-between group min-w-0"
+                className="bg-card hover:bg-card/80 transition-colors cursor-pointer border border-border rounded-xl px-3 py-2 flex items-center gap-2 group"
                 data-testid="button-location"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="bg-primary/10 p-1.5 rounded-lg text-primary shrink-0">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="font-black text-[13px] text-foreground truncate">
-                      {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground font-medium shrink-0">
-                      {i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn}
-                    </span>
-                  </div>
-                </div>
-                <ChevronDown className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                <span className="font-black text-[13px] text-foreground">
+                  {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
               </div>
 
               <Button
                 onClick={toggleTimeFormat}
                 variant="outline"
-                className="h-10 w-16 rounded-xl flex items-center justify-center gap-1 border-border bg-card hover:bg-card/80 px-0 shrink-0"
+                className="h-9 rounded-xl flex items-center justify-center gap-1.5 border-border bg-card hover:bg-card/80 px-3 shrink-0"
                 data-testid="button-time-format"
               >
                 <Clock className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[11px] font-black text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
+                <span className="text-[13px] font-black text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
               </Button>
             </div>
 
