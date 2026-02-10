@@ -223,8 +223,10 @@ export function QuranKhatm() {
     return saved ? parseInt(saved) : DEFAULT_FONT_SIZE;
   });
   const [controlsHidden, setControlsHidden] = useState(false);
+  const [toolbarVisible, setToolbarVisible] = useState(true);
   const lastScrollY = useRef(0);
   const scrollThreshold = 80;
+  const toolbarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const todayDay = startDate ? computeTodayDay(startDate) : null;
   const isRamadanActive = todayDay !== null && todayDay >= 1 && todayDay <= 30;
@@ -260,6 +262,13 @@ export function QuranKhatm() {
   }, [focusMode]);
 
   useEffect(() => {
+    const startHideTimer = () => {
+      if (toolbarTimerRef.current) clearTimeout(toolbarTimerRef.current);
+      toolbarTimerRef.current = setTimeout(() => {
+        setToolbarVisible(false);
+      }, 2000);
+    };
+
     const handleScroll = () => {
       const currentY = window.scrollY;
       if (currentY > lastScrollY.current + scrollThreshold && currentY > 200) {
@@ -268,9 +277,18 @@ export function QuranKhatm() {
         setControlsHidden(false);
       }
       lastScrollY.current = currentY;
+
+      setToolbarVisible(true);
+      startHideTimer();
     };
+
+    startHideTimer();
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (toolbarTimerRef.current) clearTimeout(toolbarTimerRef.current);
+    };
   }, []);
 
   const fetchJuz = useCallback(
@@ -933,7 +951,14 @@ export function QuranKhatm() {
       )}
 
       {/* === FLOATING BOTTOM TOOLBAR === */}
-      <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1 bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-2xl px-2 py-1.5 animate-in slide-in-from-bottom-2 duration-300">
+      <div
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1 bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-2xl px-2 py-1.5 transition-all duration-300"
+        style={{
+          opacity: toolbarVisible ? 1 : 0,
+          transform: `translateX(-50%) translateY(${toolbarVisible ? 0 : 20}px)`,
+          pointerEvents: toolbarVisible ? "auto" : "none",
+        }}
+      >
         <button
           onClick={() => { setShowSearch(!showSearch); if (showSearch) setSearchQuery(""); setShowFontSheet(false); }}
           className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${

@@ -74,7 +74,7 @@ export function InstallPrompt() {
     <>
       {/* Install Button - fixed at bottom */}
       {!showIOSOverlay && (
-        <div className="fixed bottom-20 right-4 z-50 animate-in slide-in-from-bottom-4 fade-in duration-500">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 fade-in duration-500">
           <div className="flex items-center gap-2">
             <Button
               onClick={handleInstallClick}
