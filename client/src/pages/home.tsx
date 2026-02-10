@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useLocation } from "wouter";
 import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
@@ -18,8 +19,100 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import "@/lib/i18n";
 
+const ROUTE_TO_TAB: Record<string, string> = {
+  "/": "home",
+  "/prayer-times": "home",
+  "/qiblah": "qiblah",
+  "/daily-content": "daily",
+  "/quran-khatm": "khatm",
+};
+
+const TAB_TO_ROUTE: Record<string, string> = {
+  home: "/prayer-times",
+  qiblah: "/qiblah",
+  daily: "/daily-content",
+  khatm: "/quran-khatm",
+};
+
+interface PageSeo {
+  title: string;
+  titleAr: string;
+  description: string;
+  descriptionAr: string;
+}
+
+const PAGE_SEO: Record<string, PageSeo> = {
+  home: {
+    title: "Prayer Times - Accurate Daily Salah Schedule",
+    titleAr: "مواقيت الصلاة - جدول الصلاة اليومي الدقيق",
+    description: "Get accurate prayer times for Fajr, Dhuhr, Asr, Maghrib, and Isha based on your location. Eid countdown and Islamic calendar included.",
+    descriptionAr: "احصل على مواقيت صلاة دقيقة للفجر والظهر والعصر والمغرب والعشاء حسب موقعك. يشمل العد التنازلي للعيد والتقويم الهجري.",
+  },
+  qiblah: {
+    title: "Qiblah Finder - Accurate Kaaba Direction Compass",
+    titleAr: "اتجاه القبلة - بوصلة دقيقة لتحديد اتجاه الكعبة",
+    description: "Find the accurate Qiblah direction from your location using GPS and compass. Point towards Mecca for prayer easily.",
+    descriptionAr: "حدد اتجاه القبلة الدقيق من موقعك باستخدام GPS والبوصلة. توجه نحو مكة المكرمة للصلاة بسهولة.",
+  },
+  daily: {
+    title: "Daily Islamic Content - Quran Verses, Hadiths & Prophet Stories",
+    titleAr: "المحتوى الإسلامي اليومي - آيات قرآنية وأحاديث وقصص الأنبياء",
+    description: "Read daily Quran verses with tafsir, authentic Hadiths from Sahih Bukhari and Muslim, and inspiring Prophet stories from reliable sources.",
+    descriptionAr: "اقرأ آيات قرآنية يومية مع التفسير، وأحاديث صحيحة من البخاري ومسلم، وقصص ملهمة من سيرة الأنبياء من مصادر موثوقة.",
+  },
+  khatm: {
+    title: "Quran Khatm Tracker - Complete Quran Reading in Ramadan",
+    titleAr: "ختم القرآن - متابعة قراءة القرآن الكريم في رمضان",
+    description: "Track your Quran reading progress during Ramadan. Read one Juz per day with full Uthmani text, search, and bookmarking.",
+    descriptionAr: "تابع تقدمك في قراءة القرآن خلال رمضان. اقرأ جزءاً يومياً بالنص العثماني الكامل مع البحث والعلامات المرجعية.",
+  },
+};
+
 export default function Home() {
   const { t, i18n } = useTranslation();
+  const [location, setLocation] = useLocation();
+
+  const activeTab = ROUTE_TO_TAB[location] || "home";
+
+  useEffect(() => {
+    if (location === "/") {
+      setLocation("/prayer-times", { replace: true });
+    }
+  }, [location, setLocation]);
+
+  const handleTabChange = useCallback((value: string) => {
+    const route = TAB_TO_ROUTE[value] || "/prayer-times";
+    setLocation(route);
+  }, [setLocation]);
+
+  useEffect(() => {
+    const seo = PAGE_SEO[activeTab] || PAGE_SEO.home;
+    const isAr = i18n.language === "ar";
+    document.title = isAr ? seo.titleAr : seo.title;
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute("content", isAr ? seo.descriptionAr : seo.description);
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute("content", isAr ? seo.titleAr : seo.title);
+
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute("content", isAr ? seo.descriptionAr : seo.description);
+
+    const twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twTitle) twTitle.setAttribute("content", isAr ? seo.titleAr : seo.title);
+
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute("content", isAr ? seo.descriptionAr : seo.description);
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = window.location.origin + (TAB_TO_ROUTE[activeTab] || "/prayer-times");
+  }, [activeTab, i18n.language]);
   
   // Eid Events State
   const [nextEvent, setNextEvent] = useState<EidDate | null>(null);
@@ -198,7 +291,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
       {/* Main Content */}
       <main className="p-4 max-w-7xl mx-auto">
-        <Tabs defaultValue="home" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Sticky Tab Navigation */}
           <div className="sticky top-[52px] z-40 bg-background/95 backdrop-blur-sm py-4 -mx-4 px-4 mb-6">
             <div className="flex justify-center">
@@ -206,24 +299,28 @@ ${t('isha')}: ${prayerData.timings.Isha}
               <TabsTrigger 
                 value="home" 
                 className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-12 transition-colors"
+                data-testid="tab-prayer-times"
               >
                 {t('prayer_times')}
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
                 className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-12 transition-colors"
+                data-testid="tab-qiblah"
               >
                 {t('qiblah')}
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
                 className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-12 transition-colors"
+                data-testid="tab-daily-content"
               >
                 {t('daily_content')}
               </TabsTrigger>
               <TabsTrigger 
                 value="khatm" 
                 className="rounded-full text-sm md:text-base font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-12 transition-colors"
+                data-testid="tab-quran-khatm"
               >
                 {i18n.language === 'ar' ? 'الختمة' : 'Khatm'}
               </TabsTrigger>

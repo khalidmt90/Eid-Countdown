@@ -10,6 +10,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/prayer-times" component={Home} />
+      <Route path="/qiblah" component={Home} />
+      <Route path="/daily-content" component={Home} />
+      <Route path="/quran-khatm" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );
