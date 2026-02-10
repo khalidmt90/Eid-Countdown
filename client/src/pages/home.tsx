@@ -5,7 +5,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen, Compass, Languages, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -262,11 +262,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {/* Sticky Header + Tabs */}
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between relative">
+          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
             <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
-              <SelectTrigger className="w-[80px] h-8 text-xs bg-card border-border rounded-lg" data-testid="select-language">
-                <Languages className="w-3 h-3 shrink-0" />
-                <SelectValue placeholder="Language" />
+              <SelectTrigger className="w-9 h-9 p-0 bg-transparent border-none shadow-none hover:bg-muted/50 rounded-lg flex items-center justify-center" data-testid="select-language">
+                <Globe className="w-5 h-5 text-muted-foreground" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ar">العربية</SelectItem>
@@ -282,21 +281,20 @@ ${t('isha')}: ${prayerData.timings.Isha}
               </SelectContent>
             </Select>
 
-            <div className="flex flex-col items-center absolute left-1/2 -translate-x-1/2">
-              <div className="flex items-center gap-2">
-                <img src="/logo.png" alt="Logo" className="w-7 h-7 rounded-lg shrink-0" data-testid="img-logo" />
-                <span className="text-sm font-black text-primary font-serif leading-tight">
-                  {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
-                </span>
-              </div>
-              {prayerData && (
-                <span className="text-[10px] font-bold text-muted-foreground/70 leading-tight">
-                  {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
-                </span>
-              )}
+            <div className="flex items-center gap-2.5">
+              <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg shrink-0" data-testid="img-logo" />
+              <span className="text-base font-black text-primary font-serif leading-tight">
+                {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
+              </span>
             </div>
 
-            <div className="w-[80px]" />
+            {prayerData ? (
+              <span className="text-xs font-bold text-muted-foreground/80 leading-tight">
+                {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
+              </span>
+            ) : (
+              <div className="w-9" />
+            )}
           </div>
 
           <div className="px-3 pb-2">
