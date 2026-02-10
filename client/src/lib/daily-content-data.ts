@@ -302,17 +302,17 @@ Abraham emerged unharmed. The fire meant to punish him became proof of his truth
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "احْفَظِ اللَّهَ يَحْفَظْكَ، احْفَظِ اللَّهَ تَجِدْهُ تُجَاهَكَ",
-          narrator: "عبد الله بن عباس",
-          title: "وصية النبي لابن عباس",
-          story: `كان ابن عباس رضي الله عنهما غلاماً صغيراً يركب خلف النبي ﷺ، فالتفت إليه النبي بوصية عظيمة قائلاً: "يا غلام، إني أعلمك كلمات".
+          text: "مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ",
+          narrator: "أبو هريرة",
+          title: "حفظ اللسان",
+          story: `قال النبي ﷺ: "من كان يؤمن بالله واليوم الآخر فليقل خيراً أو ليصمت، ومن كان يؤمن بالله واليوم الآخر فليكرم جاره، ومن كان يؤمن بالله واليوم الآخر فليكرم ضيفه".
 
-ثم قال له: "احفظ الله يحفظك، احفظ الله تجده تجاهك. إذا سألت فاسأل الله، وإذا استعنت فاستعن بالله. واعلم أن الأمة لو اجتمعت على أن ينفعوك بشيء لم ينفعوك إلا بشيء قد كتبه الله لك، ولو اجتمعوا على أن يضروك بشيء لم يضروك إلا بشيء قد كتبه الله عليك. رُفعت الأقلام وجفت الصحف".
+ربط النبي ﷺ بين الإيمان وبين حفظ اللسان في هذا الحديث العظيم. فالمؤمن الحق هو الذي يزن كلامه قبل أن ينطق به، فإن كان خيراً تكلم به، وإن كان شراً سكت عنه. واللسان هو أخطر جوارح الإنسان، فبكلمة واحدة قد يدخل المرء الجنة، وبكلمة واحدة قد يهوي في النار.
 
-هذه الوصية النبوية تحمل معاني عميقة: احفظ حدود الله في الرخاء، يحفظك الله في الشدة. احفظ نعم الله بالشكر، يحفظها عليك. احفظ جوارحك عن المعاصي، يحفظك الله من الآفات.
+وقد جمع النبي ﷺ في هذا الحديث ثلاث خصال عظيمة: حفظ اللسان، وإكرام الجار، وإكرام الضيف. وكلها من علامات الإيمان الكامل. فالمسلم الذي يراقب لسانه ويحسن إلى جيرانه ويكرم ضيوفه هو المؤمن حقاً.
 
-والمعنى الأعمق: أن من راقب الله في السر والعلن، كان الله معه في كل أحواله، ناصراً ومعيناً وحافظاً.`,
-          source: "الترمذي",
+والدرس العظيم هنا: أن الصمت عن الشر أفضل من الكلام به، وأن الإيمان ليس مجرد اعتقاد في القلب، بل هو سلوك وعمل يظهر في تعامل المسلم مع الناس.`,
+          source: "البخاري ومسلم",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -350,15 +350,17 @@ No matter how severe crises become, taqwa is the key, and Allah never breaks His
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "Be mindful of Allah and He will protect you. Be mindful of Allah and you will find Him before you",
-          narrator: "Abdullah ibn Abbas",
-          title: "The Prophet's Advice to Ibn Abbas",
-          story: `Ibn Abbas was a young boy riding behind the Prophet when he received this great advice: "Young man, I will teach you some words: Be mindful of Allah and He will protect you. If you ask, ask Allah. If you seek help, seek it from Allah."
+          text: "Whoever believes in Allah and the Last Day, let him speak good or remain silent",
+          narrator: "Abu Hurairah",
+          title: "Guarding the Tongue",
+          story: `The Prophet ﷺ said: "Whoever believes in Allah and the Last Day, let him speak good or remain silent. Whoever believes in Allah and the Last Day, let him honor his neighbor. Whoever believes in Allah and the Last Day, let him honor his guest."
 
-The Prophet continued: "Know that if the entire nation gathered to benefit you, they could not benefit you except with what Allah has written for you. And if they gathered to harm you, they could not harm you except with what Allah has written for you. The pens have been lifted and the pages have dried."
+The Prophet linked faith with guarding the tongue in this great hadith. The true believer weighs his words before speaking - if they are good, he speaks; if harmful, he stays silent. The tongue is the most dangerous of human faculties; with one word a person may enter Paradise, and with one word he may fall into the Fire.
 
-The deeper meaning: Whoever watches over Allah's commands in secret and public, Allah will be with him as a supporter, helper, and protector.`,
-          source: "Tirmidhi",
+The Prophet combined three great qualities in this hadith: guarding the tongue, honoring the neighbor, and honoring the guest. All are signs of complete faith. The Muslim who watches his tongue, treats his neighbors well, and honors his guests is the true believer.
+
+The great lesson: silence from evil is better than speaking it, and faith is not merely a belief in the heart, but behavior and action that appears in how a Muslim interacts with people.`,
+          source: "Bukhari and Muslim",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -400,8 +402,8 @@ The lesson: Obedience to Allah is salvation even if it seems strange to people, 
 والبشارة الخالدة: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا". ليس اليسر بعد العسر فحسب، بل معه، في نفس التوقيت. فإذا أصابك عسر في الرزق، فمعه يسر الصحة. وإذا أصابك عسر في الجسد، فمعه يسر القلب والرضا.
 
 وقد تحقق الوعد: بعد عام الحزن جاء الإسراء والمعراج، وبعد الهجرة جاء النصر، وبعد بدر جاء الفتح. هذه سنة الله، فلا تيأس.`,
-          source: "ابن القيم",
-          sourceUrl: "https://islamweb.net"
+          source: "ابن كثير",
+          sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
           text: "عَجَبًا لأَمْرِ الْمُؤْمِنِ، إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ",
@@ -448,8 +450,8 @@ The lesson: Obedience to Allah is salvation even if it seems strange to people, 
 The surah was revealed when the Prophet was at his most difficult time: he lost his wife Khadijah and his uncle Abu Talib, and was rejected in Taif. The surah came to reassure him.
 
 The promise was fulfilled: after the Year of Sorrow came the Night Journey, after migration came victory, after Badr came conquest. This is Allah's way—never despair.`,
-          source: "Ibn al-Qayyim",
-          sourceUrl: "https://islamweb.net"
+          source: "Ibn Kathir",
+          sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
           text: "How wonderful is the affair of the believer, for all his affairs are good",
@@ -506,11 +508,15 @@ const additionalEntries: DailyContent[] = [
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "مَن لاَ يَشْكُرُ النَّاسَ لاَ يَشْكُرُ اللَّهَ",
-          narrator: "أبو هريرة",
-          title: "شكر الناس من شكر الله",
-          story: `الشكر للخالق يبدأ بشكر المخلوق. فمن كان لا يقدّر جميل الناس ولا يشكرهم على معروفهم، فهو أبعد ما يكون عن شكر الله. كان النبي ﷺ يشكر أصحابه ويثني عليهم، ويشكر زوجاته، ويشكر كل من أحسن إليه. بل إنه كان يقوم الليل حتى تتورم قدماه، فلما سُئل: "أتفعل هذا وقد غُفر لك ما تقدم من ذنبك وما تأخر؟" قال: "أفلا أكون عبداً شكوراً؟". الشكر إذن ليس مجرد رد فعل على النعمة، بل هو منهج حياة، وسمة المؤمن الحق.`,
-          source: "الترمذي",
+          text: "إِنَّ اللَّهَ لَيَرْضَى عَنِ الْعَبْدِ أَنْ يَأْكُلَ الْأَكْلَةَ فَيَحْمَدَهُ عَلَيْهَا أَوْ يَشْرَبَ الشَّرْبَةَ فَيَحْمَدَهُ عَلَيْهَا",
+          narrator: "أنس بن مالك",
+          title: "الحمد على النعم",
+          story: `كان النبي ﷺ يحمد الله بعد كل أكلة يأكلها وبعد كل شربة يشربها، فيقول: "الحمد لله الذي أطعمني هذا ورزقنيه من غير حول مني ولا قوة". وقد بيّن ﷺ في هذا الحديث أن الله يرضى عن العبد الذي يحمده على نعمه، حتى ولو كانت نعمة صغيرة كأكلة أو شربة.
+
+والحمد على النعم هو أساس الشكر في الإسلام، فمن حمد الله على طعامه وشرابه، فقد شكره على ما أنعم به عليه. وكان النبي ﷺ قدوة في ذلك، فلم يكن يأكل طعاماً إلا حمد الله عليه، ولم يشرب شراباً إلا شكر الله عليه.
+
+بل إنه ﷺ كان يقوم الليل حتى تتورم قدماه، فلما سُئل: "أتفعل هذا وقد غُفر لك ما تقدم من ذنبك وما تأخر؟" قال: "أفلا أكون عبداً شكوراً؟". فالحمد والشكر ليسا مجرد رد فعل على النعمة، بل هما منهج حياة وسمة المؤمن الحق.`,
+          source: "صحيح مسلم",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -534,11 +540,15 @@ const additionalEntries: DailyContent[] = [
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "He who does not thank people does not thank Allah",
-          narrator: "Abu Hurairah",
-          title: "Thanking People is Thanking Allah",
-          story: `Gratitude to the Creator begins with gratitude to creation. Whoever doesn't appreciate people's kindness is far from thanking Allah. The Prophet would thank his companions, praise them, thank his wives, and thank everyone who did him a favor. He would stand in night prayer until his feet swelled. When asked why, having been forgiven, he said: "Should I not be a grateful servant?" Gratitude is not just a reaction to blessing, but a way of life and the characteristic of a true believer.`,
-          source: "Tirmidhi",
+          text: "Indeed, Allah is pleased with a servant who eats a meal and praises Him for it, or drinks a drink and praises Him for it",
+          narrator: "Anas ibn Malik",
+          title: "Praising Allah for Blessings",
+          story: `The Prophet ﷺ would praise Allah after every meal and every drink, saying: "All praise is due to Allah who fed me this and provided it for me without any power or strength from me." In this hadith, he explained that Allah is pleased with the servant who praises Him for His blessings, even if they are as small as a meal or a drink.
+
+Praising Allah for blessings is the foundation of gratitude in Islam. Whoever praises Allah for food and drink has thanked Him for His favors. The Prophet ﷺ was the perfect example in this - he never ate food without praising Allah, and never drank without thanking Allah.
+
+He would stand in night prayer until his feet swelled. When asked why, having been forgiven all his sins, he said: "Should I not be a grateful servant?" Praise and gratitude are not just reactions to blessings, but a way of life and the characteristic of a true believer.`,
+          source: "Sahih Muslim",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -568,11 +578,15 @@ const additionalEntries: DailyContent[] = [
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "لَوْ أَنَّكُمْ تَوَكَّلْتُمْ عَلَى اللَّهِ حَقَّ تَوَكُّلِهِ لَرُزِقْتُمْ كَمَا يُرْزَقُ الطَّيْرُ",
-          narrator: "عمر بن الخطاب",
-          title: "التوكل الحقيقي",
-          story: `قال النبي ﷺ: "لو أنكم توكلتم على الله حق توكله، لرزقكم كما يرزق الطير: تغدو خماصاً وتروح بطاناً". تأمل: الطير تخرج من أعشاشها جائعة (خماصاً) في الصباح تبحث عن الرزق، فترجع ممتلئة (بطاناً) في المساء. لم تبقَ في أعشاشها تنتظر أن يأتيها الرزق، بل خرجت تطلبه. هذا هو التوكل: العمل والسعي مع اليقين التام بأن الرزق من عند الله، وأنه لن يفوتك ما كُتب لك.`,
-          source: "الترمذي",
+          text: "يَدْخُلُ الْجَنَّةَ مِنْ أُمَّتِي سَبْعُونَ أَلْفًا بِغَيْرِ حِسَابٍ... هُمُ الَّذِينَ لَا يَسْتَرْقُونَ وَلَا يَتَطَيَّرُونَ وَعَلَى رَبِّهِمْ يَتَوَكَّلُونَ",
+          narrator: "ابن عباس",
+          title: "السبعون ألفاً المتوكلون",
+          story: `قال النبي ﷺ: "يدخل الجنة من أمتي سبعون ألفاً بغير حساب"، فتساءل الصحابة: من هم؟ فقال ﷺ: "هم الذين لا يسترقون ولا يتطيرون وعلى ربهم يتوكلون". فقام عكاشة بن محصن فقال: "ادع الله أن يجعلني منهم"، فقال: "أنت منهم".
+
+هذا الحديث العظيم يبين أن أعلى مراتب التوكل هي التي يدخل بها صاحبها الجنة بغير حساب ولا عذاب. والتوكل الحقيقي هو الاعتماد الكامل على الله مع الأخذ بالأسباب المشروعة، دون التعلق بالأسباب نفسها.
+
+والذين لا يسترقون أي لا يطلبون الرقية من غيرهم اعتماداً على الله، ولا يتطيرون أي لا يتشاءمون بشيء لأنهم يعلمون أن كل شيء بيد الله. هذا هو التوكل الحق: اطمئنان القلب إلى الله في كل الأحوال، والثقة التامة بأن ما أصابك لم يكن ليخطئك، وما أخطأك لم يكن ليصيبك.`,
+          source: "البخاري ومسلم",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -596,11 +610,15 @@ const additionalEntries: DailyContent[] = [
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "If you were to rely upon Allah with true reliance, He would provide for you as He provides for the birds",
-          narrator: "Umar ibn al-Khattab",
-          title: "True Reliance",
-          story: `The Prophet said: "If you were to rely upon Allah with true reliance, He would provide for you as He provides for the birds: they go out hungry in the morning and return full in the evening." Notice: birds leave their nests hungry, searching for provision, then return full. They don't wait in their nests for provision to come. This is reliance: working and striving with complete certainty that provision is from Allah and that what is written for you will never miss you.`,
-          source: "Tirmidhi",
+          text: "Seventy thousand of my ummah will enter Paradise without reckoning... they are those who do not seek ruqyah, do not believe in omens, and they put their trust in their Lord",
+          narrator: "Ibn Abbas",
+          title: "The Seventy Thousand Who Trust Allah",
+          story: `The Prophet ﷺ said: "Seventy thousand of my ummah will enter Paradise without reckoning." The companions wondered: who are they? He said: "They are those who do not seek ruqyah, do not believe in omens, and they put their trust in their Lord." Ukkashah ibn Mihsan stood and said: "Pray to Allah to make me one of them." He said: "You are one of them."
+
+This great hadith shows that the highest level of tawakkul (trust in Allah) is what earns entry to Paradise without reckoning or punishment. True reliance means complete dependence on Allah while taking lawful means, without becoming attached to the means themselves.
+
+Those who don't seek ruqyah means they don't ask others for spiritual healing out of reliance on Allah alone, and they don't believe in omens because they know everything is in Allah's hands. This is true reliance: the heart's tranquility with Allah in all circumstances, and complete trust that what befalls you was never going to miss you, and what misses you was never going to befall you.`,
+          source: "Bukhari and Muslim",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -650,8 +668,8 @@ const moreEntries: DailyContent[] = [
           story: `جاء أعرابي جافٍ إلى النبي ﷺ وجذب رداءه بشدة حتى أثّر في عنقه، ثم قال بفظاظة: "يا محمد، احمل لي على هاتين البعيرين، فإنك لا تحمل لي من مالك ولا من مال أبيك!". كان الصحابة مستعدين للانتقام من هذا الرجل الوقح، لكن النبي ﷺ تبسم وقال: "المال مال الله، وأنا عبده". ثم أمر له بعطاء. هذا الموقف يعلمنا درساً عظيماً في الحلم والصبر والعفو. النبي ﷺ كان يملك القوة والسلطان، وكان بإمكانه أن يعاقب هذا الأعرابي، لكنه اختار العفو والكلمة الطيبة. وفي موقف آخر، جاء رجل يطلب من النبي شيئاً، فأعطاه، فلم يشكر بل قال كلاماً سيئاً. فغضب بعض الصحابة، فقال النبي ﷺ: "مَثَلِي وَمَثَلُ هَذَا كَمَثَلِ رَجُلٍ لَهُ نَاقَةٌ شَرَدَتْ مِنْهُ، فَاتَّبَعَهَا النَّاسُ فَلَمْ يَزِيدُوهَا إِلَّا نُفُورًا، فَنَادَاهَا صَاحِبُهَا: يَا نَاقَةُ، لَيْسَ مِنَّا إِلَّا الرِّفْقُ، فَجَاءَتْ وَاسْتَنَاخَتْ، وَشَدَّ عَلَيْهَا رَحْلَهَا". فالكلمة الطيبة واللين يفعلان ما لا تفعله القوة والشدة.`,
           quranReference: "وَإِنَّكَ لَعَلَىٰ خُلُقٍ عَظِيمٍ",
           quranCitation: "سورة القلم: 4",
-          source: "السيرة النبوية",
-          sourceUrl: "https://islamweb.net"
+          source: "ابن كثير",
+          sourceUrl: "https://quran.ksu.edu.sa"
         }
       },
       en: {
@@ -678,8 +696,8 @@ const moreEntries: DailyContent[] = [
           story: `A rough Bedouin came to the Prophet and pulled his cloak harshly, leaving a mark on his neck, then said rudely: "O Muhammad, load these two camels for me, for you're not loading from your wealth or your father's wealth!" The companions were ready to punish this insolent man, but the Prophet smiled and said: "The wealth belongs to Allah, and I am His servant." Then he ordered provisions for him. This incident teaches a great lesson in forbearance, patience, and pardon. The Prophet had power and authority and could have punished this Bedouin, but he chose pardon and kind words. In another incident, a man asked the Prophet for something, so he gave it to him, but he didn't thank him and said bad words. Some companions got angry, but the Prophet said: "My parable and this man's is like a man whose camel ran away from him. People chased it but only made it more wild. Its owner called: O camel, we have only gentleness for you. So it came and knelt, and he fastened its saddle on it." The good word and gentleness accomplish what force and harshness cannot.`,
           quranReference: "And indeed, you are of a great moral character",
           quranCitation: "Surah Al-Qalam: 4",
-          source: "Prophetic Biography",
-          sourceUrl: "https://islamweb.net"
+          source: "Ibn Kathir",
+          sourceUrl: "https://quran.ksu.edu.sa"
         }
       }
     }
@@ -699,11 +717,15 @@ const moreEntries: DailyContent[] = [
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "أَوَّلُ مَا يُحَاسَبُ بِهِ الْعَبْدُ يَوْمَ الْقِيَامَةِ الصَّلَاةُ",
-          narrator: "أبو هريرة",
-          title: "منزلة الصلاة",
-          story: `قال النبي ﷺ: "أول ما يُحاسب به العبد يوم القيامة من عمله الصلاة، فإن صلحت فقد أفلح وأنجح، وإن فسدت فقد خاب وخسر". هذا الحديث يبين عظم منزلة الصلاة في الإسلام، فهي أول ما يُسأل عنه العبد يوم القيامة. إذا كانت صلاته صالحة - أي مقبولة عند الله - فإن باقي أعماله تُقبل، وإن كانت فاسدة فقد خاب وخسر. الصلاة هي عمود الدين، كما قال النبي ﷺ: "رأس الأمر الإسلام، وعموده الصلاة، وذروة سنامه الجهاد في سبيل الله". فمن أقام الصلاة فقد أقام الدين، ومن هدمها فقد هدم الدين. كان الصحابة رضوان الله عليهم يعتنون بالصلاة عناية فائقة، فعمر بن الخطاب كان يكتب إلى عماله في الأمصار: "إن أهم أموركم عندي الصلاة، فمن حفظها وحافظ عليها حفظ دينه، ومن ضيّعها فهو لما سواها أضيع". وكان السلف الصالح يوصون أبناءهم عند الموت بالصلاة قبل كل شيء، لأنها الفارق بين المسلم والكافر كما قال النبي ﷺ.`,
-          source: "الترمذي والنسائي",
+          text: "بُنِيَ الْإِسْلَامُ عَلَى خَمْسٍ: شَهَادَةِ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، وَإِقَامِ الصَّلَاةِ، وَإِيتَاءِ الزَّكَاةِ، وَحَجِّ الْبَيْتِ، وَصَوْمِ رَمَضَانَ",
+          narrator: "عبد الله بن عمر",
+          title: "أركان الإسلام",
+          story: `قال النبي ﷺ: "بُني الإسلام على خمس: شهادة أن لا إله إلا الله وأن محمداً رسول الله، وإقام الصلاة، وإيتاء الزكاة، وحج البيت، وصوم رمضان". هذا الحديث العظيم يبين أركان الإسلام الخمسة التي هي أساس الدين.
+
+والملاحظ أن النبي ﷺ جعل الصلاة الركن الثاني بعد الشهادتين مباشرة، مما يدل على عظم منزلتها في الإسلام. فالصلاة هي عمود الدين، كما قال النبي ﷺ: "رأس الأمر الإسلام، وعموده الصلاة". فمن أقام الصلاة فقد أقام الدين، ومن هدمها فقد هدم الدين.
+
+كان الصحابة رضوان الله عليهم يعتنون بالصلاة عناية فائقة، فعمر بن الخطاب كان يكتب إلى عماله في الأمصار: "إن أهم أموركم عندي الصلاة، فمن حفظها وحافظ عليها حفظ دينه، ومن ضيّعها فهو لما سواها أضيع". وكان السلف الصالح يوصون أبناءهم عند الموت بالصلاة قبل كل شيء، لأنها الفارق بين المسلم والكافر.`,
+          source: "البخاري ومسلم",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -712,8 +734,8 @@ const moreEntries: DailyContent[] = [
           story: `في غزوة ذات الرقاع، كان المسلمون في حالة حرب وخوف من عدوهم، ومع ذلك لم يتركوا الصلاة. فأنزل الله صلاة الخوف، حيث يصلي بعض الجنود بينما يحرس الآخرون، ثم يتبادلون. صلى النبي ﷺ بطائفة من أصحابه ركعة، ثم ثبتوا قياماً وأتم صلاته، ثم سلم. فذهبت تلك الطائفة وجاءت الطائفة الأخرى التي كانت تحرس، فصلى بهم الركعة الباقية ثم سلم. هذا الموقف يعلمنا درساً عظيماً: الصلاة لا تُترك بحال من الأحوال، حتى في أشد حالات الخوف والحرب. إذا كانت الصلاة لا تسقط في الحرب، فكيف نتركها في حالة السلم والأمان؟ وقد قال الله: "حَافِظُوا عَلَى الصَّلَوَاتِ وَالصَّلَاةِ الْوُسْطَىٰ وَقُومُوا لِلَّهِ قَانِتِينَ". فالصلاة هي الصلة بالله، وهي الراحة والطمأنينة، كما كان النبي ﷺ يقول لبلال: "أرحنا بها يا بلال"، فالراحة الحقيقية في الصلاة لا في تركها.`,
           quranReference: "حَافِظُوا عَلَى الصَّلَوَاتِ وَالصَّلَاةِ الْوُسْطَىٰ",
           quranCitation: "سورة البقرة: 238",
-          source: "السيرة النبوية",
-          sourceUrl: "https://islamweb.net"
+          source: "ابن كثير",
+          sourceUrl: "https://quran.ksu.edu.sa"
         }
       },
       en: {
@@ -727,11 +749,15 @@ const moreEntries: DailyContent[] = [
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "The first thing a servant will be held accountable for on the Day of Judgment is prayer",
-          narrator: "Abu Hurairah",
-          title: "The Status of Prayer",
-          story: `The Prophet said: "The first deed for which a servant will be held accountable on the Day of Judgment is prayer. If it is good, he will have succeeded and prospered. If it is bad, he will have failed and lost." This hadith shows prayer's great status in Islam - it's the first deed asked about on Judgment Day. If one's prayer is acceptable to Allah, other deeds will be accepted; if corrupt, one has failed and lost. Prayer is the pillar of religion, as the Prophet said: "The head of the matter is Islam, its pillar is prayer, and its peak is jihad in Allah's path." Whoever establishes prayer establishes the religion; whoever abandons it has demolished religion. The companions gave exceptional care to prayer. Umar ibn al-Khattab would write to his governors: "The most important matter to me is prayer. Whoever preserves and maintains it has preserved his religion, and whoever neglects it is more neglectful of everything else." The righteous predecessors would advise their children about prayer before anything else at death, because it's the difference between a Muslim and disbeliever, as the Prophet said.`,
-          source: "Tirmidhi and Nasa'i",
+          text: "Islam is built upon five pillars: testimony that there is no god but Allah and Muhammad is the Messenger of Allah, establishing prayer, giving zakah, pilgrimage to the House, and fasting Ramadan",
+          narrator: "Abdullah ibn Umar",
+          title: "Pillars of Islam",
+          story: `The Prophet ﷺ said: "Islam is built upon five: testimony that there is no god but Allah and Muhammad is the Messenger of Allah, establishing prayer, giving zakah, pilgrimage to the House, and fasting Ramadan." This great hadith outlines the five pillars of Islam that form the foundation of the religion.
+
+Notably, the Prophet ﷺ placed prayer as the second pillar immediately after the testimony of faith, showing its great status in Islam. Prayer is the pillar of the religion, as the Prophet said: "The head of the matter is Islam, and its pillar is prayer." Whoever establishes prayer has established the religion; whoever abandons it has demolished the religion.
+
+The companions gave exceptional care to prayer. Umar ibn al-Khattab would write to his governors: "The most important matter to me is prayer. Whoever preserves and maintains it has preserved his religion, and whoever neglects it is more neglectful of everything else." The righteous predecessors would advise their children about prayer before anything else at death, because it is the distinguishing mark between a Muslim and a disbeliever.`,
+          source: "Bukhari and Muslim",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -740,8 +766,8 @@ const moreEntries: DailyContent[] = [
           story: `In the Battle of Dhat ar-Riqa, Muslims were in a state of war and fear of their enemy, yet they didn't abandon prayer. Allah revealed the prayer of fear, where some soldiers pray while others stand guard, then they switch. The Prophet prayed one unit with a group of companions, who then stood still while he completed his prayer and gave salaam. That group left and the other group that was guarding came, and he prayed the remaining unit with them then gave salaam. This teaches a great lesson: prayer is never abandoned under any circumstances, even in the most severe states of fear and war. If prayer doesn't fall away during war, how can we abandon it in times of peace and safety? Allah said: "Guard strictly the prayers, especially the middle prayer, and stand before Allah devoutly." Prayer is the connection with Allah, and it is rest and tranquility, as the Prophet would say to Bilal: "Give us rest through it, O Bilal." True rest is in prayer, not in abandoning it.`,
           quranReference: "Guard strictly the prayers and the middle prayer",
           quranCitation: "Surah Al-Baqarah: 238",
-          source: "Prophetic Biography",
-          sourceUrl: "https://islamweb.net"
+          source: "Ibn Kathir",
+          sourceUrl: "https://quran.ksu.edu.sa"
         }
       }
     }
@@ -757,15 +783,21 @@ const moreEntries: DailyContent[] = [
           verseNumber: 23,
           title: "بر الوالدين",
           story: `قرن الله عبادته ببر الوالدين في آيات كثيرة، وهذا يدل على عظم حق الوالدين. قال تعالى: "وَقَضَىٰ رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَانًا". فجعل الإحسان إلى الوالدين مقروناً بعبادته. والإحسان هنا شامل لكل معاني البر: طاعتهما في المعروف، وخفض الجناح لهما، واللين في القول معهما، وإكرامهما، والإنفاق عليهما، والدعاء لهما. وقد شدد الله النكير على من يعق والديه، فقال: "فَلَا تَقُل لَّهُمَا أُفٍّ وَلَا تَنْهَرْهُمَا وَقُل لَّهُمَا قَوْلًا كَرِيمًا". فحرّم حتى التأفف، وهو أدنى مراتب الأذى. جاء رجل إلى النبي ﷺ فقال: "من أحق الناس بحسن صحابتي؟" قال: "أمك"، قال: "ثم من؟" قال: "أمك"، قال: "ثم من؟" قال: "أمك"، قال: "ثم من؟" قال: "أبوك". فجعل للأم ثلاثة أرباع البر والإحسان، لما تحملته من مشاق الحمل والوضع والرضاعة والتربية. وقد ورد في الحديث أن رجلاً حمل أمه على ظهره وطاف بها الكعبة، ثم سأل النبي: "هل أديت حقها؟" فقال: "لا، ولا بزفرة واحدة"، أي من زفرات الطلق عند الولادة. فما أعظم حق الوالدين!`,
-          source: "القرطبي",
+          source: "ابن كثير",
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "الْجَنَّةُ تَحْتَ أَقْدَامِ الْأُمَّهَاتِ",
-          narrator: "أنس بن مالك",
-          title: "فضل الأم",
-          story: `هذا الحديث وإن كان في سنده ضعف، إلا أن معناه صحيح ثابت بالنصوص الأخرى. فقد جعل الإسلام بر الأم من أعظم القربات وأجل الطاعات. جاء رجل إلى النبي ﷺ يستأذنه في الجهاد، فقال له: "أحيّة أمك؟" قال: "نعم"، قال: "الزم رجلها فثَمّ الجنة". وجاء آخر فقال: "يا رسول الله، إني أريد أن أغزو وقد جئت أستشيرك"، فقال: "هل لك من أم؟" قال: "نعم"، قال: "فالزمها فإن الجنة عند رجلها". فانظر كيف جعل النبي ﷺ خدمة الأم والقرب منها أفضل من الجهاد في سبيل الله، وذلك لعظم حقها. وكان جريج العابد يتعبد في صومعته، فنادته أمه فلم يجبها لانشغاله بالصلاة، فدعت عليه أن يبتليه الله بالزانية، فابتُلي بفتنة امرأة ادعت أنه زنا بها، حتى برّأه الله ببراءة الطفل الرضيع الذي نطق وهو في المهد فقال: "يا جريج لا تحزن، ليست أنت أبي". فكانت عقوبة تقديمه النافلة على حق أمه أن ابتُلي بهذا الابتلاء العظيم. فاحذر أخي المسلم من عقوق الوالدين، وأكثر من برهما، فإن رضا الله في رضا الوالدين، وسخط الله في سخطهما.`,
-          source: "النسائي وابن ماجه",
+          text: "مَنْ أَحَقُّ النَّاسِ بِحُسْنِ صَحَابَتِي؟ قَالَ: أُمُّكَ، قَالَ: ثُمَّ مَنْ؟ قَالَ: ثُمَّ أُمُّكَ، قَالَ: ثُمَّ مَنْ؟ قَالَ: ثُمَّ أُمُّكَ، قَالَ: ثُمَّ مَنْ؟ قَالَ: ثُمَّ أَبُوكَ",
+          narrator: "أبو هريرة",
+          title: "حق الأم",
+          story: `جاء رجل إلى النبي ﷺ فقال: "يا رسول الله، من أحق الناس بحسن صحابتي؟" قال: "أمك"، قال: "ثم من؟" قال: "ثم أمك"، قال: "ثم من؟" قال: "ثم أمك"، قال: "ثم من؟" قال: "ثم أبوك".
+
+فجعل النبي ﷺ للأم ثلاثة أرباع البر والإحسان، لما تحملته من مشاق الحمل والوضع والرضاعة والتربية. وهذا يدل على عظم منزلة الأم في الإسلام.
+
+وقد جعل الإسلام بر الأم من أعظم القربات وأجل الطاعات. وكان جريج العابد يتعبد في صومعته، فنادته أمه فلم يجبها لانشغاله بالصلاة، فدعت عليه أن يبتليه الله، فابتُلي بفتنة عظيمة حتى برّأه الله ببراءة الطفل الرضيع الذي نطق في المهد. فكانت عقوبة تقديمه النافلة على حق أمه أن ابتُلي بهذا الابتلاء العظيم.
+
+وقد ورد أن رجلاً حمل أمه على ظهره وطاف بها الكعبة، ثم سأل: "هل أديت حقها؟" فقيل له: "لا، ولا بزفرة واحدة" من زفرات الطلق عند الولادة. فاحذر أخي المسلم من عقوق الوالدين، وأكثر من برهما، فإن رضا الله في رضا الوالدين.`,
+          source: "البخاري ومسلم",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
@@ -785,15 +817,21 @@ const moreEntries: DailyContent[] = [
           verseNumber: 23,
           title: "Dutifulness to Parents",
           story: `Allah linked His worship with kindness to parents in many verses, indicating the greatness of parents' rights. Allah said: "Your Lord has decreed that you worship none but Him, and to parents, good treatment." He made excellence to parents coupled with His worship. Excellence here includes all meanings of dutifulness: obeying them in goodness, lowering the wing of humility, speaking gently, honoring them, spending on them, and supplicating for them. Allah severely warned against disobeying parents, saying: "So do not say to them 'uff' and do not repel them, but speak to them a noble word." He forbade even saying "uff," the lowest level of harm. A man came to the Prophet and asked: "Who is most deserving of my good companionship?" He said: "Your mother." He said: "Then who?" He said: "Your mother." He said: "Then who?" He said: "Your mother." He said: "Then who?" He said: "Your father." He gave the mother three-quarters of dutifulness for what she endured of pregnancy, delivery, nursing, and upbringing. It's narrated that a man carried his mother on his back and circumambulated the Kaaba, then asked the Prophet: "Have I fulfilled her right?" He said: "No, not even one gasp" - meaning one gasp of labor during childbirth. How great is parents' right!`,
-          source: "Qurtubi",
+          source: "Ibn Kathir",
           sourceUrl: "https://quran.ksu.edu.sa"
         },
         hadith: {
-          text: "Paradise lies at the feet of mothers",
-          narrator: "Anas ibn Malik",
-          title: "The Mother's Virtue",
-          story: `Though this hadith has weakness in its chain, its meaning is correct and established by other texts. Islam made dutifulness to the mother among the greatest acts of worship. A man came to the Prophet seeking permission for jihad, so he asked: "Is your mother alive?" He said: "Yes." He said: "Stay with her, for Paradise is at her feet." Another came and said: "O Messenger of Allah, I want to go on a military expedition and have come to consult you." He asked: "Do you have a mother?" He said: "Yes." He said: "Stay with her, for Paradise is at her feet." See how the Prophet made serving the mother and being close to her better than jihad for Allah's sake, due to the greatness of her right. Jurayj the worshipper was worshipping in his tower when his mother called him but he didn't answer because he was busy praying. She prayed against him to be tested with a prostitute. He was tested when a woman claimed he committed adultery with her, until Allah cleared him through a baby who spoke from the cradle saying: "O Jurayj, do not grieve, you are not my father." The punishment for prioritizing voluntary prayer over his mother's right was this great trial. Beware of disobeying parents and increase in dutifulne to them, for Allah's pleasure is in parents' pleasure, and Allah's displeasure is in their displeasure.`,
-          source: "Nasa'i and Ibn Majah",
+          text: "Who is most deserving of my good companionship? He said: Your mother. He said: Then who? He said: Then your mother. He said: Then who? He said: Then your mother. He said: Then who? He said: Then your father",
+          narrator: "Abu Hurairah",
+          title: "The Mother's Right",
+          story: `A man came to the Prophet ﷺ and asked: "O Messenger of Allah, who is most deserving of my good companionship?" He said: "Your mother." He said: "Then who?" He said: "Then your mother." He said: "Then who?" He said: "Then your mother." He said: "Then who?" He said: "Then your father."
+
+The Prophet gave the mother three-quarters of dutifulness and excellence, for what she endured of the hardships of pregnancy, delivery, nursing, and upbringing. This shows the great status of the mother in Islam.
+
+Islam made dutifulness to the mother among the greatest acts of worship. Jurayj the worshipper was worshipping in his tower when his mother called him but he didn't answer because he was busy praying. She prayed against him to be tested, and he was tested with a great trial until Allah cleared him through a baby who spoke from the cradle. The punishment for prioritizing voluntary prayer over his mother's right was this great trial.
+
+It is narrated that a man carried his mother on his back and circumambulated the Kaaba, then asked: "Have I fulfilled her right?" He was told: "No, not even one gasp" - meaning one gasp of labor during childbirth. Beware of disobeying parents and increase in dutifulness to them, for Allah's pleasure is in parents' pleasure.`,
+          source: "Bukhari and Muslim",
           sourceUrl: "https://sunnah.com"
         },
         prophetStory: {
