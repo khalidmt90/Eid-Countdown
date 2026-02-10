@@ -89,7 +89,7 @@ export function DailyContentView() {
             
             {/* 1. Ayah & Story Content */}
             <TabsContent value="ayah" className="mt-0">
-              <Card className="border-2 border-primary/20 shadow-md bg-card overflow-hidden rounded-3xl">
+              <Card className="border border-primary/20 shadow-sm bg-card overflow-hidden rounded-2xl">
                 <div className="bg-primary/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-primary/20">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/20 p-2 rounded-full">
@@ -99,9 +99,9 @@ export function DailyContentView() {
                       <h2 className="text-2xl font-black text-primary font-serif">{t('ayah_story')}</h2>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-primary/60 bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-primary/60 bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>⏱ {content.ayah.readingTime || 1} {t('min_read')}</span>
+                    <span>{content.ayah.readingTime || 1} {t('min_read')}</span>
                   </div>
                 </div>
                 
@@ -147,7 +147,7 @@ export function DailyContentView() {
 
             {/* 2. Hadith Content */}
             <TabsContent value="hadith" className="mt-0">
-              <Card className="border-2 border-secondary/20 shadow-xl bg-card overflow-hidden rounded-3xl">
+              <Card className="border border-secondary/20 shadow-sm bg-card overflow-hidden rounded-2xl">
                 <div className="bg-secondary/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-secondary/20">
                   <div className="flex items-center gap-3">
                     <div className="bg-secondary/20 p-2 rounded-full">
@@ -157,9 +157,9 @@ export function DailyContentView() {
                       <h2 className="text-2xl font-black text-secondary font-serif">{t('hadith_guidance')}</h2>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-secondary/60 bg-secondary/5 px-3 py-1.5 rounded-full border border-secondary/10">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-secondary/60 bg-secondary/5 px-3 py-1.5 rounded-full border border-secondary/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>⏱ {content.hadith.readingTime || 1} {t('min_read')}</span>
+                    <span>{content.hadith.readingTime || 1} {t('min_read')}</span>
                   </div>
                 </div>
 
@@ -206,7 +206,7 @@ export function DailyContentView() {
 
             {/* 3. Prophet Story Content */}
             <TabsContent value="prophet" className="mt-0">
-              <Card className="border-2 border-accent/20 shadow-xl bg-card overflow-hidden rounded-3xl">
+              <Card className="border border-accent/20 shadow-sm bg-card overflow-hidden rounded-2xl">
                 <div className="bg-accent/10 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-accent/20">
                   <div className="flex items-center gap-3">
                     <div className="bg-accent/20 p-2 rounded-full">
@@ -216,9 +216,9 @@ export function DailyContentView() {
                       <h2 className="text-2xl font-black text-accent font-serif">{t('prophet_stories')}</h2>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-accent/60 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/10">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-accent/60 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/10">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>⏱ {content.prophetStory.readingTime || 1} {t('min_read')}</span>
+                    <span>{content.prophetStory.readingTime || 1} {t('min_read')}</span>
                   </div>
                 </div>
 

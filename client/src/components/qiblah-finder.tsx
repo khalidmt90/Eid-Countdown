@@ -246,15 +246,15 @@ export function QiblahFinder() {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in duration-500">
-      <Card className="w-full max-w-md border-2 border-primary/20 shadow-lg overflow-hidden bg-card relative">
+      <Card className="w-full max-w-md border border-primary/20 shadow-sm overflow-hidden bg-card relative rounded-2xl">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 pointer-events-none" />
         
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-[38px] tracking-tight font-black font-serif text-primary flex items-center justify-center gap-2">
-            <Compass className="w-8 h-8" />
+          <CardTitle className="text-2xl tracking-tight font-black font-serif text-primary flex items-center justify-center gap-2">
+            <Compass className="w-6 h-6" />
             {t('qiblah_direction')}
           </CardTitle>
-          <p className="text-muted-foreground text-[23px]">
+          <p className="text-muted-foreground text-sm">
             {location ? t('location_set') : t('tap_to_start')}
           </p>
         </CardHeader>
@@ -366,13 +366,13 @@ export function QiblahFinder() {
             <RotateCcw className="w-4 h-4" />
             <span className="font-bold">{isArabic ? "تلميح" : "Tip"}</span>
           </div>
-          <p className="text-[18px]">{calibrationTip}</p>
+          <p className="text-sm">{calibrationTip}</p>
         </div>
       )}
       
       {(!smoothedHeading || isStableAligned) && (
         <div className="text-center max-w-sm text-muted-foreground text-sm px-4">
-          <p className="text-[20px]">{t('accuracy_tip')}</p>
+          <p className="text-sm">{t('accuracy_tip')}</p>
         </div>
       )}
     </div>
