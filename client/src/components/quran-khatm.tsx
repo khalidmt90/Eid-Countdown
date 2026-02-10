@@ -958,6 +958,9 @@ export function QuranKhatm() {
           transform: `translateX(-50%) translateY(${toolbarVisible ? 0 : 20}px)`,
           pointerEvents: toolbarVisible ? "auto" : "none",
         }}
+        onPointerEnter={() => { setToolbarVisible(true); if (toolbarTimerRef.current) clearTimeout(toolbarTimerRef.current); }}
+        onPointerLeave={() => { toolbarTimerRef.current = setTimeout(() => setToolbarVisible(false), 2000); }}
+        onTouchStart={() => { setToolbarVisible(true); if (toolbarTimerRef.current) clearTimeout(toolbarTimerRef.current); }}
       >
         <button
           onClick={() => { setShowSearch(!showSearch); if (showSearch) setSearchQuery(""); setShowFontSheet(false); }}
