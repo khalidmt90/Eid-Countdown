@@ -19,7 +19,21 @@ import {
   Minus,
   Plus,
   Type,
+  Loader2,
 } from "lucide-react";
+
+interface GlobalSearchResult {
+  number: number;
+  text: string;
+  numberInSurah: number;
+  juz: number;
+  surah: {
+    number: number;
+    name: string;
+    englishName: string;
+    numberOfAyahs: number;
+  };
+}
 
 interface Ayah {
   number: number;
@@ -194,6 +208,24 @@ const SURAH_AYAH_COUNTS: Record<number, number> = {
   111:5,112:4,113:5,114:6,
 };
 
+const JUZ_AYAH_RANGES: [number, number][] = [
+  [1, 148], [149, 259], [260, 385], [386, 516], [517, 640],
+  [641, 750], [751, 899], [900, 1041], [1042, 1200], [1201, 1327],
+  [1328, 1478], [1479, 1648], [1649, 1802], [1803, 2029], [2030, 2214],
+  [2215, 2483], [2484, 2673], [2674, 2875], [2876, 3214], [3215, 3385],
+  [3386, 3563], [3564, 3732], [3733, 4089], [4090, 4264], [4265, 4510],
+  [4511, 4705], [4706, 5104], [5105, 5241], [5242, 5672], [5673, 6236],
+];
+
+function getJuzForAyah(globalNumber: number): number {
+  for (let i = 0; i < JUZ_AYAH_RANGES.length; i++) {
+    if (globalNumber >= JUZ_AYAH_RANGES[i][0] && globalNumber <= JUZ_AYAH_RANGES[i][1]) {
+      return i + 1;
+    }
+  }
+  return 1;
+}
+
 export function QuranKhatm() {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
@@ -209,6 +241,10 @@ export function QuranKhatm() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [globalSearchResults, setGlobalSearchResults] = useState<GlobalSearchResult[]>([]);
+  const [globalSearchLoading, setGlobalSearchLoading] = useState(false);
+  const [globalSearchDone, setGlobalSearchDone] = useState(false);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showFontSheet, setShowFontSheet] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -336,6 +372,63 @@ export function QuranKhatm() {
     [isArabic]
   );
 
+  const searchAllQuran = useCallback(async (query: string) => {
+    if (!query || query.length < 2) {
+      setGlobalSearchResults([]);
+      setGlobalSearchDone(false);
+      setGlobalSearchLoading(false);
+      return;
+    }
+    setGlobalSearchLoading(true);
+    setGlobalSearchDone(false);
+    try {
+      const res = await fetch(
+        `https://api.alquran.cloud/v1/search/${encodeURIComponent(query)}/all/ar`
+      );
+      const json = await res.json();
+      if (json.code === 200 && json.data && json.data.matches) {
+        setGlobalSearchResults(
+          json.data.matches.map((m: any) => ({
+            number: m.number,
+            text: m.text,
+            numberInSurah: m.numberInSurah,
+            juz: getJuzForAyah(m.number),
+            surah: {
+              number: m.surah.number,
+              name: m.surah.name,
+              englishName: m.surah.englishName,
+              numberOfAyahs: m.surah.numberOfAyahs,
+            },
+          }))
+        );
+      } else {
+        setGlobalSearchResults([]);
+      }
+    } catch {
+      setGlobalSearchResults([]);
+    } finally {
+      setGlobalSearchLoading(false);
+      setGlobalSearchDone(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (!searchQuery || searchQuery.length < 2) {
+      setGlobalSearchResults([]);
+      setGlobalSearchDone(false);
+      setGlobalSearchLoading(false);
+      return;
+    }
+    setGlobalSearchLoading(true);
+    searchDebounceRef.current = setTimeout(() => {
+      searchAllQuran(searchQuery);
+    }, 500);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [searchQuery, searchAllQuran]);
+
   useEffect(() => {
     setJuzData(null);
     setCurrentPage(0);
@@ -450,6 +543,18 @@ export function QuranKhatm() {
     setShowDaySheet(false);
     setSearchQuery("");
     setShowSearch(false);
+    setGlobalSearchResults([]);
+    setGlobalSearchDone(false);
+  };
+
+  const jumpToResult = (result: GlobalSearchResult) => {
+    const juzNumber = result.juz || 1;
+    setSearchQuery("");
+    setGlobalSearchResults([]);
+    setGlobalSearchDone(false);
+    setSelectedDay(juzNumber);
+    setShowDaySheet(false);
+    setCurrentPage(0);
   };
 
   const fontUp = () => {
@@ -630,14 +735,17 @@ export function QuranKhatm() {
             type="text"
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(0); }}
-            placeholder={isArabic ? "ابحث في الجزء — اكتب بدون تشكيل" : "Search in Juz — type without diacritics"}
+            placeholder={isArabic ? "ابحث في القرآن الكريم..." : "Search the entire Quran..."}
             className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
             dir="rtl"
-            data-testid="input-search-juz"
+            data-testid="input-search-quran"
           />
+          {globalSearchLoading && (
+            <Loader2 className="w-4 h-4 text-primary animate-spin shrink-0" />
+          )}
           {searchQuery && (
             <button
-              onClick={() => { setSearchQuery(""); setCurrentPage(0); }}
+              onClick={() => { setSearchQuery(""); setCurrentPage(0); setGlobalSearchResults([]); setGlobalSearchDone(false); }}
               className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
               data-testid="button-clear-search"
             >
@@ -645,14 +753,61 @@ export function QuranKhatm() {
             </button>
           )}
         </div>
-        {normalizedQuery && (
+        {searchQuery && searchQuery.length >= 2 && globalSearchDone && (
           <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
-            {filteredAyahs.length > 0
-              ? (isArabic ? `${filteredAyahs.length} نتيجة` : `${filteredAyahs.length} results`)
+            {globalSearchResults.length > 0
+              ? (isArabic ? `${globalSearchResults.length} نتيجة في القرآن كاملاً` : `${globalSearchResults.length} results across all Quran`)
               : (isArabic ? "لا توجد نتائج" : "No results")}
           </div>
         )}
       </div>
+
+      {/* === GLOBAL SEARCH RESULTS === */}
+      {searchQuery && searchQuery.length >= 2 && (globalSearchLoading || globalSearchDone) && (
+        <div className="space-y-2">
+          {globalSearchLoading && !globalSearchDone && (
+            <div className="flex items-center justify-center gap-2 py-6 text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm font-bold">{isArabic ? "جارٍ البحث..." : "Searching..."}</span>
+            </div>
+          )}
+          {globalSearchDone && globalSearchResults.length === 0 && (
+            <div className="py-8 text-center text-muted-foreground">
+              <Search className="w-10 h-10 mx-auto mb-2 opacity-30" />
+              <p className="font-bold">{isArabic ? "لا توجد نتائج" : "No results found"}</p>
+              <p className="text-xs mt-1">{isArabic ? "جرّب كلمات مختلفة" : "Try different words"}</p>
+            </div>
+          )}
+          {globalSearchDone && globalSearchResults.length > 0 && (
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto rounded-xl">
+              {globalSearchResults.map((result, idx) => (
+                <button
+                  key={`${result.number}-${idx}`}
+                  onClick={() => jumpToResult(result)}
+                  className="w-full text-right bg-card border border-border rounded-xl p-3 hover:bg-muted/50 transition-colors space-y-1.5"
+                  dir="rtl"
+                  data-testid={`search-result-${idx}`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-black text-primary">
+                      {SURAH_NAMES_AR[result.surah.number] || result.surah.name} - {isArabic ? "آية" : "Ayah"} {result.numberInSurah}
+                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md shrink-0">
+                      {isArabic ? `الجزء ${result.juz}` : `Juz ${result.juz}`}
+                    </span>
+                  </div>
+                  <p
+                    className="text-sm leading-relaxed text-foreground/80 line-clamp-2"
+                    style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif" }}
+                  >
+                    {result.text}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* === FONT SIZE BOTTOM SHEET === */}
       {showFontSheet && (
@@ -719,7 +874,9 @@ export function QuranKhatm() {
         </div>
       )}
 
-      {/* === CONTINUE READING === */}
+      {/* === CONTINUE READING + QURAN TEXT (hidden during global search) === */}
+      {!(searchQuery && searchQuery.length >= 2 && (globalSearchLoading || globalSearchDone)) && (
+      <>
       {hasSavedPosition && !searchQuery && (
         <button
           onClick={() => {
@@ -872,6 +1029,8 @@ export function QuranKhatm() {
           )}
         </>
       )}
+      </>
+      )}
 
       {/* === FLOATING BOTTOM TOOLBAR === */}
       <div
@@ -886,7 +1045,7 @@ export function QuranKhatm() {
         onTouchStart={() => { setToolbarVisible(true); if (toolbarTimerRef.current) clearTimeout(toolbarTimerRef.current); }}
       >
         <button
-          onClick={() => { setShowFontSheet(!showFontSheet); setShowSearch(false); }}
+          onClick={() => { setShowFontSheet(!showFontSheet); }}
           className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${
             showFontSheet ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
           }`}
