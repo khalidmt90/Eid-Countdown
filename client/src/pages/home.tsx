@@ -335,32 +335,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
         <main className="p-4 max-w-7xl mx-auto">
           <TabsContent value="home" className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-0">
             
-            {/* Location & Time Format Bar */}
-            <div className="flex items-center gap-2 w-full max-w-4xl mx-auto">
-              <div 
-                onClick={() => setIsLocationSheetOpen(true)}
-                className="bg-card hover:bg-card/80 transition-colors cursor-pointer border border-border rounded-xl px-3 py-2 flex items-center gap-2 group"
-                data-testid="button-location"
-              >
-                <MapPin className="w-4 h-4 text-primary shrink-0" />
-                <span className="font-black text-[13px] text-foreground">
-                  {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
-                </span>
-                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
-              </div>
-
-              <Button
-                onClick={toggleTimeFormat}
-                variant="outline"
-                className="h-9 rounded-xl flex items-center justify-center gap-1.5 border-border bg-card hover:bg-card/80 px-3 shrink-0"
-                data-testid="button-time-format"
-              >
-                <Clock className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[13px] font-black text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
-              </Button>
-            </div>
-
-            {/* HERO: Next Prayer Countdown */}
+            {/* HERO: Next Prayer Countdown with Location & Time Format */}
             {nextPrayer && (
               <motion.div 
                 initial={{ scale: 0.95, opacity: 0 }}
@@ -380,7 +355,30 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     "bg-muted-foreground"
                   )} />
                   
-                  <CardContent className="flex flex-col items-center justify-center py-8 md:py-12 bg-gradient-to-b from-card to-background">
+                  <CardContent className="flex flex-col items-center justify-center pt-3 pb-6 md:py-10 bg-gradient-to-b from-card to-background">
+                    {/* Location & Time Format inside card */}
+                    <div className="flex items-center justify-between w-full px-1 mb-4">
+                      <div 
+                        onClick={() => setIsLocationSheetOpen(true)}
+                        className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                        data-testid="button-location"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <span className="font-bold text-[13px] text-foreground">
+                          {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
+                        </span>
+                        <ChevronDown className="w-3 h-3 text-muted-foreground/50" />
+                      </div>
+                      <button
+                        onClick={toggleTimeFormat}
+                        className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+                        data-testid="button-time-format"
+                      >
+                        <Clock className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-[13px] font-bold text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
+                      </button>
+                    </div>
+
                     <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
                       {t('remaining_to')} {t(nextPrayer.name.toLowerCase())}
                     </span>
