@@ -110,6 +110,14 @@ function setCompletion(map: CompletionMap) {
   localStorage.setItem(LS_KEY_COMPLETION, JSON.stringify(map));
 }
 
+function getAllCachedJuz(): Record<number, JuzData> {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY_JUZ_CACHE) || "{}");
+  } catch {
+    return {};
+  }
+}
+
 function getCachedJuz(juz: number): JuzData | null {
   try {
     const cache = JSON.parse(localStorage.getItem(LS_KEY_JUZ_CACHE) || "{}");
@@ -372,44 +380,82 @@ export function QuranKhatm() {
     [isArabic]
   );
 
-  const searchAllQuran = useCallback(async (query: string) => {
+  const [allJuzLoaded, setAllJuzLoaded] = useState(false);
+  const prefetchingRef = useRef(false);
+
+  const prefetchAllJuz = useCallback(async () => {
+    if (prefetchingRef.current) return;
+    prefetchingRef.current = true;
+    const cached = getAllCachedJuz();
+    const missing: number[] = [];
+    for (let i = 1; i <= 30; i++) {
+      if (!cached[i]) missing.push(i);
+    }
+    if (missing.length === 0) {
+      setAllJuzLoaded(true);
+      prefetchingRef.current = false;
+      return;
+    }
+    for (const juzNum of missing) {
+      try {
+        const res = await fetch(`https://api.alquran.cloud/v1/juz/${juzNum}/quran-uthmani`);
+        if (!res.ok) continue;
+        const json = await res.json();
+        const data: JuzData = {
+          ayahs: json.data.ayahs.map((a: any) => ({
+            number: a.number,
+            text: a.text,
+            surah: { number: a.surah.number, name: a.surah.name, englishName: a.surah.englishName, numberOfAyahs: a.surah.numberOfAyahs },
+            numberInSurah: a.numberInSurah,
+            juz: a.juz,
+          })),
+          fetchedAt: new Date().toISOString(),
+        };
+        setCachedJuz(juzNum, data);
+      } catch { /* skip, retry later */ }
+    }
+    setAllJuzLoaded(true);
+    prefetchingRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    prefetchAllJuz();
+  }, [prefetchAllJuz]);
+
+  const searchLocalQuran = useCallback((query: string) => {
     if (!query || query.length < 2) {
       setGlobalSearchResults([]);
       setGlobalSearchDone(false);
-      setGlobalSearchLoading(false);
       return;
     }
-    setGlobalSearchLoading(true);
-    setGlobalSearchDone(false);
-    try {
-      const res = await fetch(
-        `https://api.alquran.cloud/v1/search/${encodeURIComponent(query)}/all/ar`
-      );
-      const json = await res.json();
-      if (json.code === 200 && json.data && json.data.matches) {
-        setGlobalSearchResults(
-          json.data.matches.map((m: any) => ({
-            number: m.number,
-            text: m.text,
-            numberInSurah: m.numberInSurah,
-            juz: getJuzForAyah(m.number),
-            surah: {
-              number: m.surah.number,
-              name: m.surah.name,
-              englishName: m.surah.englishName,
-              numberOfAyahs: m.surah.numberOfAyahs,
-            },
-          }))
-        );
-      } else {
-        setGlobalSearchResults([]);
-      }
-    } catch {
+    const normalized = normalizeArabicForSearch(query);
+    if (!normalized || normalized.length < 2) {
       setGlobalSearchResults([]);
-    } finally {
-      setGlobalSearchLoading(false);
-      setGlobalSearchDone(true);
+      setGlobalSearchDone(false);
+      return;
     }
+    const words = normalized.split(" ").filter(Boolean);
+    const allCached = getAllCachedJuz();
+    const results: GlobalSearchResult[] = [];
+    for (let juzNum = 1; juzNum <= 30; juzNum++) {
+      const juz = allCached[juzNum];
+      if (!juz) continue;
+      for (const ayah of juz.ayahs) {
+        const searchText = normalizeArabicForSearch(ayah.text);
+        if (words.every(w => searchText.includes(w))) {
+          results.push({
+            number: ayah.number,
+            text: ayah.text,
+            numberInSurah: ayah.numberInSurah,
+            juz: juzNum,
+            surah: ayah.surah,
+          });
+        }
+      }
+    }
+    setGlobalSearchResults(results);
+    setGlobalSearchDone(true);
+    setGlobalSearchLoading(false);
   }, []);
 
   useEffect(() => {
@@ -422,12 +468,12 @@ export function QuranKhatm() {
     }
     setGlobalSearchLoading(true);
     searchDebounceRef.current = setTimeout(() => {
-      searchAllQuran(searchQuery);
-    }, 500);
+      searchLocalQuran(searchQuery);
+    }, 150);
     return () => {
       if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
     };
-  }, [searchQuery, searchAllQuran]);
+  }, [searchQuery, searchLocalQuran, allJuzLoaded]);
 
   useEffect(() => {
     setJuzData(null);
@@ -756,8 +802,12 @@ export function QuranKhatm() {
         {searchQuery && searchQuery.length >= 2 && globalSearchDone && (
           <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
             {globalSearchResults.length > 0
-              ? (isArabic ? `${globalSearchResults.length} نتيجة في القرآن كاملاً` : `${globalSearchResults.length} results across all Quran`)
-              : (isArabic ? "لا توجد نتائج" : "No results")}
+              ? (isArabic
+                  ? `${globalSearchResults.length} نتيجة${!allJuzLoaded ? " (جارٍ تحميل بقية الأجزاء...)" : ""}`
+                  : `${globalSearchResults.length} results${!allJuzLoaded ? " (loading more...)" : ""}`)
+              : (isArabic
+                  ? (!allJuzLoaded ? "جارٍ تحميل الأجزاء..." : "لا توجد نتائج")
+                  : (!allJuzLoaded ? "Loading Quran data..." : "No results"))}
           </div>
         )}
       </div>
