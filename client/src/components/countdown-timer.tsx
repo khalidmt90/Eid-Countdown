@@ -69,11 +69,11 @@ function TimeUnit({ value, label, delay }: { value: number; label: string; delay
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
     >
-      <Card className="flex flex-col items-center justify-center p-3 md:p-4 bg-card border border-primary/20 rounded-xl">
-        <span className="text-2xl md:text-4xl font-black text-primary font-mono tabular-nums tracking-tight">
+      <Card className="flex flex-col items-center justify-center p-3 md:p-5 bg-card border border-primary/20 rounded-xl">
+        <span className="text-3xl md:text-4xl font-black text-primary font-mono tabular-nums tracking-tight">
           {String(value).padStart(2, '0')}
         </span>
-        <span className="text-foreground font-bold mt-1 text-xs md:text-sm">
+        <span className="text-foreground font-bold mt-1 text-sm md:text-base">
           {label}
         </span>
       </Card>

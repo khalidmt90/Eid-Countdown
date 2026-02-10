@@ -262,22 +262,9 @@ ${t('isha')}: ${prayerData.timings.Isha}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {/* Sticky Header + Tabs */}
         <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg shrink-0" data-testid="img-logo" />
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-black text-primary font-serif leading-tight truncate">
-                  {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
-                </span>
-                {prayerData && (
-                  <span className="text-[10px] font-bold text-muted-foreground/70 leading-tight truncate">
-                    {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
-                  </span>
-                )}
-              </div>
-            </div>
+          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between relative">
             <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
-              <SelectTrigger className="w-[90px] h-8 text-xs bg-card border-border rounded-lg" data-testid="select-language">
+              <SelectTrigger className="w-[80px] h-8 text-xs bg-card border-border rounded-lg" data-testid="select-language">
                 <Languages className="w-3 h-3 shrink-0" />
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
@@ -294,34 +281,50 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 <SelectItem value="es">Español</SelectItem>
               </SelectContent>
             </Select>
+
+            <div className="flex flex-col items-center absolute left-1/2 -translate-x-1/2">
+              <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="Logo" className="w-7 h-7 rounded-lg shrink-0" data-testid="img-logo" />
+                <span className="text-sm font-black text-primary font-serif leading-tight">
+                  {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
+                </span>
+              </div>
+              {prayerData && (
+                <span className="text-[10px] font-bold text-muted-foreground/70 leading-tight">
+                  {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
+                </span>
+              )}
+            </div>
+
+            <div className="w-[80px]" />
           </div>
 
           <div className="px-3 pb-2">
-            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4 h-10 bg-muted/80 border border-border/50 rounded-xl p-0.5" data-testid="tabs-nav">
+            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4 h-11 bg-muted/80 border border-border/50 rounded-xl p-0.5" data-testid="tabs-nav">
               <TabsTrigger 
                 value="home" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-8 transition-all"
+                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 transition-all"
                 data-testid="tab-prayer-times"
               >
                 {t('prayer_times')}
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-8 transition-all"
+                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-9 transition-all"
                 data-testid="tab-qiblah"
               >
                 {t('qiblah')}
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-8 transition-all"
+                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-9 transition-all"
                 data-testid="tab-daily-content"
               >
                 {t('daily_content')}
               </TabsTrigger>
               <TabsTrigger 
                 value="khatm" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-8 transition-all"
+                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 transition-all"
                 data-testid="tab-quran-khatm"
               >
                 {i18n.language === 'ar' ? 'الختمة' : 'Khatm'}
@@ -346,10 +349,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="font-black text-sm text-foreground truncate">
+                    <span className="font-black text-[13px] text-foreground truncate">
                       {i18n.language === 'ar' ? selectedCity.nameAr : selectedCity.nameEn}
                     </span>
-                    <span className="text-[10px] text-muted-foreground font-medium shrink-0">
+                    <span className="text-[11px] text-muted-foreground font-medium shrink-0">
                       {i18n.language === 'ar' ? selectedCountry.nameAr : selectedCountry.nameEn}
                     </span>
                   </div>
@@ -364,7 +367,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 data-testid="button-time-format"
               >
                 <Clock className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[10px] font-black text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
+                <span className="text-[11px] font-black text-foreground">{timeFormat === '12' ? '12H' : '24H'}</span>
               </Button>
             </div>
 
@@ -463,8 +466,8 @@ ${t('isha')}: ${prayerData.timings.Isha}
                
                <div className="bg-card border border-border rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                  <div className="text-center md:text-start">
-                   <h4 className="text-base font-black text-foreground">{t(nextEvent.nameKey)}</h4>
-                   <p className="text-xs text-muted-foreground font-medium">{formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
+                   <h4 className="text-lg font-black text-foreground">{t(nextEvent.nameKey)}</h4>
+                   <p className="text-sm text-muted-foreground font-medium">{formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
                  </div>
                  
                  <div className="w-full md:w-auto">
@@ -503,24 +506,36 @@ ${t('isha')}: ${prayerData.timings.Isha}
             </DialogTrigger>
             <DialogContent className="sm:max-w-md text-start bg-card border-primary/10">
               <DialogHeader className="text-start space-y-4">
-                <DialogTitle className="text-xl font-serif text-primary border-b border-border pb-2">{t('about')}</DialogTitle>
-                <DialogDescription className="text-sm leading-relaxed text-foreground/80">
-                  {i18n.language === 'ar' ? 
-                    "تطبيق شامل لمواقيت الصلاة، اتجاه القبلة، والعد التنازلي للأعياد، والمحتوى الإسلامي اليومي." : 
-                    "Comprehensive app for prayer times, Qiblah direction, Eid countdown, and daily Islamic content."}
-                  <br/><br/>
-                  <div className="bg-primary/10 p-3 rounded-xl border border-primary/20 text-foreground text-sm">
-                    <strong>{i18n.language === 'ar' ? "ملاحظة:" : "Note:"}</strong>
-                     {i18n.language === 'ar' ? 
-                     " مواقيت الصلاة تعتمد على تقويم أم القرى. جميع المحتويات الدينية مراجعة من مصادر موثوقة." : 
-                     " Prayer times are based on Umm Al-Qura calendar. All religious content is verified from trusted sources."}
-                  </div>
-                  <br/>
-                  <div className="bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-foreground text-sm">
-                    <strong>{i18n.language === 'ar' ? "تنبيه:" : "Disclaimer:"}</strong>
-                     {i18n.language === 'ar' ? 
-                     " بعض المحتويات الدينية (القصص والتفاسير) يتم إنشاؤها بواسطة الذكاء الاصطناعي وقد تحتوي على أخطاء. يرجى التحقق من المصادر الموثوقة." : 
-                     " Some religious content (stories and interpretations) is AI-generated and may contain errors. Please verify with trusted sources."}
+                <DialogTitle className="text-xl font-serif text-primary border-b border-border pb-2">
+                  {i18n.language === 'ar' ? "تنبيه مهم" : "Important Disclaimer"}
+                </DialogTitle>
+                <DialogDescription asChild>
+                  <div className="text-sm leading-relaxed text-foreground/80 space-y-4">
+                    <p>
+                      {i18n.language === 'ar' 
+                        ? "تم إعداد محتوى القصص باستخدام تقنيات الذكاء الاصطناعي، بالاعتماد على مصادر إسلامية موثوقة مثل القرآن الكريم وتفاسير العلماء."
+                        : "Story content was prepared using AI technologies, based on trusted Islamic sources such as the Holy Quran and scholarly Tafsir."}
+                    </p>
+                    <p>
+                      {i18n.language === 'ar'
+                        ? "ورغم الحرص على الدقة، قد ترد بعض الأخطاء غير المقصودة. في حال وجود أي تعارض أو إشكال في المحتوى، يُرجى الرجوع إلى المصادر الشرعية الأصلية مثل:"
+                        : "Despite efforts for accuracy, some unintentional errors may occur. In case of any conflict, please refer to the original sources such as:"}
+                    </p>
+                    <ul className="list-disc list-inside space-y-1 text-foreground/70 bg-primary/5 p-3 rounded-xl border border-primary/10">
+                      <li>{i18n.language === 'ar' ? "القرآن الكريم" : "The Holy Quran"}</li>
+                      <li>{i18n.language === 'ar' ? "تفسير ابن كثير" : "Tafsir Ibn Kathir"}</li>
+                      <li>{i18n.language === 'ar' ? "التفاسير المعتمدة لدى أهل العلم" : "Approved Tafsir by scholars"}</li>
+                    </ul>
+                    <div className="bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-foreground text-sm">
+                      <p>
+                        {i18n.language === 'ar'
+                          ? "هذا العمل صدقة جارية عني وعن جميع المسلمين، وأسأل الله أن ينفع به ويجعله خالصًا لوجهه الكريم."
+                          : "This work is an ongoing charity (Sadaqah Jariyah) for me and all Muslims. I ask Allah to make it beneficial and sincere for His sake."}
+                      </p>
+                    </div>
+                    <p className="text-center font-serif text-primary font-bold text-base">
+                      {i18n.language === 'ar' ? "اللهم تقبّل منا ومنكم." : "May Allah accept from us and from you."}
+                    </p>
                   </div>
                 </DialogDescription>
               </DialogHeader>
