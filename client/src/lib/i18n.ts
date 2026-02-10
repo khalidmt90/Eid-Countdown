@@ -84,7 +84,7 @@ i18n
         translation: {
           "prayer_times": "المواقيت",
           "qiblah": "القبلة",
-          "daily_content": "قصص",
+          "daily_content": "القصص",
           "upcoming_events": "الأحداث القادمة",
           "next_event": "الحدث القادم",
           "ramadan": "رمضان",

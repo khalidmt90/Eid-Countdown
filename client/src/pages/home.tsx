@@ -325,7 +325,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 transition-all"
                 data-testid="tab-quran-khatm"
               >
-                {i18n.language === 'ar' ? 'الختمة' : 'Khatm'}
+                {i18n.language === 'ar' ? 'القرآن الكريم' : 'Quran'}
               </TabsTrigger>
             </TabsList>
           </div>
