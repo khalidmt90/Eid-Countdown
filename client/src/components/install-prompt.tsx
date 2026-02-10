@@ -75,10 +75,10 @@ export function InstallPrompt() {
       {/* Install Button - fixed at bottom */}
       {!showIOSOverlay && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 fade-in duration-500">
-          <div className="flex items-center gap-2">
+          <div className="relative flex items-center gap-2 bg-card/95 backdrop-blur-md border border-border shadow-xl rounded-full px-1.5 py-1.5">
             <Button
               onClick={handleInstallClick}
-              className="rounded-full px-5 py-3 h-auto shadow-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base gap-2"
+              className="rounded-full px-5 py-3 h-auto shadow-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base gap-2"
               data-testid="button-install-app"
             >
               <Download className="w-5 h-5" />
@@ -86,10 +86,10 @@ export function InstallPrompt() {
             </Button>
             <button
               onClick={handleDismiss}
-              className="w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+              className="w-10 h-10 rounded-full bg-muted hover:bg-destructive/20 text-muted-foreground hover:text-destructive flex items-center justify-center transition-colors"
               data-testid="button-dismiss-install"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
