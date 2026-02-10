@@ -4,7 +4,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen, Compass, Languages, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2 } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass, Languages, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -54,6 +54,7 @@ export default function Home() {
   }, [locationSelected]);
 
   const [timeFormat, setTimeFormat] = useState<'12' | '24'>('12');
+  const [shareHidden, setShareHidden] = useState(false);
 
   const toggleTimeFormat = () => {
     setTimeFormat(prev => prev === '12' ? '24' : '12');
@@ -451,14 +452,24 @@ ${t('isha')}: ${prayerData.timings.Isha}
       />
 
       {/* WhatsApp Share Button */}
-      <div className="fixed bottom-6 left-6 z-50">
-        <Button 
-          onClick={handleShare}
-          className="rounded-full w-14 h-14 bg-[#25D366] hover:bg-[#128C7E] text-white shadow-lg flex items-center justify-center"
-        >
-          <Share2 className="w-6 h-6" />
-        </Button>
-      </div>
+      {!shareHidden && (
+        <div className="fixed bottom-6 left-6 z-50 flex items-center gap-2">
+          <Button 
+            onClick={handleShare}
+            className="rounded-full w-14 h-14 bg-[#25D366] hover:bg-[#128C7E] text-white shadow-lg flex items-center justify-center"
+            data-testid="button-share"
+          >
+            <Share2 className="w-6 h-6" />
+          </Button>
+          <button
+            onClick={() => setShareHidden(true)}
+            className="w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors shadow-lg"
+            data-testid="button-close-share"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
     </div>
   );
