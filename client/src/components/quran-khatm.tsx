@@ -11,7 +11,6 @@ import {
   Calendar,
   Search,
   X,
-  Settings,
   ChevronLeft,
   ChevronRight,
   Bookmark,
@@ -202,7 +201,6 @@ export function QuranKhatm() {
   const savedStart = localStorage.getItem(LS_KEY_START);
 
   const [startDate, setStartDate] = useState<string | null>(savedStart);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateInput, setDateInput] = useState(savedStart || "");
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [completion, setCompletionState] = useState<CompletionMap>(getCompletion());
@@ -211,7 +209,6 @@ export function QuranKhatm() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showFontSheet, setShowFontSheet] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -362,24 +359,6 @@ export function QuranKhatm() {
     }
   }, [currentPage, selectedDay, juzData]);
 
-  const handleSaveDate = () => {
-    if (dateInput) {
-      localStorage.setItem(LS_KEY_START, dateInput);
-      setStartDate(dateInput);
-      const today = computeTodayDay(dateInput);
-      if (today >= 1 && today <= 30) {
-        setSelectedDay(today);
-      }
-      setShowDatePicker(false);
-    }
-  };
-
-  const handleResetDate = () => {
-    localStorage.removeItem(LS_KEY_START);
-    setStartDate(null);
-    setDateInput("");
-    setShowSettings(false);
-  };
 
   const toggleComplete = (day: number) => {
     const updated = { ...completion };
@@ -520,61 +499,8 @@ export function QuranKhatm() {
             >
               <Maximize2 className="w-4 h-4" />
             </button>
-            <button
-              onClick={() => { setShowDatePicker(!showDatePicker); setShowSettings(false); }}
-              className="h-9 w-9 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-              data-testid="button-calendar"
-            >
-              <Calendar className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => { setShowSettings(!showSettings); setShowDatePicker(false); }}
-              className="h-9 w-9 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-              data-testid="button-settings"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
           </div>
         </div>
-
-        {/* Date Picker */}
-        {showDatePicker && (
-          <div className="border border-primary/30 bg-primary/5 rounded-xl p-4 space-y-3">
-            <p className="text-sm font-bold text-foreground">
-              {isArabic ? "حدد تاريخ أول يوم رمضان:" : "Set first day of Ramadan:"}
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="date"
-                value={dateInput}
-                onChange={(e) => setDateInput(e.target.value)}
-                className="flex-1 rounded-xl border-2 border-border bg-background px-3 py-2 text-base text-foreground focus:border-primary focus:outline-none"
-                data-testid="input-ramadan-date"
-              />
-              <Button onClick={handleSaveDate} disabled={!dateInput} className="rounded-xl font-bold px-6" data-testid="button-save-date">
-                {isArabic ? "حفظ" : "Save"}
-              </Button>
-            </div>
-            {startDate && (
-              <p className="text-xs text-muted-foreground">
-                {isArabic
-                  ? `التاريخ الحالي: ${new Date(startDate).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })}`
-                  : `Current: ${new Date(startDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`}
-              </p>
-            )}
-          </div>
-        )}
-
-        {showSettings && (
-          <div className="border border-destructive/30 bg-destructive/5 rounded-xl p-4 flex items-center justify-between">
-            <span className="text-sm font-bold">
-              {isArabic ? "إعادة تعيين تاريخ رمضان" : "Reset Ramadan date"}
-            </span>
-            <Button variant="destructive" size="sm" onClick={handleResetDate} data-testid="button-reset-date">
-              {isArabic ? "إعادة تعيين" : "Reset"}
-            </Button>
-          </div>
-        )}
 
         {/* Motivation Progress */}
         <div className="bg-card border border-border rounded-xl p-3 space-y-2">
