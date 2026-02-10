@@ -622,40 +622,37 @@ export function QuranKhatm() {
         )}
       </div>
 
-      {/* === SEARCH PANEL (expandable) === */}
-      {showSearch && (
-        <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
-          <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2.5">
-            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(0); }}
-              placeholder={isArabic ? "اكتب بدون تشكيل — البحث ذكي" : "Type without diacritics — smart search"}
-              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
-              dir="rtl"
-              autoFocus
-              data-testid="input-search-juz"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => { setSearchQuery(""); setCurrentPage(0); }}
-                className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
-                data-testid="button-clear-search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-          {normalizedQuery && (
-            <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
-              {filteredAyahs.length > 0
-                ? (isArabic ? `${filteredAyahs.length} نتيجة` : `${filteredAyahs.length} results`)
-                : (isArabic ? "لا توجد نتائج" : "No results")}
-            </div>
+      {/* === SEARCH BAR === */}
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-3 py-2.5">
+          <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(0); }}
+            placeholder={isArabic ? "ابحث في الجزء — اكتب بدون تشكيل" : "Search in Juz — type without diacritics"}
+            className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
+            dir="rtl"
+            data-testid="input-search-juz"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => { setSearchQuery(""); setCurrentPage(0); }}
+              className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
+              data-testid="button-clear-search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           )}
         </div>
-      )}
+        {normalizedQuery && (
+          <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
+            {filteredAyahs.length > 0
+              ? (isArabic ? `${filteredAyahs.length} نتيجة` : `${filteredAyahs.length} results`)
+              : (isArabic ? "لا توجد نتائج" : "No results")}
+          </div>
+        )}
+      </div>
 
       {/* === FONT SIZE BOTTOM SHEET === */}
       {showFontSheet && (
@@ -888,16 +885,6 @@ export function QuranKhatm() {
         onPointerLeave={() => { toolbarTimerRef.current = setTimeout(() => setToolbarVisible(false), 2000); }}
         onTouchStart={() => { setToolbarVisible(true); if (toolbarTimerRef.current) clearTimeout(toolbarTimerRef.current); }}
       >
-        <button
-          onClick={() => { setShowSearch(!showSearch); if (showSearch) setSearchQuery(""); setShowFontSheet(false); }}
-          className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${
-            showSearch ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-          }`}
-          data-testid="button-search-fab"
-        >
-          <Search className="w-4.5 h-4.5" />
-        </button>
-
         <button
           onClick={() => { setShowFontSheet(!showFontSheet); setShowSearch(false); }}
           className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${
