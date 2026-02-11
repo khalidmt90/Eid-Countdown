@@ -1,0 +1,149 @@
+Copy this exact prompt into Replit AI.
+It tells Replit to generate the endpoint correctly for a Scriptable widget with device-location default and proper prayer calculation.
+
+Replit Prompt
+
+Create a production-ready API endpoint for my project.
+
+Goal
+
+Build an endpoint for an iOS Scriptable widget that returns the next prayer time based on the user’s device location.
+
+Endpoint
+
+Create:
+
+GET /api/next-prayer
+
+Location behavior (important)
+
+If query contains:
+
+?lat=XX&lng=YY
+
+
+→ Use these coordinates (this will come from the device GPS via Scriptable).
+
+If lat and lng are missing or invalid:
+
+Detect location using IP geolocation.
+
+Use a public service like https://ipapi.co/json/.
+
+If IP lookup fails:
+
+Use fallback location:
+
+Latitude: 24.7136
+Longitude: 46.6753
+City: Riyadh
+
+
+Return location source:
+
+"source": "gps" | "ip" | "fallback"
+
+Prayer calculation
+
+Use Node library:
+
+adhan
+
+Calculation method: Umm Al-Qura
+
+Madhab: Shafi
+
+Steps:
+
+Calculate today’s prayer times:
+
+Fajr
+
+Dhuhr
+
+Asr
+
+Maghrib
+
+Isha
+
+Compare with current time.
+
+Return the next upcoming prayer.
+
+If current time is after Isha → return tomorrow’s Fajr.
+
+Timezone
+
+Use tz-lookup to determine timezone from coordinates.
+
+Return prayer time as ISO string with timezone offset.
+
+Response format (exact)
+{
+  "tz": "Asia/Riyadh",
+  "method": "UmmAlQura",
+  "location": {
+    "lat": 26.42,
+    "lng": 50.10,
+    "source": "gps"
+  },
+  "nextPrayer": {
+    "name": "Asr",
+    "timeISO": "2026-02-11T15:18:00+03:00"
+  }
+}
+
+Options
+
+Support query parameters:
+
+lang=ar → return Arabic prayer names:
+
+الفجر
+الظهر
+العصر
+المغرب
+العشاء
+
+
+Default language: English.
+
+Performance
+
+Add in-memory cache per lat/lng for 5 minutes.
+
+Handle errors safely.
+
+Response time should be fast.
+
+Dependencies
+
+Install:
+
+npm install adhan tz-lookup node-fetch
+
+Integration
+
+If project uses Express:
+
+Create router file /api/next-prayer.js
+
+Mount it with:
+
+app.use("/api", router)
+
+
+If project uses Next.js:
+
+Create /pages/api/next-prayer.js
+
+Make sure endpoint works at:
+
+https://my-domain/api/next-prayer
+https://my-domain/api/next-prayer?lat=26.42&lng=50.10&lang=ar
+
+Final requirement
+
+This endpoint will be used by an iOS Scriptable widget that refreshes frequently.
+Keep the code clean, stable, and production-ready.
