@@ -9,9 +9,12 @@ import {
 } from "adhan";
 // @ts-ignore
 import tzlookup from "tz-lookup";
+// @ts-ignore
+import momentHijri from "moment-hijri";
 
 const ARABIC_NAMES: Record<string, string> = {
   fajr: "الفجر",
+  sunrise: "الشروق",
   dhuhr: "الظهر",
   asr: "العصر",
   maghrib: "المغرب",
@@ -19,6 +22,19 @@ const ARABIC_NAMES: Record<string, string> = {
 };
 
 const PRAYER_ORDER = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
+const FULL_PRAYER_ORDER = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"] as const;
+
+const HIJRI_MONTHS_AR: Record<number, string> = {
+  1: "محرم", 2: "صفر", 3: "ربيع الأول", 4: "ربيع الثاني",
+  5: "جمادى الأولى", 6: "جمادى الآخرة", 7: "رجب", 8: "شعبان",
+  9: "رمضان", 10: "شوال", 11: "ذو القعدة", 12: "ذو الحجة",
+};
+
+const HIJRI_MONTHS_EN: Record<number, string> = {
+  1: "Muharram", 2: "Safar", 3: "Rabi al-Awwal", 4: "Rabi al-Thani",
+  5: "Jumada al-Ula", 6: "Jumada al-Akhirah", 7: "Rajab", 8: "Sha'ban",
+  9: "Ramadan", 10: "Shawwal", 11: "Dhul-Qi'dah", 12: "Dhul-Hijjah",
+};
 
 const FALLBACK = { lat: 24.7136, lng: 46.6753, city: "Riyadh" };
 
@@ -200,13 +216,12 @@ export async function registerRoutes(
       const prayerTimes = new PrayerTimes(coords, localDate, params);
 
       const formatHHMM = (d: Date): string => {
-        const p = new Intl.DateTimeFormat("en-GB", {
+        return new Intl.DateTimeFormat("en-GB", {
           timeZone: tz,
           hour: "2-digit",
           minute: "2-digit",
           hour12: false,
         }).format(d);
-        return p;
       };
 
       const dateParts = new Intl.DateTimeFormat("en-CA", {
@@ -215,6 +230,13 @@ export async function registerRoutes(
         month: "2-digit",
         day: "2-digit",
       }).format(now);
+
+      const hijriMoment = momentHijri();
+      const iDay = hijriMoment.iDate();
+      const iMonth = hijriMoment.iMonth() + 1;
+      const iYear = hijriMoment.iYear();
+      const monthNames = lang === "ar" ? HIJRI_MONTHS_AR : HIJRI_MONTHS_EN;
+      const hijri = `${iDay} ${monthNames[iMonth] || iMonth} ${iYear}`;
 
       let city = "";
       if (location.source === "fallback") {
@@ -240,14 +262,24 @@ export async function registerRoutes(
         } catch {}
       }
 
-      const prayers = PRAYER_ORDER.map((p) => ({
+      const prayerTimeMap: Record<string, Date> = {
+        fajr: prayerTimes.fajr,
+        sunrise: prayerTimes.sunrise,
+        dhuhr: prayerTimes.dhuhr,
+        asr: prayerTimes.asr,
+        maghrib: prayerTimes.maghrib,
+        isha: prayerTimes.isha,
+      };
+
+      const prayers = FULL_PRAYER_ORDER.map((p) => ({
         key: p,
         name: lang === "ar" ? ARABIC_NAMES[p] : p.charAt(0).toUpperCase() + p.slice(1),
-        time: formatHHMM(prayerTimes[p] as Date),
+        time: formatHHMM(prayerTimeMap[p]),
       }));
 
       const response = {
         city,
+        hijri,
         date: dateParts,
         tz,
         location: {
