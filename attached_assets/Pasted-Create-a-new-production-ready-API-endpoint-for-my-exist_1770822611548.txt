@@ -1,0 +1,94 @@
+Create a new production-ready API endpoint for my existing Node/Express project.
+
+GOAL
+Build an endpoint that returns today’s full prayer times based on the user’s location. This will be used by an iOS Scriptable widget.
+
+ENDPOINT
+GET /api/prayer-times
+
+QUERY PARAMETERS
+lat   (optional)
+lng   (optional)
+lang  (optional: ar or en)
+
+LOCATION BEHAVIOR
+1) If lat and lng are provided → use them (GPS source)
+2) If missing → detect location using IP via https://ipapi.co/json/
+3) If IP lookup fails → fallback to:
+   Latitude: 24.7136
+   Longitude: 46.6753
+   City: Riyadh
+
+Return location source as:
+gps | ip | fallback
+
+DEPENDENCIES (install if missing)
+npm install adhan tz-lookup node-fetch
+
+PRAYER CALCULATION
+- Use library: adhan
+- Calculation method: Umm Al-Qura
+- Madhab: Shafi
+- Calculate for TODAY only
+- Include:
+  fajr
+  dhuhr
+  asr
+  maghrib
+  isha
+
+TIMEZONE
+- Detect using tz-lookup
+- Return times in LOCAL format HH:MM (not ISO)
+
+LANGUAGE
+If lang=ar, use Arabic names:
+fajr = الفجر
+dhuhr = الظهر
+asr = العصر
+maghrib = المغرب
+isha = العشاء
+
+Default language: English.
+
+RESPONSE FORMAT (exact structure)
+{
+  "city": "الخبر",
+  "date": "2026-02-11",
+  "tz": "Asia/Riyadh",
+  "location": {
+    "lat": 26.28,
+    "lng": 50.21,
+    "source": "gps"
+  },
+  "prayers": [
+    { "key": "fajr", "name": "الفجر", "time": "05:07" },
+    { "key": "dhuhr", "name": "الظهر", "time": "11:45" },
+    { "key": "asr", "name": "العصر", "time": "15:06" },
+    { "key": "maghrib", "name": "المغرب", "time": "17:38" },
+    { "key": "isha", "name": "العشاء", "time": "19:08" }
+  ]
+}
+
+PERFORMANCE
+- Add in-memory cache
+- Cache key: lat + lng
+- Cache duration: 10 minutes
+
+INTEGRATION
+If Express:
+- Create file: /api/prayer-times.js
+- Mount it with:
+app.use("/api", require("./api/prayer-times"));
+
+The endpoint must work at:
+https://islamtimeandstory.com/api/prayer-times
+https://islamtimeandstory.com/api/prayer-times?lat=26.42&lng=50.10&lang=ar
+
+ERROR HANDLING
+- Do not crash if location lookup fails
+- Always return valid prayer times
+- If everything fails, use fallback Riyadh coordinates
+
+IMPORTANT
+This endpoint will be used by an iOS widget, so keep the response small, fast, and stable.
