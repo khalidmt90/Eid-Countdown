@@ -1,0 +1,89 @@
+CRITICAL BUG: iPhone cannot scroll the pages (Safari/PWA). Fix global scrolling.
+
+Symptoms:
+- Page feels stuck (cannot scroll vertically).
+- This often happens due to 100vh containers, overflow hidden, or nested scroll containers capturing touch.
+
+Goal:
+- Vertical scrolling must work everywhere on iOS.
+- No nested scroll traps.
+- Header can stay sticky, but content must scroll.
+
+====================================================
+1) REMOVE BODY/ROOT SCROLL LOCKS
+====================================================
+Search the codebase for and REMOVE/adjust:
+- overflow: hidden on html/body/#root
+- height: 100vh on main wrappers that also lock scroll
+- any "position: fixed" full-screen wrappers that block touch
+
+Ensure:
+html, body {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+If using Next.js/React root wrappers, do not force overflow hidden.
+
+====================================================
+2) USE STICKY HEADER (NOT FIXED FULLSCREEN)
+====================================================
+Header should be:
+position: sticky;
+top: 0;
+z-index: 50;
+
+Do NOT wrap the entire app in a fixed container.
+Do NOT use a full-page fixed div for layout unless strictly needed.
+
+====================================================
+3) MAIN CONTENT SCROLL MODEL (SIMPLE)
+====================================================
+Use this structure:
+
+<body scrolls>
+  <Header sticky />
+  <main class="page-content">
+    ...content...
+  </main>
+
+The main content should NOT be the scroll container unless necessary.
+If you must use a scroll container:
+- give it explicit height: calc(100vh - headerHeight)
+- set overflow-y: auto
+- add -webkit-overflow-scrolling: touch
+But prefer body scrolling.
+
+====================================================
+4) CHECK FOR OVERLAYS BLOCKING TOUCH
+====================================================
+Find any elements that are:
+position: fixed;
+left:0; right:0; top:0; bottom:0;
+and ensure they either:
+- are removed, OR
+- have pointer-events: none when not active, OR
+- are limited to the header only
+
+Common culprits:
+- invisible modal backdrops
+- floating buttons with wide containers
+- gradient overlays
+
+====================================================
+5) IOS TOUCH ACTION SAFETY
+====================================================
+Add to scrollable areas (if any):
+touch-action: pan-y;
+
+Ensure no JS listeners call preventDefault on touchmove/scroll.
+
+====================================================
+DELIVERABLE
+====================================================
+- Identify the exact CSS/containers causing scroll lock
+- Fix it so every page scrolls on iPhone Safari
+- Confirm by testing /prayer-times, /dua, /quran, /stories
+- Output the changed files and exact diff

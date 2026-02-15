@@ -188,36 +188,9 @@ export default function Home() {
     el.addEventListener('scroll', updateFades, { passive: true });
     window.addEventListener('resize', updateFades);
     updateFades();
-
-    let startX = 0;
-    let startScroll = 0;
-    let isDragging = false;
-
-    const onTouchStart = (e: TouchEvent) => {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      startScroll = el.scrollLeft;
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (!isDragging) return;
-      const dx = e.touches[0].clientX - startX;
-      el.scrollLeft = startScroll - dx;
-      if (Math.abs(dx) > 5) {
-        e.preventDefault();
-      }
-    };
-    const onTouchEnd = () => { isDragging = false; };
-
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
-
     return () => {
       el.removeEventListener('scroll', updateFades);
       window.removeEventListener('resize', updateFades);
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-      el.removeEventListener('touchend', onTouchEnd);
     };
   }, [updateFades]);
 
@@ -438,8 +411,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </div>
 
           {/* Layer 2: Navigation Pills */}
-          <nav className="relative" style={{ marginTop: '8px', marginBottom: '12px', overflow: 'visible' }}>
-            <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
+          <nav className="relative" style={{ marginTop: '8px', marginBottom: '12px' }}>
             {showFadeLeft && (
               <div
                 className="absolute top-0 bottom-0 z-10 pointer-events-none flex items-center"
@@ -476,16 +448,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
             )}
             <div
               ref={pillContainerRef}
-              className="flex items-center overflow-x-auto overflow-y-hidden"
+              className="flex items-center"
               style={{
                 scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch',
                 height: '60px',
                 whiteSpace: 'nowrap' as const,
                 gap: '10px',
                 paddingInline: '12px',
-                touchAction: 'pan-x',
                 flexWrap: 'nowrap',
               }}
               data-testid="tabs-nav"
