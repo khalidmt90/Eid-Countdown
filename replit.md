@@ -37,9 +37,23 @@ Preferred communication style: Simple, everyday language.
 
 ### Feature Modules
 1. **Countdown Timer**: Tracks Ramadan, Eid al-Fitr, and Eid al-Adha with confetti celebration on completion
-2. **Prayer Times**: Fetches times based on geolocation or manual city selection, displays next prayer countdown
+2. **Prayer Times**: Fetches times based on geolocation or manual city selection, displays next prayer countdown. API endpoints: `/api/prayer-times` and `/api/next-prayer` with GPS/IP fallback, Hijri dates, sunrise times, and 10-min caching
 3. **Qiblah Finder**: Uses device compass and geolocation to calculate direction to Mecca
 4. **Daily Content**: Rotating Islamic content with reading time estimates, sourced from static data files
+5. **Quran Reader**: Full Quran with Juz-based navigation, Surah selector modal (search by name/number), global search across all 30 Juz with local caching, bookmarks, and focus mode
+6. **Duas & Adhkar**: Hisn Al-Muslim content with 37 authentic duas across 8 categories (أذكار الصباح/المساء/النوم/الاستيقاظ, دعاء السفر/المنزل, أذكار الطعام). Features search, category filters, copy/share, expand/collapse
+7. **Home Quick Services**: Service shortcut cards on home page linking to Quran, Duas, Qiblah, and Stories
+
+### Navigation Tabs (5 tabs)
+- المواقيت (Prayer Times) - default
+- القبلة (Qiblah)
+- القصص (Stories/Daily Content)
+- القرآن (Quran Reader)
+- الأدعية (Duas)
+
+### Key Data Files
+- `client/src/data/surahs.json` - All 114 Surahs (number + Arabic name)
+- `client/src/data/hisn-al-muslim.json` - 37 authentic duas from Hisn Al-Muslim with sources
 
 ## External Dependencies
 
