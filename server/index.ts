@@ -3,6 +3,7 @@ import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { apiRateLimit, authRateLimit } from "./rate-limit";
 
 const app = express();
 const httpServer = createServer(app);
@@ -36,6 +37,15 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
+function getClientIP(req: express.Request): string {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") return forwarded.split(",")[0].trim();
+  return req.ip || req.socket.remoteAddress || "unknown";
+}
+
+app.use("/api/auth/*", authRateLimit);
+app.use("/api/*", apiRateLimit);
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -50,12 +60,20 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
+      const ip = getClientIP(req);
+      const status = res.statusCode;
+      const isError = status >= 400;
+      const cacheHit = res.getHeader("X-Cache") === "HIT";
 
-      log(logLine);
+      let logLine = `${req.method} ${path} ${status} ${duration}ms ip=${ip}`;
+      if (cacheHit) logLine += " [CACHE HIT]";
+
+      if (isError && capturedJsonResponse?.error) {
+        logLine += ` err=${capturedJsonResponse.error.code}`;
+        log(logLine, "api:error");
+      } else {
+        log(logLine, "api");
+      }
     }
   });
 

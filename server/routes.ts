@@ -299,6 +299,7 @@ export async function registerRoutes(
       const key = `next_${cacheKey(location.lat, location.lng, lang)}`;
       const cached = cache.get(key);
       if (cached && cached.expires > Date.now()) {
+        res.setHeader("X-Cache", "HIT");
         return success(res, cached.data);
       }
 
@@ -345,6 +346,7 @@ export async function registerRoutes(
       const key = `times_${cacheKey(location.lat, location.lng, lang)}_${dateSuffix}`;
       const cached = cache.get(key);
       if (cached && cached.expires > Date.now()) {
+        res.setHeader("X-Cache", "HIT");
         return success(res, cached.data);
       }
 

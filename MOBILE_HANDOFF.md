@@ -413,6 +413,56 @@ All API endpoints accept cross-origin requests from any domain. The following he
 
 ---
 
+## Caching
+
+The server caches prayer time calculations in memory to avoid redundant computation.
+
+| Endpoint           | Cache Key                          | TTL        |
+|--------------------|------------------------------------|------------|
+| `/api/next-prayer` | lat (2dp) + lng (2dp) + lang       | 5 minutes  |
+| `/api/prayer-times`| lat (2dp) + lng (2dp) + lang + date| 10 minutes |
+
+**How it works:**
+- Coordinates are rounded to 2 decimal places for cache keys (e.g., `21.42_39.83_en`)
+- Requests with the same rounded location, language, and date within the TTL window return the cached result instantly
+- Cached responses include the `X-Cache: HIT` response header so your app can detect cache hits
+- Cache is cleaned automatically; expired entries are purged periodically
+
+**Mobile recommendation:** Cache prayer times locally on the device as well. Prayer times for a given location and date do not change, so a 24-hour local cache is safe.
+
+---
+
+## Rate Limiting
+
+Rate limits are enforced per IP address to protect the API from abuse.
+
+| Scope               | Limit              | Window   |
+|----------------------|--------------------|----------|
+| General `/api/*`     | 60 requests        | 1 minute |
+| Auth `/api/auth/*`   | 10 requests        | 1 minute |
+
+**Response headers** (included on every API response):
+
+| Header                  | Description                              |
+|-------------------------|------------------------------------------|
+| `X-RateLimit-Limit`     | Max requests allowed in the window       |
+| `X-RateLimit-Remaining` | Requests remaining in the current window |
+| `Retry-After`           | Seconds until the window resets (only on 429) |
+
+**When rate limited (429)**:
+```json
+{
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Too many requests. Try again in 45 seconds."
+  }
+}
+```
+
+**Mobile recommendation:** If you receive a 429, read the `Retry-After` header and wait that many seconds before retrying. Auth endpoints have a stricter limit (10/min) to prevent brute-force attacks.
+
+---
+
 ## Calculation Method
 
 All prayer times use:
@@ -435,6 +485,7 @@ All prayer times use:
 | `USER_NOT_FOUND`    | 401  | User account no longer exists        |
 | `NOT_FOUND`         | 404  | Endpoint does not exist              |
 | `USERNAME_TAKEN`    | 409  | Username already registered          |
+| `RATE_LIMITED`      | 429  | Too many requests, retry later       |
 | `REGISTER_FAILED`   | 500  | Registration server error            |
 | `LOGIN_FAILED`      | 500  | Login server error                   |
 | `LOGOUT_FAILED`     | 500  | Logout server error                  |
