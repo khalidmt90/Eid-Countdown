@@ -1,0 +1,169 @@
+You are working on an existing Islamic WEBSITE (not an iOS app). Do NOT redesign the whole site. Extend the existing "القصص" section to be credible and source-based.
+
+CURRENT PROBLEM
+- The Stories section is not clearly tied to trusted sources.
+- Categories are not aligned to data sources.
+- We need a structure where every story has an explicit source and is grouped by source type.
+
+GOAL
+Refactor Stories so that it becomes a serious, credible section:
+- Clear categories tied to reliable sources
+- Every story card and detail page shows a mandatory “المصدر”
+- No “random Islamic stories” without references
+
+====================================================
+1) CHANGE STORIES CATEGORIES (RENAME/DELETE AS NEEDED)
+====================================================
+
+Inside the "القصص" main tab, replace the current sub-categories (e.g. "آية وقصة" etc.) with the following structure:
+
+Main Stories categories (exact names):
+A) قصص الأنبياء
+B) السيرة النبوية
+C) قصص من الأحاديث الصحيحة
+D) مواقف من الصحابة
+
+If the existing sub-tabs do not match, REMOVE them and create the above. Keep the UI style consistent with your current tabs (pill buttons). Arabic-first RTL.
+
+IMPORTANT:
+- Do NOT keep “آية وقصة” as a category unless it becomes a feature under one of these categories.
+- If you keep it, convert it to a “Daily feature” only: "آية اليوم + قصة موثقة" with mandatory source.
+
+====================================================
+2) DATA SOURCES (IMPORT + CACHE LOCALLY)
+====================================================
+
+Implement data ingestion (do not manually write stories with AI).
+
+Use these sources:
+
+A) قصص الأنبياء:
+- Import from GitHub: https://github.com/ahmedkhir/qasas-al-anbiya
+- Parse stories into structured JSON.
+- Each story must include at least:
+  title, prophetName (optional), content, sourceLine
+- Add mandatory source line in Arabic:
+  "المصدر: قصص الأنبياء (مستند إلى ابن كثير) — يرجى التحقق"
+(Yes, include “يرجى التحقق” because this repo may be derived; we must not claim it is 100% Ibn Kathir unless verified.)
+
+B) السيرة النبوية:
+- Import from GitHub: https://github.com/islambook/seerah-json
+- It is timeline/events style. Convert events into story cards:
+  title = event title
+  content = short summary text from dataset (no AI rewriting)
+  details page shows full text if available.
+- Mandatory source line:
+  "المصدر: بيانات السيرة (seerah-json)"
+
+C) قصص من الأحاديث الصحيحة:
+- Use Hadith API: https://github.com/fawazahmed0/hadith-api
+- Implement as “Hadith story cards”:
+  - User selects collection (البخاري/مسلم)
+  - Search by keywords (Arabic)
+  - When user opens an item, show hadith text + reference number if provided
+- Mandatory source line:
+  "المصدر: {collection} — رقم الحديث: {number if available}"
+If number is not available, show book/chapter metadata.
+
+D) مواقف من الصحابة:
+- DO NOT invent stories.
+- Implement this category as a curated set derived from hadith collections (same hadith API),
+  or leave it disabled until a reliable dataset is added.
+- If no reliable dataset is available, show:
+  "قريباً — سيتم إضافة مصادر موثوقة"
+Do not fill it with unsourced content.
+
+CACHING RULES
+- Prefer downloading GitHub JSON into /data/ at build time (or via a script).
+- For hadith-api: cache results locally by query + collection for 24 hours (localStorage or server cache).
+- No heavy requests on every page load.
+
+====================================================
+3) UNIFIED STORY SCHEMA (INTERNAL)
+====================================================
+
+Create a unified normalized schema:
+
+Story {
+  id: string,
+  category: "قصص الأنبياء" | "السيرة النبوية" | "قصص من الأحاديث الصحيحة" | "مواقف من الصحابة",
+  title: string,
+  excerpt: string,
+  content: string,
+  source: string,
+  tags?: string[],
+  date?: string,
+  collection?: string,
+  reference?: string
+}
+
+Normalize each dataset into this schema for consistent UI.
+
+====================================================
+4) STORIES UI/UX (KEEP EXISTING STYLE)
+====================================================
+
+Inside /stories:
+
+- Top: category pills (the 4 categories above)
+- Search bar:
+  Placeholder: "ابحث في القصص…"
+  Search should search title + excerpt + content + tags
+
+- Story list:
+  Each card shows:
+  - Title (large)
+  - 2–3 line excerpt
+  - Source badge (mandatory) e.g. "البخاري" / "السيرة" / "قصص الأنبياء"
+  - CTA: "اقرأ المزيد"
+
+- Story details page:
+  - Title
+  - Content (RTL, readable, line-height 1.9)
+  - Source block at bottom (mandatory)
+  - Share button
+  - Copy button
+
+ACCESSIBILITY (older-friendly)
+- Add font size controls in Stories page:
+  A- / A / A+ stored in localStorage
+- Avoid endless scroll: use pagination (10 items per page) with next/prev
+
+====================================================
+5) DAILY FEATURE (OPTIONAL, ONLY IF EASY)
+====================================================
+
+If you already have “آية وقصة” concept:
+Convert it into a small widget inside Stories page:
+- "آية اليوم" (from Quran source you already use)
+- "قصة اليوم" MUST be from one of the above categories and show a clear source line.
+If you can’t guarantee sourcing, remove this widget.
+
+====================================================
+6) DELIVERABLES
+====================================================
+
+Create:
+- /scripts/fetchStoriesSources.(js|ts)
+  - downloads/reads GitHub repos data into /data/
+- /data/stories_prophets.json (normalized)
+- /data/stories_seerah.json (normalized)
+- Hadith API integration module:
+  /lib/hadithClient.(js|ts) with caching
+
+Update pages/components:
+- /pages/stories (or existing route) to use new categories + schema
+- StoryCard component
+- StoryDetail component/page
+- Font size preference hook
+
+IMPORTANT QUALITY RULES
+- Do NOT generate story text with AI.
+- Do NOT claim “Ibn Kathir” as exact unless dataset explicitly confirms. Use “مستند إلى” + “يرجى التحقق”.
+- Every story MUST show a “المصدر” line.
+- If a category has no trustworthy data, show “قريباً” instead of filling it.
+
+After implementing, output:
+- File tree
+- Sample of 2 stories from each implemented category with their source lines shown
+- Confirm that old categories were removed/renamed.
