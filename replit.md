@@ -44,14 +44,18 @@ Preferred communication style: Simple, everyday language.
 6. **Duas & Adhkar**: Hisn Al-Muslim content with 295 authentic duas across 15 categories. Features pagination (8 mobile/12 desktop), font size controls (A-/A/A+ with 3 scales persisted in localStorage), compact/full view toggle, debounced search across title+text+source, category pills with counts, collapsible cards, copy/share with 44px touch targets, and scroll-to-top button. Uses `useDuaPreferences` hook for persisted settings.
 7. **Home Quick Services**: Service shortcut cards on home page linking to Quran, Duas, Qiblah, and Stories
 
-### Navigation Tabs (5 tabs)
+### Navigation (Apple-style pill bar, 5 tabs)
 - المواقيت (Prayer Times) - default
 - القبلة (Qiblah)
-- القصص (Stories/Daily Content)
 - القرآن (Quran Reader)
 - الأدعية (Duas)
+- القصص (Stories/Daily Content)
+- Header: Two-layer design (app identity + nav pills), dark (#0B1324) background
+- Pill style: Custom buttons with gradient active state, horizontally scrollable with auto-centering
+- Page title section below header shows current section name in Arabic/English
 
 ### Key Data Files
+- `client/src/data/quran.json` - Full Quran text (114 surahs, 6236 verses) from quran-json@3.1.2, loaded locally
 - `client/src/data/surahs.json` - All 114 Surahs (number + Arabic name)
 - `client/src/data/hisn-al-muslim.json` - 37 authentic duas from Hisn Al-Muslim with sources
 
