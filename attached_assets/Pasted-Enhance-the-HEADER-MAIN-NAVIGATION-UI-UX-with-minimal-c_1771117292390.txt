@@ -1,0 +1,119 @@
+Enhance the HEADER + MAIN NAVIGATION UI/UX with minimal change and big impact.
+Do NOT redesign the whole site.
+Keep the current dark theme, card layout, blue highlight, and content structure.
+Only improve: navigation size, spacing, hierarchy, and page title clarity.
+
+========================================================
+A) INCREASE NAVIGATION HEIGHT + TOUCH TARGETS
+========================================================
+Current tabs feel tight/small. Update them:
+
+- Tab bar height: 60px (acceptable range 56–64px)
+- Tab font size: 17px (range 16–18px)
+- Horizontal padding inside each pill: 18–22px
+- Border radius: 14px
+- Gap between pills: 10px
+- Minimum touch width per tab: 72px
+- Ensure touch height >= 56px
+
+========================================================
+B) PILL NAVIGATION BAR (APPLE-STYLE)
+========================================================
+Tabs order must be:
+[ المواقيت ] [ القبلة ] [ القرآن ] [ الأدعية ] [ القصص ]
+
+Implementation:
+- Pills horizontally scrollable when needed:
+  overflow-x: auto
+  white-space: nowrap
+- Hide scrollbar while preserving scrolling
+- Keep active tab clearly highlighted
+
+Styles:
+- Header background: #0B1324
+
+Active tab:
+- background: linear-gradient(135deg, #0D6EFD, #1E88FF)
+- color: #FFFFFF
+
+Inactive tab:
+- background: #101A2E
+- color: #9FB3C8
+
+Add subtle border for inactive pills if needed:
+border: 1px solid rgba(42, 60, 99, 0.55)
+
+========================================================
+C) CENTER ACTIVE TAB (IF POSSIBLE)
+========================================================
+When user changes tabs:
+- Scroll pill container so active tab is centered (best effort)
+- Smooth scroll
+
+========================================================
+D) ADD SECTION TITLE UNDER NAV (BIG ORIENTATION WIN)
+========================================================
+Right now content starts immediately. Add a page title under the nav pills.
+
+Examples:
+- On prayer page: "مواقيت الصلاة"
+- On qibla page: "القبلة"
+- On Quran page: "القرآن الكريم"
+- On dua page: "الأدعية"
+- On stories page: "القصص"
+
+Title style:
+- font-size: 22px
+- font-weight: bold
+- right aligned
+- margin-bottom: 8px
+- color: #FFFFFF
+- secondary subtitle optional (small, muted)
+
+========================================================
+E) INCREASE TOP SPACING (REMOVE CRAMPED FEEL)
+========================================================
+Add padding-top: 12–16px for the main page container area under the header.
+Increase vertical rhythm slightly so header feels like a real app header.
+
+========================================================
+F) OPTIONAL: TWO-LAYER HEADER HIERARCHY (DO NOT BREAK LAYOUT)
+========================================================
+If current header is:
+(globe icon) (app name) (hijri date) all in one tight row,
+refactor to two layers:
+
+Layer 1:
+- App name centered (primary)
+- Hijri date small (secondary)
+- Globe/language icon stays but with proper spacing
+
+Layer 2:
+- Navigation pills (the improved pill bar)
+
+IMPORTANT:
+- Keep the same elements; just separate into 2 rows for clarity.
+- Do not change business logic.
+
+========================================================
+G) OLDER USER OPTIMIZATION (MUST)
+========================================================
+- Tab text never below 16px
+- Touch height >= 56px
+- High contrast preserved
+- No tiny icons that reduce readability
+- Ensure no overflow/cropping on mobile
+
+========================================================
+DELIVERABLE
+========================================================
+Implement the header-only changes:
+- Update the header component + nav tabs component styles
+- Add a "PageTitle" component used per tab/page, with correct Arabic titles
+- Ensure smooth horizontal scroll for pills and hide scrollbar
+- Add “center active tab” behavior
+
+After implementation, show:
+- Which files were changed
+- The new header/nav component code
+- The PageTitle component code
