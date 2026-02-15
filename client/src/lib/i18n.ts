@@ -77,7 +77,21 @@ i18n
           "loading": "Loading...",
           "turn_right": "Right",
           "turn_left": "Left",
-          "min_read": "min read"
+          "min_read": "min read",
+          "stories_categories": "Categories",
+          "prophet_stories_title": "Stories of the Prophets",
+          "seerah_title": "Prophet's Biography",
+          "hadith_stories_title": "Stories from Authentic Hadiths",
+          "companions_title": "Companions' Stories",
+          "coming_soon": "Coming Soon",
+          "back_to_categories": "Back to Categories",
+          "story_count": "{{count}} stories",
+          "hadith_number": "Hadith #",
+          "search_hadiths": "Search hadiths...",
+          "sahih_bukhari": "Sahih Bukhari",
+          "sahih_muslim": "Sahih Muslim",
+          "next_story": "Next",
+          "previous_story": "Previous"
         }
       },
       ar: {
@@ -140,7 +154,21 @@ i18n
           "loading": "جاري التحميل...",
           "turn_right": "يمين",
           "turn_left": "يسار",
-          "min_read": "دقائق قراءة"
+          "min_read": "دقائق قراءة",
+          "stories_categories": "الأقسام",
+          "prophet_stories_title": "قصص الأنبياء",
+          "seerah_title": "السيرة النبوية",
+          "hadith_stories_title": "قصص من الأحاديث الصحيحة",
+          "companions_title": "مواقف من الصحابة",
+          "coming_soon": "قريباً",
+          "back_to_categories": "العودة للأقسام",
+          "story_count": "{{count}} قصة",
+          "hadith_number": "حديث رقم",
+          "search_hadiths": "ابحث في الأحاديث...",
+          "sahih_bukhari": "صحيح البخاري",
+          "sahih_muslim": "صحيح مسلم",
+          "next_story": "التالي",
+          "previous_story": "السابق"
         }
       },
       ur: {

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
-import { DailyContentView } from "@/components/daily-content-view";
+import { StoriesView } from "@/components/stories-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, ChevronUp, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
@@ -710,7 +710,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </TabsContent>
 
           <TabsContent value="daily" className="mt-0">
-            <DailyContentView />
+            <StoriesView />
           </TabsContent>
 
           <TabsContent value="khatm" className="mt-0">
@@ -740,24 +740,20 @@ ${t('isha')}: ${prayerData.timings.Isha}
             <DialogContent className="sm:max-w-md text-start bg-card border-primary/10">
               <DialogHeader className="text-start space-y-4">
                 <DialogTitle className="text-xl font-serif text-primary border-b border-border pb-2">
-                  {i18n.language === 'ar' ? "تنبيه مهم" : "Important Disclaimer"}
+                  {i18n.language === 'ar' ? "عن التطبيق" : "About This App"}
                 </DialogTitle>
                 <DialogDescription asChild>
                   <div className="text-sm leading-relaxed text-foreground/80 space-y-4">
                     <p>
                       {i18n.language === 'ar' 
-                        ? "تم إعداد محتوى القصص باستخدام تقنيات الذكاء الاصطناعي، بالاعتماد على مصادر إسلامية موثوقة مثل القرآن الكريم وتفاسير العلماء."
-                        : "Story content was prepared using AI technologies, based on trusted Islamic sources such as the Holy Quran and scholarly Tafsir."}
-                    </p>
-                    <p>
-                      {i18n.language === 'ar'
-                        ? "ورغم الحرص على الدقة، قد ترد بعض الأخطاء غير المقصودة. في حال وجود أي تعارض أو إشكال في المحتوى، يُرجى الرجوع إلى المصادر الشرعية الأصلية مثل:"
-                        : "Despite efforts for accuracy, some unintentional errors may occur. In case of any conflict, please refer to the original sources such as:"}
+                        ? "يقدم هذا التطبيق محتوى إسلامي من مصادر موثوقة تشمل القرآن الكريم وصحيح البخاري وصحيح مسلم وكتب التفاسير المعتمدة."
+                        : "This app provides Islamic content from authentic sources including the Holy Quran, Sahih Bukhari, Sahih Muslim, and approved scholarly Tafsir."}
                     </p>
                     <ul className="list-disc list-inside space-y-1 text-foreground/70 bg-primary/5 p-3 rounded-xl border border-primary/10">
                       <li>{i18n.language === 'ar' ? "القرآن الكريم" : "The Holy Quran"}</li>
+                      <li>{i18n.language === 'ar' ? "صحيح البخاري" : "Sahih Bukhari"}</li>
+                      <li>{i18n.language === 'ar' ? "صحيح مسلم" : "Sahih Muslim"}</li>
                       <li>{i18n.language === 'ar' ? "تفسير ابن كثير" : "Tafsir Ibn Kathir"}</li>
-                      <li>{i18n.language === 'ar' ? "التفاسير المعتمدة لدى أهل العلم" : "Approved Tafsir by scholars"}</li>
                     </ul>
                     <div className="bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-foreground text-sm">
                       <p>
