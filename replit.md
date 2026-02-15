@@ -31,16 +31,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Key Design Patterns
 - **Component Architecture**: Atomic design with reusable UI components in `client/src/components/ui/`
-- **Custom Hooks**: Business logic extracted into hooks (`use-prayer-times`, `use-mobile`, `use-toast`)
+- **Custom Hooks**: Business logic extracted into hooks (`use-prayer-times`, `use-mobile`, `use-toast`, `use-ui-preferences`, `use-dua-preferences`)
 - **Content Management**: Daily content rotates based on date with localStorage persistence
 - **Responsive Design**: Mobile-first with RTL support, using CSS Grid and Flexbox
 
 ### Feature Modules
 1. **Countdown Timer**: Tracks Ramadan, Eid al-Fitr, and Eid al-Adha with confetti celebration on completion
-2. **Prayer Times**: Fetches times based on geolocation or manual city selection, displays next prayer countdown. API endpoints: `/api/prayer-times` and `/api/next-prayer` with GPS/IP fallback, Hijri dates, sunrise times, and 10-min caching
-3. **Qiblah Finder**: Uses device compass and geolocation to calculate direction to Mecca
+2. **Prayer Times**: Fetches times based on geolocation or manual city selection, displays next prayer countdown with "prayer now" detection. API endpoints: `/api/prayer-times` and `/api/next-prayer` with GPS/IP fallback, Hijri dates, sunrise times, and 10-min caching
+3. **Qiblah Finder**: Uses device compass and geolocation to calculate direction to Mecca. Features accuracy indicator (high/medium/low based on heading variance), distance to Makkah display (Haversine), color-coded alignment feedback, and calibration tips
 4. **Daily Content**: Rotating Islamic content with reading time estimates, sourced from static data files
-5. **Quran Reader**: Full Quran with Juz-based navigation, Surah selector modal (search by name/number), global search across all 30 Juz with local caching, bookmarks, and focus mode
+5. **Quran Reader**: Full Quran with Juz-based navigation, Surah selector modal (search by name/number), global search across all 30 Juz with local caching, bookmarks, focus mode, and inline A-/A/A+ font size controls
 6. **Duas & Adhkar**: Hisn Al-Muslim content with 295 authentic duas across 15 categories. Features pagination (8 mobile/12 desktop), font size controls (A-/A/A+ with 3 scales persisted in localStorage), compact/full view toggle, debounced search across title+text+source, category pills with counts, collapsible cards, copy/share with 44px touch targets, and scroll-to-top button. Uses `useDuaPreferences` hook for persisted settings.
 7. **Home Quick Services**: Service shortcut cards on home page linking to Quran, Duas, Qiblah, and Stories
 
