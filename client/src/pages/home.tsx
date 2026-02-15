@@ -5,7 +5,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X, HandMetal } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
