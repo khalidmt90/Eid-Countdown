@@ -5,7 +5,8 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X, HandMetal } from "lucide-react";
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +19,7 @@ import { LocationSheet } from "@/components/location-sheet";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import "@/lib/i18n";
+const DuaPage = lazy(() => import("@/pages/dua"));
 
 const ROUTE_TO_TAB: Record<string, string> = {
   "/": "home",
@@ -25,6 +27,7 @@ const ROUTE_TO_TAB: Record<string, string> = {
   "/qiblah": "qiblah",
   "/daily-content": "daily",
   "/quran-khatm": "khatm",
+  "/dua": "dua",
 };
 
 const TAB_TO_ROUTE: Record<string, string> = {
@@ -32,6 +35,7 @@ const TAB_TO_ROUTE: Record<string, string> = {
   qiblah: "/qiblah",
   daily: "/daily-content",
   khatm: "/quran-khatm",
+  dua: "/dua",
 };
 
 interface PageSeo {
@@ -65,6 +69,12 @@ const PAGE_SEO: Record<string, PageSeo> = {
     titleAr: "ختم القرآن - متابعة قراءة القرآن الكريم في رمضان",
     description: "Track your Quran reading progress during Ramadan. Read one Juz per day with full Uthmani text, search, and bookmarking.",
     descriptionAr: "تابع تقدمك في قراءة القرآن خلال رمضان. اقرأ جزءاً يومياً بالنص العثماني الكامل مع البحث والعلامات المرجعية.",
+  },
+  dua: {
+    title: "Duas & Adhkar - Hisn Al-Muslim",
+    titleAr: "الأدعية والأذكار - حصن المسلم",
+    description: "Authentic duas and adhkar from Hisn Al-Muslim with proper source attribution from Sahih Bukhari and Muslim.",
+    descriptionAr: "أدعية وأذكار صحيحة من حصن المسلم مع ذكر المصادر من صحيح البخاري ومسلم.",
   },
 };
 
@@ -298,34 +308,41 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </div>
 
           <div className="px-3 pb-2">
-            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4 h-11 bg-muted/80 border border-border/50 rounded-xl p-0.5" data-testid="tabs-nav">
+            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-5 h-11 bg-muted/80 border border-border/50 rounded-xl p-0.5" data-testid="tabs-nav">
               <TabsTrigger 
                 value="home" 
-                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 transition-all"
+                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 transition-all"
                 data-testid="tab-prayer-times"
               >
-                {t('prayer_times')}
+                {i18n.language === 'ar' ? 'المواقيت' : t('prayer_times')}
               </TabsTrigger>
               <TabsTrigger 
                 value="qiblah" 
-                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-9 transition-all"
+                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-9 transition-all"
                 data-testid="tab-qiblah"
               >
                 {t('qiblah')}
               </TabsTrigger>
               <TabsTrigger 
                 value="daily" 
-                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-9 transition-all"
+                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-9 transition-all"
                 data-testid="tab-daily-content"
               >
-                {t('daily_content')}
+                {i18n.language === 'ar' ? 'القصص' : t('daily_content')}
               </TabsTrigger>
               <TabsTrigger 
                 value="khatm" 
-                className="rounded-lg text-[13px] md:text-sm font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 transition-all"
+                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 transition-all"
                 data-testid="tab-quran-khatm"
               >
-                {i18n.language === 'ar' ? 'القرآن الكريم' : 'Quran'}
+                {i18n.language === 'ar' ? 'القرآن' : 'Quran'}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="dua" 
+                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-amber-600 data-[state=active]:text-white h-9 transition-all"
+                data-testid="tab-dua"
+              >
+                {i18n.language === 'ar' ? 'الأدعية' : 'Duas'}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -463,6 +480,37 @@ ${t('isha')}: ${prayerData.timings.Isha}
                </div>
              </section>
 
+            {/* Quick Services */}
+            <section className="w-full max-w-4xl mx-auto" dir="rtl">
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4 text-muted-foreground" />
+                <h3 className="text-sm font-bold text-muted-foreground">
+                  {i18n.language === 'ar' ? 'خدمات إضافية' : 'Quick Services'}
+                </h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { label: i18n.language === 'ar' ? 'القرآن الكريم' : 'Holy Quran', tab: 'khatm', icon: '📖', color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
+                  { label: i18n.language === 'ar' ? 'الأدعية' : 'Duas', tab: 'dua', icon: '🤲', color: 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400' },
+                  { label: i18n.language === 'ar' ? 'القبلة' : 'Qiblah', tab: 'qiblah', icon: '🧭', color: 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400' },
+                  { label: i18n.language === 'ar' ? 'القصص' : 'Stories', tab: 'daily', icon: '📚', color: 'bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400' },
+                ].map((item) => (
+                  <button
+                    key={item.tab}
+                    onClick={() => handleTabChange(item.tab)}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border transition-all hover:scale-[1.02] active:scale-95",
+                      item.color
+                    )}
+                    data-testid={`service-card-${item.tab}`}
+                  >
+                    <span className="text-2xl">{item.icon}</span>
+                    <span className="text-sm font-black">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
           </TabsContent>
 
           <TabsContent value="qiblah" className="mt-0">
@@ -475,6 +523,12 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
           <TabsContent value="khatm" className="mt-0">
             <QuranKhatm />
+          </TabsContent>
+
+          <TabsContent value="dua" className="mt-0">
+            <Suspense fallback={<div className="py-12 text-center text-muted-foreground animate-pulse font-bold">{i18n.language === 'ar' ? 'جارٍ التحميل...' : 'Loading...'}</div>}>
+              <DuaPage />
+            </Suspense>
           </TabsContent>
         </main>
 

@@ -14,6 +14,7 @@ function Router() {
       <Route path="/qiblah" component={Home} />
       <Route path="/daily-content" component={Home} />
       <Route path="/quran-khatm" component={Home} />
+      <Route path="/dua" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );
