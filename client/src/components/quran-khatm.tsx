@@ -239,7 +239,7 @@ function getJuzData(juzNumber: number): JuzData {
   };
 }
 
-export function QuranKhatm() {
+export function QuranKhatm({ resumeReading }: { resumeReading?: boolean }) {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
@@ -427,6 +427,15 @@ export function QuranKhatm() {
       saveReadPosition(selectedDay, currentPage);
     }
   }, [currentPage, selectedDay, juzData]);
+
+  useEffect(() => {
+    if (resumeReading && juzData) {
+      const pos = getReadPosition(selectedDay);
+      if (pos && pos.page > 0) {
+        setCurrentPage(pos.page);
+      }
+    }
+  }, [resumeReading, juzData, selectedDay]);
 
 
   const toggleComplete = (day: number) => {

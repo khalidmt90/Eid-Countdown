@@ -121,6 +121,7 @@ export default function Home() {
   }, [activeTab, i18n.language]);
   
   const [duaCategory, setDuaCategory] = useState<string | undefined>(undefined);
+  const [quranResume, setQuranResume] = useState(false);
 
   // Eid Events State
   const [nextEvent, setNextEvent] = useState<EidDate | null>(null);
@@ -643,26 +644,40 @@ ${t('isha')}: ${prayerData.timings.Isha}
               const isha = parseT(prayerData.timings.Isha);
 
               let actionKey = 'daily_quran_reading';
-              let subtitleKey: string | null = 'read_5_minutes';
+              let subtitle = t('read_5_minutes');
               let actionTab = 'khatm';
               let icon = '📖';
               let targetCategory: string | undefined = undefined;
 
+              const quranPos = (() => {
+                try {
+                  const lastDay = localStorage.getItem('lastSelectedDay');
+                  const juz = lastDay ? parseInt(lastDay) : 1;
+                  const positions = JSON.parse(localStorage.getItem('khatmReadPosition') || '{}');
+                  const pos = positions[juz];
+                  if (pos && pos.page > 0) {
+                    return { juz, page: pos.page + 1 };
+                  }
+                  return { juz, page: 1 };
+                } catch { return { juz: 1, page: 1 }; }
+              })();
+              subtitle = t('continue_reading', { page: quranPos.page }) || `${t('read_5_minutes')}`;
+
               if (isRamadan && now < maghrib) {
                 actionKey = 'dua_before_iftar';
-                subtitleKey = null;
+                subtitle = t('dua_before_iftar');
                 actionTab = 'dua';
                 icon = '🤲';
                 targetCategory = 'أدعية متنوعة';
               } else if (now >= fajr && now < sunrise) {
                 actionKey = 'morning_adhkar';
-                subtitleKey = null;
+                subtitle = t('morning_adhkar');
                 actionTab = 'dua';
                 icon = '🌅';
                 targetCategory = 'أذكار الصباح';
               } else if (now >= maghrib || now >= isha) {
                 actionKey = 'evening_adhkar';
-                subtitleKey = null;
+                subtitle = t('evening_adhkar');
                 actionTab = 'dua';
                 icon = '🌙';
                 targetCategory = 'أذكار المساء';
@@ -677,12 +692,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
                         <span className="text-2xl">{icon}</span>
                         <div>
                           <p className="text-base font-black text-foreground">{t(actionKey)}</p>
-                          {subtitleKey && <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>}
+                          <p className="text-sm text-muted-foreground">{subtitle}</p>
                         </div>
                       </div>
                       <Button
                         onClick={() => {
                           if (targetCategory) setDuaCategory(targetCategory);
+                          if (actionTab === 'khatm') setQuranResume(true);
                           handleTabChange(actionTab);
                         }}
                         className="w-full rounded-xl font-bold"
@@ -862,7 +878,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </TabsContent>
 
           <TabsContent value="khatm" className="mt-0">
-            <QuranKhatm />
+            <QuranKhatm resumeReading={quranResume} />
           </TabsContent>
 
           <TabsContent value="dua" className="mt-0">
