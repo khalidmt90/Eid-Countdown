@@ -5,7 +5,7 @@ import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
+import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, ChevronUp, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -139,6 +139,7 @@ export default function Home() {
     nextPrayer,
     timeRemaining,
     dailyAyah,
+    isRamadan,
     handleCountryChange,
     handleCityChange,
     handleUseCurrentLocation,
@@ -158,6 +159,54 @@ export default function Home() {
 
   const [timeFormat, setTimeFormat] = useState<'12' | '24'>('12');
   const [shareHidden, setShareHidden] = useState(false);
+  const [ramadanScheduleOpen, setRamadanScheduleOpen] = useState(false);
+  const [weekSchedule, setWeekSchedule] = useState<Array<{date: string; dayName: string; fajr: string; maghrib: string}>>([]);
+
+  useEffect(() => {
+    if (!isRamadan || !selectedCity) return;
+    setRamadanScheduleOpen(true);
+
+    const lat = usingExactLocation && selectedCity ? selectedCity.lat : selectedCity.lat;
+    const lng = usingExactLocation && selectedCity ? selectedCity.lng : selectedCity.lng;
+    const cacheKey = `ramadan7_${selectedCity.nameEn}_${new Date().toDateString()}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try { setWeekSchedule(JSON.parse(cached)); return; } catch {}
+    }
+
+    const today = new Date();
+    const days: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + i);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      days.push(`${y}-${m}-${dd}`);
+    }
+
+    Promise.all(
+      days.map(date =>
+        fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lng}&method=4`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.code === 200) {
+              const t = data.data.timings;
+              const dateObj = new Date(date + 'T12:00:00');
+              const dayName = new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'short' }).format(dateObj);
+              const shortDate = new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short' }).format(dateObj);
+              return { date: shortDate, dayName, fajr: t.Fajr?.split(' ')[0] || '', maghrib: t.Maghrib?.split(' ')[0] || '' };
+            }
+            return null;
+          })
+          .catch(() => null)
+      )
+    ).then(results => {
+      const valid = results.filter(Boolean) as Array<{date: string; dayName: string; fajr: string; maghrib: string}>;
+      setWeekSchedule(valid);
+      try { localStorage.setItem(cacheKey, JSON.stringify(valid)); } catch {}
+    });
+  }, [isRamadan, selectedCity, usingExactLocation, i18n.language]);
 
   const toggleTimeFormat = () => {
     setTimeFormat(prev => prev === '12' ? '24' : '12');
@@ -366,12 +415,14 @@ ${t('isha')}: ${prayerData.timings.Isha}
               >
                 <Card className={cn(
                   "overflow-hidden border-2 shadow-lg relative",
+                  isRamadan ? "border-primary/50 shadow-primary/20" :
                   nextPrayer.name === 'Fajr' ? "border-primary/50 shadow-primary/20" : 
                   nextPrayer.name === 'Maghrib' ? "border-secondary/50 shadow-secondary/20" : 
                   "border-border"
                 )}>
                   <div className={cn(
                     "absolute top-0 inset-x-0 h-1.5",
+                    isRamadan ? "bg-primary" :
                     nextPrayer.name === 'Fajr' ? "bg-primary" : 
                     nextPrayer.name === 'Maghrib' ? "bg-secondary" : 
                     "bg-muted-foreground"
@@ -402,7 +453,11 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     </div>
 
                     <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                      {t('remaining_to')} {t(nextPrayer.name.toLowerCase())}
+                      {isRamadan && nextPrayer.name === "__iftar__"
+                        ? (i18n.language === 'ar' ? "المتبقي على الإفطار" : "Time until Iftar")
+                        : isRamadan && nextPrayer.name === "__imsak__"
+                        ? (i18n.language === 'ar' ? "المتبقي على الإمساك (الفجر)" : "Time until Imsak (Fajr)")
+                        : `${t('remaining_to')} ${t(nextPrayer.name.toLowerCase())}`}
                     </span>
                     
                     <div className="flex items-baseline justify-center gap-1 md:gap-2 mb-4" dir="ltr">
@@ -428,10 +483,28 @@ ${t('isha')}: ${prayerData.timings.Isha}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm font-medium bg-muted/50 px-4 py-1.5 rounded-full">
-                       <Clock className="w-4 h-4 text-muted-foreground" />
-                       <span>{t('next_prayer')}: {formatTime(nextPrayer.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}))}</span>
-                    </div>
+                    {!isRamadan && (
+                      <div className="flex items-center gap-2 text-sm font-medium bg-muted/50 px-4 py-1.5 rounded-full">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <span>{t('next_prayer')}: {formatTime(nextPrayer.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}))}</span>
+                      </div>
+                    )}
+
+                    {isRamadan && prayerData && (
+                      <div className="flex items-center gap-4 text-sm font-bold bg-muted/50 px-5 py-2 rounded-full mt-1" dir="rtl">
+                        <div className="flex items-center gap-1.5">
+                          <Moon className="w-3.5 h-3.5 text-primary/70" />
+                          <span className="text-muted-foreground">{i18n.language === 'ar' ? 'الإمساك:' : 'Imsak:'}</span>
+                          <span className="text-foreground">{formatTime(prayerData.timings.Fajr)}</span>
+                        </div>
+                        <span className="text-muted-foreground/30">|</span>
+                        <div className="flex items-center gap-1.5">
+                          <Sunset className="w-3.5 h-3.5 text-primary/70" />
+                          <span className="text-muted-foreground">{i18n.language === 'ar' ? 'الإفطار:' : 'Iftar:'}</span>
+                          <span className="text-foreground">{formatTime(prayerData.timings.Maghrib)}</span>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -444,7 +517,9 @@ ${t('isha')}: ${prayerData.timings.Isha}
                   .filter(([key]) => ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].includes(key))
                   .map(([name, time]) => {
                     const Icon = prayerIcons[name] || Clock;
-                    const isNext = nextPrayer?.name === name;
+                    const isNext = isRamadan
+                      ? (nextPrayer?.name === "__iftar__" && name === "Maghrib") || (nextPrayer?.name === "__imsak__" && name === "Fajr")
+                      : nextPrayer?.name === name;
                     
                     return (
                       <div key={name} className={cn(
@@ -465,6 +540,83 @@ ${t('isha')}: ${prayerData.timings.Isha}
                   })}
               </div>
             </div>
+
+            {/* Ramadan 7-Day Schedule */}
+            {isRamadan && weekSchedule.length > 0 && (
+              <section className="w-full max-w-4xl mx-auto" data-testid="section-ramadan-schedule">
+                <button
+                  onClick={() => setRamadanScheduleOpen(!ramadanScheduleOpen)}
+                  className="flex items-center justify-between w-full mb-3 group"
+                  data-testid="button-toggle-ramadan-schedule"
+                >
+                  <div className="flex items-center gap-2">
+                    <Moon className="w-4 h-4 text-primary" />
+                    <h3 className="text-sm font-bold text-muted-foreground">
+                      {i18n.language === 'ar' ? 'رمضان — ٧ أيام القادمة' : 'Ramadan — Next 7 Days'}
+                    </h3>
+                  </div>
+                  {ramadanScheduleOpen ? (
+                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
+
+                {ramadanScheduleOpen && (
+                  <>
+                    {/* Desktop: compact table */}
+                    <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden">
+                      <table className="w-full text-sm" dir="rtl">
+                        <thead>
+                          <tr className="border-b border-border bg-muted/50">
+                            <th className="py-3 px-4 text-start font-bold text-muted-foreground">{i18n.language === 'ar' ? 'اليوم' : 'Day'}</th>
+                            <th className="py-3 px-4 text-start font-bold text-muted-foreground">{i18n.language === 'ar' ? 'التاريخ' : 'Date'}</th>
+                            <th className="py-3 px-4 text-center font-bold text-muted-foreground">{i18n.language === 'ar' ? 'الإمساك (الفجر)' : 'Imsak (Fajr)'}</th>
+                            <th className="py-3 px-4 text-center font-bold text-muted-foreground">{i18n.language === 'ar' ? 'الإفطار (المغرب)' : 'Iftar (Maghrib)'}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {weekSchedule.map((day, idx) => (
+                            <tr key={idx} className={cn("border-b border-border/50 last:border-0", idx === 0 ? "bg-primary/5" : "")}>
+                              <td className="py-3 px-4 font-bold text-foreground">{day.dayName}</td>
+                              <td className="py-3 px-4 text-muted-foreground">{day.date}</td>
+                              <td className="py-3 px-4 text-center font-mono font-bold text-foreground">{formatTime(day.fajr)}</td>
+                              <td className="py-3 px-4 text-center font-mono font-bold text-foreground">{formatTime(day.maghrib)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mobile: horizontal scroll cards */}
+                    <div className="md:hidden flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: "none" }} dir="rtl">
+                      {weekSchedule.map((day, idx) => (
+                        <div
+                          key={idx}
+                          className={cn(
+                            "shrink-0 w-[130px] bg-card border rounded-2xl p-3 space-y-2 text-center",
+                            idx === 0 ? "border-primary/50 bg-primary/5" : "border-border"
+                          )}
+                        >
+                          <div className="text-xs font-bold text-primary">{day.dayName}</div>
+                          <div className="text-[11px] text-muted-foreground">{day.date}</div>
+                          <div className="space-y-1 pt-1 border-t border-border/50">
+                            <div>
+                              <span className="text-[10px] text-muted-foreground block">{i18n.language === 'ar' ? 'الإمساك' : 'Imsak'}</span>
+                              <span className="text-sm font-black font-mono text-foreground">{formatTime(day.fajr)}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] text-muted-foreground block">{i18n.language === 'ar' ? 'الإفطار' : 'Iftar'}</span>
+                              <span className="text-sm font-black font-mono text-foreground">{formatTime(day.maghrib)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </section>
+            )}
 
             {/* Secondary: Eid Countdown */}
              <section className="w-full max-w-4xl mx-auto">

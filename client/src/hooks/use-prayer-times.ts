@@ -127,7 +127,10 @@ export function usePrayerTimes() {
       });
   }, [selectedCity, userLocation, usingExactLocation]);
 
-  // Calculate Next Prayer Countdown
+  const hijriMonth = prayerData?.date?.hijri?.month;
+  const isRamadan = hijriMonth?.en === "Ramadan" || hijriMonth?.ar === "رمضان";
+
+  // Calculate Next Prayer Countdown (context-aware for Ramadan)
   useEffect(() => {
     if (!prayerData) return;
 
@@ -141,31 +144,43 @@ export function usePrayerTimes() {
     const interval = setInterval(() => {
       const now = new Date();
       const timings = prayerData.timings;
-      
-      const prayers = [
-        { name: "Fajr", time: parseTime(timings.Fajr) },
-        { name: "Sunrise", time: parseTime(timings.Sunrise) },
-        { name: "Dhuhr", time: parseTime(timings.Dhuhr) },
-        { name: "Asr", time: parseTime(timings.Asr) },
-        { name: "Maghrib", time: parseTime(timings.Maghrib) },
-        { name: "Isha", time: parseTime(timings.Isha) },
-      ];
 
-      let next = prayers.find(p => p.time > now);
-      
-      if (!next) {
-        const fajrTomorrow = parseTime(timings.Fajr);
-        fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
-        next = { name: "Fajr", time: fajrTomorrow };
+      if (isRamadan) {
+        const maghribTime = parseTime(timings.Maghrib);
+        if (now < maghribTime) {
+          setNextPrayer({ name: "__iftar__", time: maghribTime });
+          setTimeRemaining(maghribTime.getTime() - now.getTime());
+        } else {
+          const fajrTomorrow = parseTime(timings.Fajr);
+          fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
+          setNextPrayer({ name: "__imsak__", time: fajrTomorrow });
+          setTimeRemaining(fajrTomorrow.getTime() - now.getTime());
+        }
+      } else {
+        const prayers = [
+          { name: "Fajr", time: parseTime(timings.Fajr) },
+          { name: "Sunrise", time: parseTime(timings.Sunrise) },
+          { name: "Dhuhr", time: parseTime(timings.Dhuhr) },
+          { name: "Asr", time: parseTime(timings.Asr) },
+          { name: "Maghrib", time: parseTime(timings.Maghrib) },
+          { name: "Isha", time: parseTime(timings.Isha) },
+        ];
+
+        let next = prayers.find(p => p.time > now);
+        
+        if (!next) {
+          const fajrTomorrow = parseTime(timings.Fajr);
+          fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
+          next = { name: "Fajr", time: fajrTomorrow };
+        }
+
+        setNextPrayer(next);
+        setTimeRemaining(next.time.getTime() - now.getTime());
       }
-
-      setNextPrayer(next);
-      setTimeRemaining(next.time.getTime() - now.getTime());
-
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [prayerData]);
+  }, [prayerData, isRamadan]);
 
   const handleCountryChange = (val: string) => {
     const country = COUNTRIES.find(c => c.nameEn === val);
@@ -204,6 +219,7 @@ export function usePrayerTimes() {
     nextPrayer,
     timeRemaining,
     dailyAyah,
+    isRamadan,
     handleCountryChange,
     handleCityChange,
     handleUseCurrentLocation,

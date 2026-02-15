@@ -189,12 +189,14 @@ export async function registerRoutes(
   app.get("/api/prayer-times", async (req: Request, res: Response) => {
     try {
       const lang = (req.query.lang as string) === "ar" ? "ar" : "en";
+      const dateParam = req.query.date as string | undefined;
       const location = await resolveLocation(
         req.query.lat as string | undefined,
         req.query.lng as string | undefined
       );
 
-      const key = `times_${cacheKey(location.lat, location.lng, lang)}`;
+      const dateSuffix = dateParam || "today";
+      const key = `times_${cacheKey(location.lat, location.lng, lang)}_${dateSuffix}`;
       const cached = cache.get(key);
       if (cached && cached.expires > Date.now()) {
         return res.json(cached.data);
@@ -211,9 +213,16 @@ export async function registerRoutes(
       const params = CalculationMethod.UmmAlQura();
       params.madhab = Madhab.Shafi;
 
-      const now = new Date();
-      const localDate = new Date(now.toLocaleString("en-US", { timeZone: tz }));
-      const prayerTimes = new PrayerTimes(coords, localDate, params);
+      let targetDate: Date;
+      if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+        const [y, m, d] = dateParam.split("-").map(Number);
+        targetDate = new Date(y, m - 1, d);
+      } else {
+        const now = new Date();
+        targetDate = new Date(now.toLocaleString("en-US", { timeZone: tz }));
+      }
+
+      const prayerTimes = new PrayerTimes(coords, targetDate, params);
 
       const formatHHMM = (d: Date): string => {
         return new Intl.DateTimeFormat("en-GB", {
@@ -229,9 +238,11 @@ export async function registerRoutes(
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-      }).format(now);
+      }).format(targetDate);
 
-      const hijriMoment = momentHijri();
+      const hijriMoment = dateParam
+        ? momentHijri(dateParam, "YYYY-MM-DD")
+        : momentHijri();
       const iDay = hijriMoment.iDate();
       const iMonth = hijriMoment.iMonth() + 1;
       const iYear = hijriMoment.iYear();
