@@ -42,6 +42,25 @@ export function StoriesView() {
   const lang = isAr ? "ar" : "en";
   const isMobile = useIsMobile();
 
+  const [storyFontSize, setStoryFontSize] = useState(() => {
+    try {
+      const saved = localStorage.getItem('storyFontScale');
+      return saved ? parseInt(saved) : 18;
+    } catch { return 18; }
+  });
+
+  const storyFontUp = () => {
+    const next = Math.min(storyFontSize + 2, 28);
+    setStoryFontSize(next);
+    localStorage.setItem('storyFontScale', String(next));
+  };
+
+  const storyFontDown = () => {
+    const next = Math.max(storyFontSize - 2, 14);
+    setStoryFontSize(next);
+    localStorage.setItem('storyFontScale', String(next));
+  };
+
   const [view, setView] = useState<ViewState>(() => {
     const saved = localStorage.getItem("stories_last_view");
     if (saved === "prophets" || saved === "hadiths") return saved;
@@ -127,6 +146,9 @@ export function StoriesView() {
             onPageChange={setHadithPage}
             onToggleExpand={(id) => setExpandedHadith(expandedHadith === id ? null : id)}
             onBack={() => navigateTo("categories")}
+            fontSize={storyFontSize}
+            onFontUp={storyFontUp}
+            onFontDown={storyFontDown}
           />
         )}
         {view === "prophet-detail" && (
@@ -137,6 +159,9 @@ export function StoriesView() {
             storyIndex={selectedStoryIndex}
             onBack={() => navigateTo("prophets")}
             onNavigate={setSelectedStoryIndex}
+            fontSize={storyFontSize}
+            onFontUp={storyFontUp}
+            onFontDown={storyFontDown}
           />
         )}
       </AnimatePresence>
@@ -374,6 +399,9 @@ function HadithListView({
   onPageChange: (p: number) => void;
   onToggleExpand: (id: string) => void;
   onBack: () => void;
+  fontSize: number;
+  onFontUp: () => void;
+  onFontDown: () => void;
 }) {
   return (
     <motion.div
@@ -406,6 +434,33 @@ function HadithListView({
             {t("story_count", { count: totalCount })}
           </p>
         </div>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 py-1">
+        <button
+          onClick={onFontDown}
+          disabled={fontSize <= 14}
+          className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted disabled:opacity-30 transition-all active:scale-95"
+          data-testid="button-hadith-font-down"
+        >
+          A-
+        </button>
+        <button
+          onClick={() => {}}
+          className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted transition-all active:scale-95 cursor-default"
+          data-testid="button-hadith-font-indicator"
+        >
+          A
+        </button>
+        <button
+          onClick={onFontUp}
+          disabled={fontSize >= 28}
+          className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted disabled:opacity-30 transition-all active:scale-95"
+          data-testid="button-hadith-font-up"
+        >
+          A+
+        </button>
+        <span className="text-xs text-muted-foreground/50 mr-2">{fontSize}px</span>
       </div>
 
       <div className="relative">
@@ -484,7 +539,7 @@ function HadithListView({
                     >
                       <div className="px-4 pb-4 space-y-3">
                         <div className="bg-blue-500/5 p-4 rounded-xl border border-blue-500/10">
-                          <p className="text-base leading-[2] font-serif font-medium text-foreground whitespace-pre-line">
+                          <p className="leading-[2] font-serif font-medium text-foreground whitespace-pre-line" style={{ fontSize }}>
                             {hadith.text}
                           </p>
                         </div>
@@ -538,12 +593,18 @@ function ProphetDetailView({
   storyIndex,
   onBack,
   onNavigate,
+  fontSize,
+  onFontUp,
+  onFontDown,
 }: {
   t: any;
   lang: string;
   storyIndex: number;
   onBack: () => void;
   onNavigate: (index: number) => void;
+  fontSize: number;
+  onFontUp: () => void;
+  onFontDown: () => void;
 }) {
   const story = PROPHET_STORIES[storyIndex];
   const s = lang === "ar" ? story.ar : story.en;
@@ -596,8 +657,35 @@ function ProphetDetailView({
             </span>
           </div>
 
+          <div className="flex items-center justify-center gap-2 py-1">
+            <button
+              onClick={onFontDown}
+              disabled={fontSize <= 14}
+              className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted disabled:opacity-30 transition-all active:scale-95"
+              data-testid="button-prophet-font-down"
+            >
+              A-
+            </button>
+            <button
+              onClick={() => {}}
+              className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted transition-all active:scale-95 cursor-default"
+              data-testid="button-prophet-font-indicator"
+            >
+              A
+            </button>
+            <button
+              onClick={onFontUp}
+              disabled={fontSize >= 28}
+              className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted disabled:opacity-30 transition-all active:scale-95"
+              data-testid="button-prophet-font-up"
+            >
+              A+
+            </button>
+            <span className="text-xs text-muted-foreground/50 mr-2">{fontSize}px</span>
+          </div>
+
           <div className="prose prose-lg prose-slate dark:prose-invert max-w-none">
-            <p className="md:text-xl text-muted-foreground text-justify whitespace-pre-line font-medium text-[22px]">
+            <p className="text-muted-foreground text-justify whitespace-pre-line font-medium" style={{ fontSize }}>
               {s.story}
             </p>
           </div>

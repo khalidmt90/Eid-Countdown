@@ -28,15 +28,29 @@ export function QiblahFinder() {
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isStableAligned, setIsStableAligned] = useState(false);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [accuracy, setAccuracy] = useState<'high' | 'medium' | 'low' | null>(null);
   
   const cumulativeRotation = useRef(0);
   const lastDelta = useRef<number | null>(null);
   const prevSmoothed = useRef<number | null>(null);
   const alignedSince = useRef<number | null>(null);
   const hasVibrated = useRef(false);
+  const headingHistory = useRef<number[]>([]);
 
   const MECCA_LAT = 21.4225;
   const MECCA_LNG = 39.8262;
+
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return Math.round(R * c);
+  };
 
   const calculateQiblah = (lat: number, lng: number) => {
     const phiK = MECCA_LAT * Math.PI / 180.0;
@@ -71,6 +85,20 @@ export function QiblahFinder() {
   useEffect(() => {
     if (rawHeading === null) return;
     
+    headingHistory.current.push(rawHeading);
+    if (headingHistory.current.length > 10) {
+      headingHistory.current.shift();
+    }
+    if (headingHistory.current.length >= 3) {
+      const hist = headingHistory.current;
+      const mean = hist.reduce((a, b) => a + b, 0) / hist.length;
+      const variance = hist.reduce((sum, v) => sum + (v - mean) ** 2, 0) / hist.length;
+      const stddev = Math.sqrt(variance);
+      if (stddev < 3) setAccuracy('high');
+      else if (stddev < 8) setAccuracy('medium');
+      else setAccuracy('low');
+    }
+
     if (prevSmoothed.current === null) {
       prevSmoothed.current = rawHeading;
       setSmoothedHeading(rawHeading);
@@ -113,6 +141,8 @@ export function QiblahFinder() {
         setLocation({ lat: latitude, lng: longitude });
         const bearing = calculateQiblah(latitude, longitude);
         setQiblahBearing(bearing);
+        const dist = calculateDistance(latitude, longitude, MECCA_LAT, MECCA_LNG);
+        setDistance(dist);
 
         if (window.DeviceOrientationEvent) {
           window.addEventListener("deviceorientationabsolute", handleOrientation as EventListener, { capture: true, passive: true });
@@ -257,6 +287,21 @@ export function QiblahFinder() {
           <p className="text-muted-foreground text-sm">
             {location ? t('location_set') : t('tap_to_start')}
           </p>
+          {accuracy && (
+            <div className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
+              accuracy === 'high' ? 'bg-green-500/10 text-green-600' :
+              accuracy === 'medium' ? 'bg-yellow-500/10 text-yellow-600' :
+              'bg-red-500/10 text-red-600'
+            }`} data-testid="badge-accuracy">
+              <span className={`w-1.5 h-1.5 rounded-full ${
+                accuracy === 'high' ? 'bg-green-500' : accuracy === 'medium' ? 'bg-yellow-500' : 'bg-red-500'
+              }`} />
+              {isArabic 
+                ? (accuracy === 'high' ? 'دقة عالية' : accuracy === 'medium' ? 'دقة متوسطة' : 'دقة منخفضة')
+                : (accuracy === 'high' ? 'High accuracy' : accuracy === 'medium' ? 'Medium accuracy' : 'Low accuracy')
+              }
+            </div>
+          )}
         </CardHeader>
 
         <CardContent className="flex flex-col items-center pt-8 pb-12 space-y-8 relative">
@@ -312,6 +357,11 @@ export function QiblahFinder() {
                 }`}>
                   {Math.round(qiblahBearing)}°
                 </div>
+                {distance !== null && (
+                  <div className="text-sm font-bold text-muted-foreground mt-1" data-testid="text-distance-makkah">
+                    {isArabic ? `${distance.toLocaleString('ar-SA')} كم من مكة المكرمة` : `${distance.toLocaleString()} km to Makkah`}
+                  </div>
+                )}
                 
                 {smoothedHeading !== null && (
                   isStableAligned ? (
@@ -361,12 +411,12 @@ export function QiblahFinder() {
       </Card>
       
       {smoothedHeading !== null && !isStableAligned && (
-        <div className="text-center max-w-sm text-muted-foreground text-sm px-4 bg-muted/30 p-3 rounded-xl border border-border/50">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <RotateCcw className="w-4 h-4" />
-            <span className="font-bold">{isArabic ? "تلميح" : "Tip"}</span>
+        <div className="text-center max-w-sm text-muted-foreground text-sm px-4 bg-amber-500/10 p-4 rounded-xl border border-amber-500/30 shadow-sm">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <RotateCcw className="w-5 h-5 text-amber-600 animate-spin" style={{ animationDuration: '3s' }} />
+            <span className="font-black text-amber-700 text-base">{isArabic ? "⚠️ تلميح مهم" : "⚠️ Calibration Tip"}</span>
           </div>
-          <p className="text-sm">{calibrationTip}</p>
+          <p className="text-sm font-medium">{calibrationTip}</p>
         </div>
       )}
       

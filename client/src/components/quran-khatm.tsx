@@ -671,6 +671,34 @@ export function QuranKhatm() {
         </button>
       </div>
 
+      {/* === INLINE FONT CONTROLS === */}
+      <div className="flex items-center justify-center gap-2 py-1">
+        <button
+          onClick={fontDown}
+          disabled={fontSize <= FONT_STEPS[0]}
+          className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted disabled:opacity-30 transition-all active:scale-95"
+          data-testid="button-font-down-inline"
+        >
+          A-
+        </button>
+        <button
+          onClick={() => setFontSize(FONT_STEPS[Math.floor(FONT_STEPS.length / 2)])}
+          className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted transition-all active:scale-95"
+          data-testid="button-font-reset-inline"
+        >
+          A
+        </button>
+        <button
+          onClick={fontUp}
+          disabled={fontSize >= FONT_STEPS[FONT_STEPS.length - 1]}
+          className="h-8 px-3 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted disabled:opacity-30 transition-all active:scale-95"
+          data-testid="button-font-up-inline"
+        >
+          A+
+        </button>
+        <span className="text-xs text-muted-foreground/50 mr-2">{fontSize}px</span>
+      </div>
+
       {/* === STICKY MINI HEADER with page progress === */}
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border/50 pb-1.5 pt-1 -mx-1 px-1">
         <div className="flex items-center justify-between text-xs font-bold text-muted-foreground px-1 mb-1">

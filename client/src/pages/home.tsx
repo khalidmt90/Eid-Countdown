@@ -418,7 +418,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
         </header>
 
         {/* Page Section Title */}
-        <div className="max-w-7xl mx-auto px-4 pb-1" dir="rtl" style={{ paddingTop: '12px' }}>
+        <div className="max-w-7xl mx-auto px-4 pb-1" dir="rtl" style={{ paddingTop: '12px', marginBottom: '8px' }}>
           <h2
             className="text-[22px] font-black text-foreground text-right"
             data-testid="text-page-title"
@@ -481,36 +481,53 @@ ${t('isha')}: ${prayerData.timings.Isha}
                       </button>
                     </div>
 
-                    <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                      {isRamadan && nextPrayer.name === "__iftar__"
-                        ? (i18n.language === 'ar' ? "المتبقي على الإفطار" : "Time until Iftar")
-                        : isRamadan && nextPrayer.name === "__imsak__"
-                        ? (i18n.language === 'ar' ? "المتبقي على الإمساك (الفجر)" : "Time until Imsak (Fajr)")
-                        : `${t('remaining_to')} ${t(nextPrayer.name.toLowerCase())}`}
-                    </span>
-                    
-                    <div className="flex items-baseline justify-center gap-1 md:gap-2 mb-4" dir="ltr">
-                      <div className="flex flex-col items-center">
-                        <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-foreground leading-none">
-                          {String(hours).padStart(2, '0')}
-                        </span>
-                        <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">{t('hours')}</span>
-                      </div>
-                      <span className="text-3xl md:text-6xl font-black text-muted-foreground/30 -translate-y-4">:</span>
-                      <div className="flex flex-col items-center">
-                        <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-foreground leading-none">
-                          {String(minutes).padStart(2, '0')}
-                        </span>
-                        <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">{t('minutes')}</span>
-                      </div>
-                      <span className="text-3xl md:text-6xl font-black text-muted-foreground/30 -translate-y-4">:</span>
-                      <div className="flex flex-col items-center">
-                        <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-primary leading-none">
-                          {String(seconds).padStart(2, '0')}
-                        </span>
-                        <span className="text-[10px] md:text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">{t('seconds')}</span>
-                      </div>
-                    </div>
+                    {(() => {
+                      const isPrayerNow = timeRemaining <= 0 || (hours === 0 && minutes < 1);
+                      return isPrayerNow ? (
+                        <div className="flex flex-col items-center gap-3 py-4">
+                          <div className="text-4xl">🕌</div>
+                          <div className="text-2xl font-black text-primary animate-pulse">
+                            {i18n.language === 'ar' ? 'حان وقت الصلاة' : 'Prayer Time Now'}
+                          </div>
+                          <div className="text-lg font-bold text-muted-foreground">
+                            {t(nextPrayer.name.toLowerCase())}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                            {isRamadan && nextPrayer.name === "__iftar__"
+                              ? (i18n.language === 'ar' ? "المتبقي على الإفطار" : "Time until Iftar")
+                              : isRamadan && nextPrayer.name === "__imsak__"
+                              ? (i18n.language === 'ar' ? "المتبقي على الإمساك (الفجر)" : "Time until Imsak (Fajr)")
+                              : `${t('remaining_to')} ${t(nextPrayer.name.toLowerCase())}`}
+                          </span>
+                          
+                          <div className="flex items-baseline justify-center gap-1 md:gap-2 mb-4" dir="ltr">
+                            <div className="flex flex-col items-center">
+                              <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-foreground leading-none">
+                                {String(hours).padStart(2, '0')}
+                              </span>
+                              <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">{t('hours')}</span>
+                            </div>
+                            <span className="text-3xl md:text-6xl font-black text-muted-foreground/30 -translate-y-4">:</span>
+                            <div className="flex flex-col items-center">
+                              <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-foreground leading-none">
+                                {String(minutes).padStart(2, '0')}
+                              </span>
+                              <span className="text-[10px] md:text-xs font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">{t('minutes')}</span>
+                            </div>
+                            <span className="text-3xl md:text-6xl font-black text-muted-foreground/30 -translate-y-4">:</span>
+                            <div className="flex flex-col items-center">
+                              <span className="text-5xl md:text-8xl font-black font-mono tracking-tighter text-primary leading-none">
+                                {String(seconds).padStart(2, '0')}
+                              </span>
+                              <span className="text-[10px] md:text-xs font-bold text-primary/60 uppercase tracking-widest mt-1">{t('seconds')}</span>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
 
                     {!isRamadan && (
                       <div className="flex items-center gap-2 text-sm font-medium bg-muted/50 px-4 py-1.5 rounded-full">
