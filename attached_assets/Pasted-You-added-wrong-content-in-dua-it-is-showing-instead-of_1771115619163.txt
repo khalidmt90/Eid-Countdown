@@ -1,0 +1,89 @@
+You added wrong content in /dua (it is showing آيات instead of أدعية).
+Fix it by replacing the entire dua data source with Hisn Al-Muslim (حصن المسلم) ONLY.
+
+STRICT RULES
+- Dua page must show ONLY حصن المسلم content (adhkar/duas), not Quran verses.
+- Do NOT generate or paraphrase any text with AI.
+- Import the dataset from an open-source Hisn Al-Muslim JSON (MIT licensed) and store it locally in the repo.
+- Every item must have a category, text, and reference/source when available.
+- If an item is Quran-only (detected by patterns below), EXCLUDE it from /dua.
+
+DATA SOURCE (choose one and implement)
+Option A (preferred): GitHub repo contains whole Hisn Al-Muslim as JSON with MIT license:
+- asellam/HisnElMuslim (JSON file in repo)
+Option B: rn0x/hisn_almuslim_json (Arabic JSON)
+
+Implementation requirement:
+- Add a script (node) that downloads the chosen raw JSON into:
+  /data/hisn-raw.json
+- Then normalize it into:
+  /data/hisn-al-muslim.json
+  using my site schema below.
+
+TARGET SCHEMA (used by UI)
+Create /data/hisn-al-muslim.json in this structure:
+
+[
+  {
+    "id": "hisn-1",
+    "category": "أذكار الصباح",
+    "title": "أذكار الصباح",
+    "text": "…",
+    "repeat": 1,
+    "source": "…"
+  }
+]
+
+NORMALIZATION RULES
+- Preserve the Arabic text EXACTLY as in the dataset.
+- If the raw JSON has arrays (text[]), join with "\n\n".
+- If the raw JSON has footnotes/references, put them in "source".
+- If repeat count exists, map to repeat; otherwise set repeat = 1.
+
+CATEGORY MAPPING (make it clean and consistent)
+Map all items into ONLY these categories (exact spelling):
+- أذكار الصباح
+- أذكار المساء
+- أذكار النوم
+- أذكار الاستيقاظ
+- دعاء السفر
+- دعاء دخول المنزل
+- دعاء الخروج من المنزل
+- أذكار الطعام
+- أذكار بعد الصلاة
+- أدعية متنوعة
+
+If the raw data has more categories, map them to the closest one above.
+If unknown, put in "أدعية متنوعة".
+
+IMPORTANT: FILTER OUT QURAN-ONLY ITEMS
+Exclude any record that matches ANY of the following:
+- source contains "سورة" or "آية"
+- text contains "صدق الله العظيم"
+- text is mostly Quran formatting markers like (۝) or verse numbers (١٢٣)
+- category explicitly says "آيات" or "القرآن"
+
+DUA PAGE UI (keep your current design)
+- Keep existing UI and styling (dark theme, rounded cards, RTL).
+- Replace the data source only.
+- Ensure the counter shows total "دعاء" count based on filtered Hisn items.
+- Each card shows:
+  title (if any)
+  text (large, readable)
+  repeat badge (e.g. "3 مرات") if repeat > 1
+  source (small muted)
+  copy + share buttons
+
+SEARCH + FILTER
+- Search must search inside title + text.
+- Category pills filter must work correctly and not show Quran verses ever.
+
+DELIVERABLE
+- Remove any previous wrong dua dataset and references.
+- Add:
+  /scripts/fetchHisnData.js (downloads raw JSON)
+  /scripts/normalizeHisnData.js (outputs /data/hisn-al-muslim.json)
+  /data/hisn-raw.json
+  /data/hisn-al-muslim.json
+- Update /dua page to read ONLY /data/hisn-al-muslim.json
+- Confirm by showing 3 sample items from 3 different categories and verify none are Quran verses.

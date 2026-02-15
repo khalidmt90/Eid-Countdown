@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import duasData from "@/data/hisn-al-muslim.json";
 
 interface Dua {
-  id: number;
+  id: string;
   category: string;
   title: string;
   text: string;
@@ -19,10 +19,17 @@ const CATEGORIES = [
   "أذكار المساء",
   "أذكار النوم",
   "أذكار الاستيقاظ",
+  "أذكار الصلاة",
+  "أذكار بعد الصلاة",
+  "أذكار الأذان",
+  "أذكار الطهارة",
+  "أذكار الطعام",
   "دعاء السفر",
   "دعاء دخول المنزل",
   "دعاء الخروج من المنزل",
-  "أذكار الطعام",
+  "أدعية الهم والكرب",
+  "دعاء المريض",
+  "أدعية متنوعة",
 ];
 
 function normalizeArabic(text: string): string {
