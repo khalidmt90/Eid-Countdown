@@ -129,6 +129,8 @@ export default function Home() {
     canonical.href = window.location.origin + (TAB_TO_ROUTE[activeTab] || "/prayer-times");
   }, [activeTab, i18n.language]);
   
+  const [duaCategory, setDuaCategory] = useState<string | undefined>(undefined);
+
   // Eid Events State
   const [nextEvent, setNextEvent] = useState<EidDate | null>(null);
   const [followingEvent, setFollowingEvent] = useState<EidDate | null>(null);
@@ -186,9 +188,36 @@ export default function Home() {
     el.addEventListener('scroll', updateFades, { passive: true });
     window.addEventListener('resize', updateFades);
     updateFades();
+
+    let startX = 0;
+    let startScroll = 0;
+    let isDragging = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      isDragging = true;
+      startX = e.touches[0].clientX;
+      startScroll = el.scrollLeft;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      el.scrollLeft = startScroll - dx;
+      if (Math.abs(dx) > 5) {
+        e.preventDefault();
+      }
+    };
+    const onTouchEnd = () => { isDragging = false; };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+
     return () => {
       el.removeEventListener('scroll', updateFades);
       window.removeEventListener('resize', updateFades);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
     };
   }, [updateFades]);
 
@@ -456,7 +485,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 whiteSpace: 'nowrap' as const,
                 gap: '10px',
                 paddingInline: '12px',
-                scrollSnapType: 'x proximity',
                 touchAction: 'pan-x',
                 flexWrap: 'nowrap',
               }}
@@ -484,7 +512,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
                       fontSize: '17px',
                       fontWeight: 700,
                       lineHeight: 'normal',
-                      scrollSnapAlign: 'center',
                       ...(isActive
                         ? { background: 'linear-gradient(135deg, #0D6EFD, #1E88FF)', color: '#FFFFFF', border: '1px solid transparent' }
                         : { background: '#101A2E', color: '#9FB3C8', border: '1px solid rgba(42, 60, 99, 0.55)' }),
@@ -671,22 +698,26 @@ ${t('isha')}: ${prayerData.timings.Isha}
               let subtitleKey: string | null = 'read_5_minutes';
               let actionTab = 'khatm';
               let icon = '📖';
+              let targetCategory: string | undefined = undefined;
 
               if (isRamadan && now < maghrib) {
                 actionKey = 'dua_before_iftar';
                 subtitleKey = null;
                 actionTab = 'dua';
                 icon = '🤲';
+                targetCategory = 'أدعية متنوعة';
               } else if (now >= fajr && now < sunrise) {
                 actionKey = 'morning_adhkar';
                 subtitleKey = null;
                 actionTab = 'dua';
                 icon = '🌅';
+                targetCategory = 'أذكار الصباح';
               } else if (now >= maghrib || now >= isha) {
                 actionKey = 'evening_adhkar';
                 subtitleKey = null;
                 actionTab = 'dua';
                 icon = '🌙';
+                targetCategory = 'أذكار المساء';
               }
 
               return (
@@ -702,7 +733,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
                         </div>
                       </div>
                       <Button
-                        onClick={() => handleTabChange(actionTab)}
+                        onClick={() => {
+                          if (targetCategory) setDuaCategory(targetCategory);
+                          handleTabChange(actionTab);
+                        }}
                         className="w-full rounded-xl font-bold"
                         style={{ height: '46px' }}
                         data-testid="button-next-action"
@@ -890,7 +924,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
           <TabsContent value="dua" className="mt-0">
             <Suspense fallback={<div className="py-12 text-center text-muted-foreground animate-pulse font-bold">{t('loading')}</div>}>
-              <DuaPage />
+              <DuaPage initialCategory={duaCategory} />
             </Suspense>
           </TabsContent>
         </main>

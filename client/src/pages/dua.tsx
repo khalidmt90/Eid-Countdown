@@ -215,12 +215,19 @@ function DuaCard({
   );
 }
 
-export default function DuaPage() {
+export default function DuaPage({ initialCategory }: { initialCategory?: string }) {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("الكل");
+  const [activeCategory, setActiveCategory] = useState(initialCategory || "الكل");
+
+  useEffect(() => {
+    if (initialCategory && initialCategory !== activeCategory) {
+      setActiveCategory(initialCategory);
+      setCurrentPage(1);
+    }
+  }, [initialCategory]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
