@@ -2,7 +2,7 @@
 
 ## Overview
 
-A bilingual (Arabic/English) Islamic application that provides an Eid countdown timer, prayer times, Qiblah finder, and daily Islamic content (Ayahs, Hadiths, and Prophet stories). The application is built with React and designed with RTL-first Arabic support, featuring a modern Islamic aesthetic with gold and deep navy theming.
+A multilingual Islamic application supporting 10 languages (Arabic, English, Urdu, Farsi, Indonesian, Turkish, French, Bengali, Russian, Spanish) that provides an Eid countdown timer, prayer times, Qiblah finder, Quran reader, Duas & Adhkar, and daily Islamic content (Prophet stories and authentic Hadiths). The application is built with React and designed with RTL-first support for Arabic, Urdu, and Farsi, featuring a modern Islamic aesthetic with deep navy theming.
 
 ## User Preferences
 
@@ -16,7 +16,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack React Query for server state, React useState for local state
 - **Styling**: Tailwind CSS v4 with CSS variables for theming, using shadcn/ui component library
 - **Animations**: Framer Motion for smooth transitions and effects
-- **Internationalization**: i18next with browser language detection, supporting Arabic (default) and English
+- **Internationalization**: i18next with browser language detection, supporting 10 languages: Arabic (default), English, Urdu, Farsi, Indonesian, Turkish, French, Bengali, Russian, Spanish. 165 translation keys per language. RTL auto-detected for ar/ur/fa via `i18n.dir()`. All UI text uses `t()` translation calls — no hardcoded language checks for displayed text.
 
 ### Backend Architecture
 - **Server**: Express.js with TypeScript
