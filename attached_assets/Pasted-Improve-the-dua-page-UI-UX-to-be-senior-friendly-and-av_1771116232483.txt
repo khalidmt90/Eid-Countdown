@@ -1,0 +1,130 @@
+Improve the /dua page UI/UX to be senior-friendly and avoid endless scrolling.
+Keep the current dark theme and overall design language (same colors, cards, RTL).
+Do NOT redesign the whole site. Only refactor /dua UX + add settings related to text size.
+
+GOALS
+- Older-people friendly reading
+- User can change font size easily
+- Reduce long scrolling (use pagination + collapsible + quick jump)
+
+==================================================
+A) ADD ACCESSIBILITY CONTROLS (TOP BAR)
+==================================================
+
+At the top of /dua, under the title, add a "reading controls" bar:
+
+1) Font size control:
+- Buttons: A-  A  A+
+- Default = "A"
+- Changes dua text size globally on /dua page
+- Persist selection in localStorage (key: duaFontScale)
+- Apply scale to dua text AND title slightly.
+- Allow 3 levels:
+  - small: 1.0
+  - medium: 1.15
+  - large: 1.3
+
+2) Line height increases with font:
+- small: 1.9
+- medium: 2.05
+- large: 2.2
+
+3) "عرض مختصر / عرض كامل" toggle:
+- Compact mode: show only titles + first 2 lines
+- Full mode: show full text (still collapsible per card)
+Persist in localStorage (key: duaViewMode)
+
+==================================================
+B) REMOVE ENDLESS SCROLL (PAGINATION)
+==================================================
+
+Instead of rendering all items at once, implement pagination:
+
+- Show 8 duas per page on mobile
+- 10–12 on desktop
+- Controls at bottom:
+  "السابق"  page X/Y  "التالي"
+- Also add "اذهب إلى الصفحة" dropdown for quick jump (optional)
+- When switching category or search, reset to page 1.
+
+Must be fast and not laggy.
+
+==================================================
+C) BETTER READING CARD DESIGN
+==================================================
+
+Update DuaCard layout:
+
+- Increase padding
+- Add max width for readability (e.g., container max-w: 900px)
+- Make card text bigger and clearer
+- Use a clear hierarchy:
+  Title
+  Text
+  Repeat badge (if >1)
+  Source (small muted)
+  Actions row
+
+Actions row (bigger tap targets):
+- Copy (with toast "تم النسخ")
+- Share
+- Bookmark (optional placeholder; if too much, skip)
+
+Collapsible:
+- Each dua starts collapsed if it’s long:
+  show first ~5 lines + "عرض المزيد"
+- Clicking expands in-place smoothly.
+- In "Full mode", default expanded only for short items (< 500 chars), else collapsed.
+
+==================================================
+D) IMPROVE CATEGORY NAVIGATION
+==================================================
+
+Category pills are fine but improve usability:
+
+- Increase pill height and padding
+- Make active pill clearly highlighted
+- Add a count next to category when selected: "أذكار الصباح (22)"
+
+Add "Jump to top" floating button (bottom-right) when user scrolls down.
+
+==================================================
+E) SEARCH UX
+==================================================
+
+Search input improvements:
+- Larger height
+- Clear (x) button
+- Debounce 150ms
+- Search in: title + text + source
+- Show results count: "النتائج: 22"
+
+==================================================
+F) IMPLEMENTATION DETAILS
+==================================================
+
+- Use CSS variables or Tailwind classes to apply the font scale:
+  Example:
+  const scale = 1 / 1.15 / 1.3
+  Apply to class style:
+  fontSize: `${base * scale}px`
+- Persist settings in localStorage
+- Do NOT break RTL layout
+- Ensure no horizontal overflow on mobile
+- Ensure long Arabic text wraps cleanly
+- Make everything touch-friendly (44px min)
+
+==================================================
+DELIVERABLE
+==================================================
+
+Modify:
+- /pages/dua (or existing dua route component)
+- DuaCard component
+- Add a small hook:
+  useDuaPreferences() handles localStorage + scale + viewMode.
+
+Show me:
+- the updated /dua page code
+- updated DuaCard code
+- the new preference hook code
