@@ -194,6 +194,13 @@ i18n
           "remaining_tomorrow_fajr": "Remaining until tomorrow's Fajr",
           "iftar_approaching": "Iftar is approaching!",
           "imsak_approaching": "Imsak is approaching!",
+          "suggestion_now": "Suggested Now",
+          "morning_adhkar": "Morning Adhkar",
+          "evening_adhkar": "Evening Adhkar",
+          "daily_quran_reading": "Daily Quran Reading",
+          "read_5_minutes": "Read for 5 minutes",
+          "dua_before_iftar": "Dua before Iftar",
+          "start_now": "Start Now",
           "continue_reading": "Continue where you stopped (page {{page}})"
         }
       },
@@ -374,6 +381,13 @@ i18n
           "remaining_tomorrow_fajr": "المتبقي على فجر الغد",
           "iftar_approaching": "اقترب موعد الإفطار!",
           "imsak_approaching": "اقترب موعد الإمساك!",
+          "suggestion_now": "اقتراح الآن",
+          "morning_adhkar": "أذكار الصباح",
+          "evening_adhkar": "أذكار المساء",
+          "daily_quran_reading": "ورد اليوم من القرآن",
+          "read_5_minutes": "اقرأ 5 دقائق",
+          "dua_before_iftar": "دعاء قبل الإفطار",
+          "start_now": "ابدأ الآن",
           "continue_reading": "تابع من حيث توقفت (صفحة {{page}})"
         }
       },
@@ -554,6 +568,13 @@ i18n
           "remaining_tomorrow_fajr": "کل کی فجر تک باقی",
           "iftar_approaching": "افطار کا وقت قریب ہے!",
           "imsak_approaching": "امساک کا وقت قریب ہے!",
+          "suggestion_now": "ابھی کی تجویز",
+          "morning_adhkar": "صبح کے اذکار",
+          "evening_adhkar": "شام کے اذکار",
+          "daily_quran_reading": "آج کا قرآنی ورد",
+          "read_5_minutes": "5 منٹ پڑھیں",
+          "dua_before_iftar": "افطار سے پہلے کی دعا",
+          "start_now": "ابھی شروع کریں",
           "continue_reading": "جہاں رکے تھے وہاں سے جاری رکھیں (صفحہ {{page}})"
         }
       },
@@ -734,6 +755,13 @@ i18n
           "remaining_tomorrow_fajr": "مانده تا فجر فردا",
           "iftar_approaching": "زمان افطار نزدیک است!",
           "imsak_approaching": "زمان امساک نزدیک است!",
+          "suggestion_now": "پیشنهاد اکنون",
+          "morning_adhkar": "اذکار صبح",
+          "evening_adhkar": "اذکار شب",
+          "daily_quran_reading": "ورد روزانه قرآن",
+          "read_5_minutes": "5 دقیقه بخوانید",
+          "dua_before_iftar": "دعا پیش از افطار",
+          "start_now": "همین الان شروع کنید",
           "continue_reading": "ادامه از جایی که متوقف شدید (صفحه {{page}})"
         }
       },
@@ -914,6 +942,13 @@ i18n
           "remaining_tomorrow_fajr": "Sisa waktu hingga Subuh besok",
           "iftar_approaching": "Waktu berbuka sudah dekat!",
           "imsak_approaching": "Waktu imsak sudah dekat!",
+          "suggestion_now": "Saran Sekarang",
+          "morning_adhkar": "Dzikir Pagi",
+          "evening_adhkar": "Dzikir Petang",
+          "daily_quran_reading": "Bacaan Al-Quran Harian",
+          "read_5_minutes": "Baca 5 menit",
+          "dua_before_iftar": "Doa Sebelum Berbuka",
+          "start_now": "Mulai Sekarang",
           "continue_reading": "Lanjutkan dari halaman terakhir (halaman {{page}})"
         }
       },
@@ -1094,6 +1129,13 @@ i18n
           "remaining_tomorrow_fajr": "Yarının İmsak'ına kalan",
           "iftar_approaching": "İftar vakti yaklaşıyor!",
           "imsak_approaching": "İmsak vakti yaklaşıyor!",
+          "suggestion_now": "Şimdi Önerilen",
+          "morning_adhkar": "Sabah Zikirleri",
+          "evening_adhkar": "Akşam Zikirleri",
+          "daily_quran_reading": "Günlük Kur'an Okuma",
+          "read_5_minutes": "5 dakika okuyun",
+          "dua_before_iftar": "İftar Öncesi Dua",
+          "start_now": "Şimdi Başla",
           "continue_reading": "Kaldığınız yerden devam edin (sayfa {{page}})"
         }
       },
@@ -1274,6 +1316,13 @@ i18n
           "remaining_tomorrow_fajr": "Temps restant jusqu'au Fajr de demain",
           "iftar_approaching": "L'Iftar approche !",
           "imsak_approaching": "L'Imsak approche !",
+          "suggestion_now": "Suggestion",
+          "morning_adhkar": "Adhkar du Matin",
+          "evening_adhkar": "Adhkar du Soir",
+          "daily_quran_reading": "Lecture quotidienne du Coran",
+          "read_5_minutes": "Lire pendant 5 minutes",
+          "dua_before_iftar": "Dua avant l'Iftar",
+          "start_now": "Commencer",
           "continue_reading": "Reprendre là où vous vous êtes arrêté (page {{page}})"
         }
       },
@@ -1454,6 +1503,13 @@ i18n
           "remaining_tomorrow_fajr": "আগামীকালের ফজর পর্যন্ত বাকি",
           "iftar_approaching": "ইফতারের সময় ঘনিয়ে আসছে!",
           "imsak_approaching": "ইমসাকের সময় ঘনিয়ে আসছে!",
+          "suggestion_now": "এখনকার পরামর্শ",
+          "morning_adhkar": "সকালের আযকার",
+          "evening_adhkar": "সন্ধ্যার আযকার",
+          "daily_quran_reading": "আজকের কুরআন পাঠ",
+          "read_5_minutes": "5 মিনিট পড়ুন",
+          "dua_before_iftar": "ইফতারের আগের দোয়া",
+          "start_now": "এখনই শুরু করুন",
           "continue_reading": "যেখানে থেমেছিলেন সেখান থেকে চালিয়ে যান (পৃষ্ঠা {{page}})"
         }
       },
@@ -1634,6 +1690,13 @@ i18n
           "remaining_tomorrow_fajr": "Осталось до завтрашнего Фаджра",
           "iftar_approaching": "Ифтар приближается!",
           "imsak_approaching": "Имсак приближается!",
+          "suggestion_now": "Рекомендация",
+          "morning_adhkar": "Утренние азкары",
+          "evening_adhkar": "Вечерние азкары",
+          "daily_quran_reading": "Ежедневное чтение Корана",
+          "read_5_minutes": "Читайте 5 минут",
+          "dua_before_iftar": "Дуа перед ифтаром",
+          "start_now": "Начать сейчас",
           "continue_reading": "Продолжить с того места, где остановились (страница {{page}})"
         }
       },
@@ -1814,6 +1877,13 @@ i18n
           "remaining_tomorrow_fajr": "Tiempo restante hasta el Fajr de mañana",
           "iftar_approaching": "¡Se acerca el Iftar!",
           "imsak_approaching": "¡Se acerca el Imsak!",
+          "suggestion_now": "Sugerencia",
+          "morning_adhkar": "Adhkar de la Mañana",
+          "evening_adhkar": "Adhkar de la Noche",
+          "daily_quran_reading": "Lectura diaria del Corán",
+          "read_5_minutes": "Lee durante 5 minutos",
+          "dua_before_iftar": "Dua antes del Iftar",
+          "start_now": "Empezar ahora",
           "continue_reading": "Continuar donde lo dejaste (página {{page}})"
         }
       }

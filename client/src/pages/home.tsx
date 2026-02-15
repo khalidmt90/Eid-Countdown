@@ -639,6 +639,66 @@ ${t('isha')}: ${prayerData.timings.Isha}
               </motion.div>
             )}
 
+            {/* Next Action Recommendation */}
+            {prayerData && (() => {
+              const parseT = (ts: string) => {
+                const [h, m] = ts.split(':').map(Number);
+                const d = new Date(); d.setHours(h, m, 0, 0); return d;
+              };
+              const now = new Date();
+              const fajr = parseT(prayerData.timings.Fajr);
+              const sunrise = parseT(prayerData.timings.Sunrise);
+              const maghrib = parseT(prayerData.timings.Maghrib);
+              const isha = parseT(prayerData.timings.Isha);
+
+              let actionKey = 'daily_quran_reading';
+              let subtitleKey: string | null = 'read_5_minutes';
+              let actionTab = 'khatm';
+              let icon = '📖';
+
+              if (isRamadan && now < maghrib) {
+                actionKey = 'dua_before_iftar';
+                subtitleKey = null;
+                actionTab = 'dua';
+                icon = '🤲';
+              } else if (now >= fajr && now < sunrise) {
+                actionKey = 'morning_adhkar';
+                subtitleKey = null;
+                actionTab = 'dua';
+                icon = '🌅';
+              } else if (now >= maghrib || now >= isha) {
+                actionKey = 'evening_adhkar';
+                subtitleKey = null;
+                actionTab = 'dua';
+                icon = '🌙';
+              }
+
+              return (
+                <div className="w-full max-w-4xl mx-auto" style={{ marginTop: '12px' }}>
+                  <Card className="border border-border/60 overflow-hidden" style={{ borderRadius: '16px' }}>
+                    <CardContent className="p-4">
+                      <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">{t('suggestion_now')}</p>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-2xl">{icon}</span>
+                        <div>
+                          <p className="text-base font-black text-foreground">{t(actionKey)}</p>
+                          {subtitleKey && <p className="text-sm text-muted-foreground">{t(subtitleKey)}</p>}
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleTabChange(actionTab)}
+                        className="w-full rounded-xl font-bold"
+                        style={{ height: '46px' }}
+                        data-testid="button-next-action"
+                      >
+                        {t('start_now')}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
+
             {/* Prayer Times Grid - Compact */}
             <div className="w-full max-w-4xl mx-auto">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
