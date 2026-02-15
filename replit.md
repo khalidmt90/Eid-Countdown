@@ -71,9 +71,17 @@ Preferred communication style: Simple, everyday language.
 - **Icons**: Lucide React icon library
 - **Fonts**: Google Fonts (Cairo for modern text, Amiri for classical Arabic)
 
+### Backend API (Mobile-Ready)
+- **Response Format**: Standardized `{ data: ... }` for success, `{ error: { code, message } }` for errors
+- **Endpoints**: `/api/health`, `/api/next-prayer`, `/api/prayer-times`
+- **Validation**: Input validation for coordinates, dates, language; 404 catch-all for unknown endpoints
+- **CORS**: Enabled for all origins (development mode)
+- **Error Handling**: Safe error responses with no stack trace leaking
+- **Documentation**: See `MOBILE_HANDOFF.md` for full API reference
+
 ### APIs and Services
-- **Prayer Times API**: Aladhan API (external) for accurate prayer time calculations
-- **Geolocation**: Browser Geolocation API for user location
+- **Prayer Times API**: Adhan library (local) for accurate prayer time calculations
+- **Geolocation**: Browser Geolocation API for user location, IP fallback, Riyadh default
 - **Device Orientation**: DeviceOrientationEvent API for Qiblah compass
 
 ### Database
