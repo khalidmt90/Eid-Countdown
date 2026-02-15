@@ -394,8 +394,9 @@ export function QuranKhatm() {
   }, [searchQuery, searchLocalQuran, allJuzLoaded]);
 
   useEffect(() => {
-    setJuzData(null);
-    setCurrentPage(0);
+    if (pendingSurahJump === null) {
+      setCurrentPage(0);
+    }
     fetchJuz(selectedDay);
   }, [selectedDay, fetchJuz]);
 
@@ -408,10 +409,8 @@ export function QuranKhatm() {
         if (ayahIndex >= 0) {
           const targetPage = Math.floor(ayahIndex / AYAHS_PER_PAGE);
           setCurrentPage(targetPage);
-        } else {
-          setCurrentPage(0);
+          setPendingSurahJump(null);
         }
-        setPendingSurahJump(null);
       } else {
         const saved = getReadPosition(selectedDay);
         if (saved && saved.page > 0) {
