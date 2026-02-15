@@ -9,46 +9,53 @@ export interface EidDate {
   name: "Ramadan" | "Eid al-Fitr" | "Eid al-Adha";
   nameKey: "ramadan" | "eid_al_fitr" | "eid_al_adha";
   date: string; // ISO format YYYY-MM-DD
+  hijriDate: string;
 }
 
 export const ISLAMIC_EVENTS: EidDate[] = [
-  // 2025
+  // 2025 — 1446 AH
   {
     year: 2025,
     name: "Ramadan",
     nameKey: "ramadan",
     date: "2025-02-28",
+    hijriDate: "١ رمضان ١٤٤٦هـ",
   },
   {
     year: 2025,
     name: "Eid al-Fitr",
     nameKey: "eid_al_fitr",
     date: "2025-03-30",
+    hijriDate: "١ شوال ١٤٤٦هـ",
   },
   {
     year: 2025,
     name: "Eid al-Adha",
     nameKey: "eid_al_adha",
     date: "2025-06-06",
+    hijriDate: "١٠ ذو الحجة ١٤٤٦هـ",
   },
-  // 2026
+  // 2026 — 1447 AH
   {
     year: 2026,
     name: "Ramadan",
     nameKey: "ramadan",
     date: "2026-02-17",
+    hijriDate: "١ رمضان ١٤٤٧هـ",
   },
   {
     year: 2026,
     name: "Eid al-Fitr",
     nameKey: "eid_al_fitr",
     date: "2026-03-20",
+    hijriDate: "١ شوال ١٤٤٧هـ",
   },
   {
     year: 2026,
     name: "Eid al-Adha",
     nameKey: "eid_al_adha",
     date: "2026-05-27",
+    hijriDate: "١٠ ذو الحجة ١٤٤٧هـ",
   },
 ];
 
@@ -88,38 +95,3 @@ export function formatDate(dateStr: string, locale: string = 'ar-SA'): string {
   }).format(date);
 }
 
-export function formatHijriDate(dateStr: string, locale: string = 'ar-SA'): string {
-  const date = parseLocalDate(dateStr);
-  try {
-    return new Intl.DateTimeFormat(locale, {
-      calendar: 'islamic-umalqura',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(date);
-  } catch {
-    return '';
-  }
-}
-
-export function getTodayFormatted(locale: string = 'ar-SA'): { gregorian: string; hijri: string } {
-  const now = new Date();
-  const gregorian = new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(now);
-
-  let hijri = '';
-  try {
-    hijri = new Intl.DateTimeFormat(locale, {
-      calendar: 'islamic-umalqura',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(now);
-  } catch {}
-
-  return { gregorian, hijri };
-}

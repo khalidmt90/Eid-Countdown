@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import { getNextEvent, getFollowingEvent, formatDate, formatHijriDate, type EidDate } from "@/lib/eid-dates";
+import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
@@ -477,7 +477,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                  <div className="text-center md:text-start">
                    <h4 className="text-lg font-black text-foreground">{t(nextEvent.nameKey)}</h4>
                    <p className="text-sm text-muted-foreground font-medium">{formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
-                   <p className="text-xs text-primary/70 font-bold mt-0.5">{formatHijriDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
+                   <p className="text-xs text-primary/70 font-bold mt-0.5">{nextEvent.hijriDate}</p>
                  </div>
                  
                  <div className="w-full md:w-auto">
