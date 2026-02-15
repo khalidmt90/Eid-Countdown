@@ -25,7 +25,9 @@ export function CountdownTimer({ targetDate, className, onComplete }: CountdownT
   useEffect(() => {
     setIsMounted(true);
     const calculateTimeLeft = () => {
-      const difference = +new Date(targetDate) - +new Date();
+      const [y, m, d] = targetDate.split('-').map(Number);
+      const target = new Date(y, m - 1, d);
+      const difference = +target - +new Date();
       
       if (difference > 0) {
         return {
