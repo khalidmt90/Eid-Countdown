@@ -256,6 +256,7 @@ export function QuranKhatm() {
   const [showDaySheet, setShowDaySheet] = useState(false);
   const [showFontSheet, setShowFontSheet] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pendingSurahJump, setPendingSurahJump] = useState<number | null>(null);
   const [focusMode, setFocusMode] = useState(() => {
     return localStorage.getItem(LS_KEY_FOCUS) === "true";
   });
@@ -485,14 +486,27 @@ export function QuranKhatm() {
 
   useEffect(() => {
     if (juzData) {
-      const saved = getReadPosition(selectedDay);
-      if (saved && saved.page > 0) {
-        setCurrentPage(saved.page);
+      if (pendingSurahJump !== null) {
+        const ayahIndex = juzData.ayahs.findIndex(
+          (a) => a.surah.number === pendingSurahJump
+        );
+        if (ayahIndex >= 0) {
+          const targetPage = Math.floor(ayahIndex / AYAHS_PER_PAGE);
+          setCurrentPage(targetPage);
+        } else {
+          setCurrentPage(0);
+        }
+        setPendingSurahJump(null);
       } else {
-        setCurrentPage(0);
+        const saved = getReadPosition(selectedDay);
+        if (saved && saved.page > 0) {
+          setCurrentPage(saved.page);
+        } else {
+          setCurrentPage(0);
+        }
       }
     }
-  }, [juzData, selectedDay]);
+  }, [juzData, selectedDay, pendingSurahJump]);
 
   useEffect(() => {
     if (juzData && currentPage > 0) {
@@ -1198,7 +1212,17 @@ export function QuranKhatm() {
                       const juz = getJuzForAyah(globalAyah);
                       setShowSurahSelector(false);
                       setSurahSearchQuery("");
-                      selectDay(juz);
+                      if (juz === selectedDay && juzData) {
+                        const ayahIndex = juzData.ayahs.findIndex(
+                          (a) => a.surah.number === num
+                        );
+                        if (ayahIndex >= 0) {
+                          setCurrentPage(Math.floor(ayahIndex / AYAHS_PER_PAGE));
+                        }
+                      } else {
+                        setPendingSurahJump(num);
+                        selectDay(juz);
+                      }
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/60 active:bg-muted transition-colors text-right"
