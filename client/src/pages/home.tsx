@@ -145,6 +145,7 @@ export default function Home() {
     timeRemaining,
     dailyAyah,
     isRamadan,
+    dayState,
     handleCountryChange,
     handleCityChange,
     handleUseCurrentLocation,
@@ -547,25 +548,42 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     </div>
 
                     {(() => {
-                      const isPrayerNow = timeRemaining <= 0 || (hours === 0 && minutes < 1);
-                      return isPrayerNow ? (
-                        <div className="flex flex-col items-center gap-3 py-4">
-                          <div className="text-4xl">🕌</div>
-                          <div className="text-2xl font-black text-primary animate-pulse">
-                            {t('prayer_time_now')}
+                      const isPrayerNow = dayState.isPrayerNow || (timeRemaining <= 0 || (hours === 0 && minutes < 1));
+
+                      if (isPrayerNow && !isRamadan) {
+                        return (
+                          <div className="flex flex-col items-center gap-3 py-4">
+                            <div className="text-4xl">🕌</div>
+                            <div className="text-2xl font-black text-primary animate-pulse">
+                              {t('prayer_time_now')}
+                            </div>
+                            <div className="text-lg font-bold text-muted-foreground">
+                              {t(nextPrayer.name.toLowerCase())}
+                            </div>
                           </div>
-                          <div className="text-lg font-bold text-muted-foreground">
-                            {t(nextPrayer.name.toLowerCase())}
-                          </div>
-                        </div>
-                      ) : (
+                        );
+                      }
+
+                      const stateLabel = (() => {
+                        if (dayState.labelKey === 'after_prayer' && dayState.labelParams) {
+                          return t('after_prayer', { prayer: t(dayState.labelParams.prayer) });
+                        }
+                        if (dayState.labelKey === 'remaining_to') {
+                          return `${t('remaining_to')} ${t(nextPrayer.name.toLowerCase())}`;
+                        }
+                        return t(dayState.labelKey);
+                      })();
+
+                      return (
                         <>
-                          <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
-                            {isRamadan && nextPrayer.name === "__iftar__"
-                              ? t('time_until_iftar')
-                              : isRamadan && nextPrayer.name === "__imsak__"
-                              ? t('time_until_imsak')
-                              : `${t('remaining_to')} ${t(nextPrayer.name.toLowerCase())}`}
+                          {dayState.isApproaching && dayState.approachingKey && (
+                            <div className="text-base font-black text-amber-400 animate-pulse mb-1" style={{ fontSize: '16px' }}>
+                              🌙 {t(dayState.approachingKey)}
+                            </div>
+                          )}
+
+                          <span className="font-bold text-center mb-2" style={{ fontSize: '16px', color: '#9FB3C8' }}>
+                            {stateLabel}
                           </span>
                           
                           <div className="flex items-baseline justify-center gap-1 md:gap-2 mb-4" dir="ltr">

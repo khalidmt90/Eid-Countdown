@@ -1,0 +1,94 @@
+Fix mobile header tabs so users can swipe horizontally, and add a smart indicator (arrow/fade) that appears ONLY when there are hidden tabs off-screen.
+
+Problem:
+- On iPhone, the navigation pills do not swipe left/right.
+- Users don’t realize there are more tabs.
+- We need an indicator arrow that is NOT fixed; it should appear only when more tabs exist on that side.
+
+Do NOT redesign the header. Keep same theme and pills.
+
+====================================================
+1) MAKE TAB ROW ACTUALLY SCROLLABLE ON MOBILE
+====================================================
+
+In the nav container element (the row that holds the tabs/pills):
+- display: flex
+- flex-wrap: nowrap
+- overflow-x: auto
+- overflow-y: hidden
+- -webkit-overflow-scrolling: touch
+- scroll-behavior: smooth
+- touch-action: pan-x   (IMPORTANT)
+- white-space: nowrap
+
+Also:
+- ensure no parent wrapper has overflow:hidden that clips/blocks scrolling
+- ensure the nav container is not inside an element capturing touch (e.g. a drag/swipe handler)
+
+Hide scrollbar:
+- scrollbar-width: none
+- ::-webkit-scrollbar { display: none; }
+
+Add padding-inline: 12px so first/last tab aren’t cut.
+
+====================================================
+2) TAB SIZE STABILITY (DON’T SHRINK)
+====================================================
+
+Each tab/pill:
+- flex: 0 0 auto
+- min-width: 92px
+- height: 56–60px
+- font-size: 17px
+- padding-inline: 18–22px
+- border-radius: 14px
+
+Active and inactive tabs must have same dimensions (no jump).
+
+====================================================
+3) AUTO-SCROLL ACTIVE TAB INTO VIEW
+====================================================
+
+On route change / tab click:
+- scroll the active tab into view:
+activeEl.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" })
+
+Fallback (older Safari):
+nav.scrollTo({
+ left: activeEl.offsetLeft - nav.clientWidth/2 + activeEl.clientWidth/2,
+ behavior:"smooth"
+})
+
+====================================================
+4) SMART INDICATOR: ARROWS + EDGE FADE (NOT FIXED)
+====================================================
+
+Add left/right overlay indicators on the tab row:
+
+- Right indicator appears ONLY if there is content hidden to the right:
+  nav.scrollWidth > nav.clientWidth AND nav.scrollLeft < (nav.scrollWidth - nav.clientWidth - 2)
+
+- Left indicator appears ONLY if nav.scrollLeft > 2
+
+Indicators:
+A) A subtle gradient fade at edges (preferred)
+B) A small arrow icon (chevron) that sits over the fade
+
+Rules:
+- pointer-events: none (so it doesn’t block swiping)
+- fade/arrow hides automatically when user reaches the end
+- update visibility on:
+  - initial render
+  - scroll event
+  - resize
+  - route change
+
+====================================================
+5) DELIVERABLE
+====================================================
+
+- Update Header nav component with:
+  - ref to nav container
+  - scroll listener to update left/right indicator visibility
+  - auto-scroll on active tab change
+- Provide the exact code changes (JS/TS + CSS/Tailwind)

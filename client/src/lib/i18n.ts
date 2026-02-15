@@ -189,6 +189,11 @@ i18n
           "search_results_with_count": "{{count}} results",
           "search_loading_more": "{{count}} results (loading more...)",
           "loading_quran": "Loading Quran data...",
+          "after_prayer": "After {{prayer}}",
+          "prayers_ended": "Today's prayers are done",
+          "remaining_tomorrow_fajr": "Remaining until tomorrow's Fajr",
+          "iftar_approaching": "Iftar is approaching!",
+          "imsak_approaching": "Imsak is approaching!",
           "continue_reading": "Continue where you stopped (page {{page}})"
         }
       },
@@ -364,6 +369,11 @@ i18n
           "search_results_with_count": "{{count}} نتيجة",
           "search_loading_more": "{{count}} نتيجة (جارٍ تحميل بقية الأجزاء...)",
           "loading_quran": "جارٍ تحميل الأجزاء...",
+          "after_prayer": "بعد {{prayer}}",
+          "prayers_ended": "انتهت صلوات اليوم",
+          "remaining_tomorrow_fajr": "المتبقي على فجر الغد",
+          "iftar_approaching": "اقترب موعد الإفطار!",
+          "imsak_approaching": "اقترب موعد الإمساك!",
           "continue_reading": "تابع من حيث توقفت (صفحة {{page}})"
         }
       },
@@ -539,6 +549,11 @@ i18n
           "search_results_with_count": "{{count}} نتائج",
           "search_loading_more": "{{count}} نتائج (مزید لوڈ ہو رہے ہیں...)",
           "loading_quran": "قرآن کا ڈیٹا لوڈ ہو رہا ہے...",
+          "after_prayer": "{{prayer}} کے بعد",
+          "prayers_ended": "آج کی نمازیں مکمل ہو گئیں",
+          "remaining_tomorrow_fajr": "کل کی فجر تک باقی",
+          "iftar_approaching": "افطار کا وقت قریب ہے!",
+          "imsak_approaching": "امساک کا وقت قریب ہے!",
           "continue_reading": "جہاں رکے تھے وہاں سے جاری رکھیں (صفحہ {{page}})"
         }
       },
@@ -714,6 +729,11 @@ i18n
           "search_results_with_count": "{{count}} نتیجه",
           "search_loading_more": "{{count}} نتیجه (در حال بارگذاری بیشتر...)",
           "loading_quran": "در حال بارگذاری داده‌های قرآن...",
+          "after_prayer": "بعد از {{prayer}}",
+          "prayers_ended": "نمازهای امروز تمام شد",
+          "remaining_tomorrow_fajr": "مانده تا فجر فردا",
+          "iftar_approaching": "زمان افطار نزدیک است!",
+          "imsak_approaching": "زمان امساک نزدیک است!",
           "continue_reading": "ادامه از جایی که متوقف شدید (صفحه {{page}})"
         }
       },
@@ -889,6 +909,11 @@ i18n
           "search_results_with_count": "{{count}} hasil",
           "search_loading_more": "{{count}} hasil (memuat lagi...)",
           "loading_quran": "Memuat data Al-Quran...",
+          "after_prayer": "Setelah {{prayer}}",
+          "prayers_ended": "Sholat hari ini sudah selesai",
+          "remaining_tomorrow_fajr": "Sisa waktu hingga Subuh besok",
+          "iftar_approaching": "Waktu berbuka sudah dekat!",
+          "imsak_approaching": "Waktu imsak sudah dekat!",
           "continue_reading": "Lanjutkan dari halaman terakhir (halaman {{page}})"
         }
       },
@@ -1064,6 +1089,11 @@ i18n
           "search_results_with_count": "{{count}} sonuç",
           "search_loading_more": "{{count}} sonuç (daha fazlası yükleniyor...)",
           "loading_quran": "Kur'an verileri yükleniyor...",
+          "after_prayer": "{{prayer}} Sonrası",
+          "prayers_ended": "Bugünkü namazlar tamamlandı",
+          "remaining_tomorrow_fajr": "Yarının İmsak'ına kalan",
+          "iftar_approaching": "İftar vakti yaklaşıyor!",
+          "imsak_approaching": "İmsak vakti yaklaşıyor!",
           "continue_reading": "Kaldığınız yerden devam edin (sayfa {{page}})"
         }
       },
@@ -1239,6 +1269,11 @@ i18n
           "search_results_with_count": "{{count}} résultats",
           "search_loading_more": "{{count}} résultats (chargement en cours...)",
           "loading_quran": "Chargement des données du Coran...",
+          "after_prayer": "Après {{prayer}}",
+          "prayers_ended": "Les prières d'aujourd'hui sont terminées",
+          "remaining_tomorrow_fajr": "Temps restant jusqu'au Fajr de demain",
+          "iftar_approaching": "L'Iftar approche !",
+          "imsak_approaching": "L'Imsak approche !",
           "continue_reading": "Reprendre là où vous vous êtes arrêté (page {{page}})"
         }
       },
@@ -1414,6 +1449,11 @@ i18n
           "search_results_with_count": "{{count}} ফলাফল",
           "search_loading_more": "{{count}} ফলাফল (আরো লোড হচ্ছে...)",
           "loading_quran": "কুরআনের তথ্য লোড হচ্ছে...",
+          "after_prayer": "{{prayer}} এর পরে",
+          "prayers_ended": "আজকের নামাজ শেষ হয়েছে",
+          "remaining_tomorrow_fajr": "আগামীকালের ফজর পর্যন্ত বাকি",
+          "iftar_approaching": "ইফতারের সময় ঘনিয়ে আসছে!",
+          "imsak_approaching": "ইমসাকের সময় ঘনিয়ে আসছে!",
           "continue_reading": "যেখানে থেমেছিলেন সেখান থেকে চালিয়ে যান (পৃষ্ঠা {{page}})"
         }
       },
@@ -1589,6 +1629,11 @@ i18n
           "search_results_with_count": "{{count}} результатов",
           "search_loading_more": "{{count}} результатов (загрузка...)",
           "loading_quran": "Загрузка данных Корана...",
+          "after_prayer": "После {{prayer}}",
+          "prayers_ended": "Сегодняшние молитвы завершены",
+          "remaining_tomorrow_fajr": "Осталось до завтрашнего Фаджра",
+          "iftar_approaching": "Ифтар приближается!",
+          "imsak_approaching": "Имсак приближается!",
           "continue_reading": "Продолжить с того места, где остановились (страница {{page}})"
         }
       },
@@ -1764,6 +1809,11 @@ i18n
           "search_results_with_count": "{{count}} resultados",
           "search_loading_more": "{{count}} resultados (cargando más...)",
           "loading_quran": "Cargando datos del Corán...",
+          "after_prayer": "Después de {{prayer}}",
+          "prayers_ended": "Las oraciones de hoy han terminado",
+          "remaining_tomorrow_fajr": "Tiempo restante hasta el Fajr de mañana",
+          "iftar_approaching": "¡Se acerca el Iftar!",
+          "imsak_approaching": "¡Se acerca el Imsak!",
           "continue_reading": "Continuar donde lo dejaste (página {{page}})"
         }
       }

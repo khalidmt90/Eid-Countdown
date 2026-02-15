@@ -61,6 +61,14 @@ export function usePrayerTimes() {
   const [nextPrayer, setNextPrayer] = useState<{name: string, time: Date} | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [dailyAyah] = useState(getDailyAyah());
+  const [dayState, setDayState] = useState<{
+    labelKey: string;
+    labelParams?: Record<string, string>;
+    isPrayerNow: boolean;
+    isApproaching: boolean;
+    approachingKey?: string;
+    isTomorrowFajr: boolean;
+  }>({ labelKey: '', isPrayerNow: false, isApproaching: false, isTomorrowFajr: false });
 
   const handleUseCurrentLocation = () => {
     setLoading(true);
@@ -130,9 +138,11 @@ export function usePrayerTimes() {
   const hijriMonth = prayerData?.date?.hijri?.month;
   const isRamadan = hijriMonth?.en === "Ramadan" || hijriMonth?.ar === "رمضان";
 
-  // Calculate Next Prayer Countdown (context-aware for Ramadan)
+  // Calculate Next Prayer Countdown + Day State (context-aware for Ramadan)
   useEffect(() => {
     if (!prayerData) return;
+
+    const NEAR_THRESHOLD_MS = 10 * 60 * 1000;
 
     const parseTime = (timeStr: string): Date => {
       const [hours, minutes] = timeStr.split(':').map(Number);
@@ -141,23 +151,41 @@ export function usePrayerTimes() {
       return date;
     };
 
-    const interval = setInterval(() => {
+    const computeState = () => {
       const now = new Date();
       const timings = prayerData.timings;
 
       if (isRamadan) {
         const maghribTime = parseTime(timings.Maghrib);
+        const fajrTime = parseTime(timings.Fajr);
+
         if (now < maghribTime) {
+          const remaining = maghribTime.getTime() - now.getTime();
           setNextPrayer({ name: "__iftar__", time: maghribTime });
-          setTimeRemaining(maghribTime.getTime() - now.getTime());
+          setTimeRemaining(remaining);
+          setDayState({
+            labelKey: 'time_until_iftar',
+            isPrayerNow: remaining <= 0,
+            isApproaching: remaining > 0 && remaining <= NEAR_THRESHOLD_MS,
+            approachingKey: remaining > 0 && remaining <= NEAR_THRESHOLD_MS ? 'iftar_approaching' : undefined,
+            isTomorrowFajr: false,
+          });
         } else {
           const fajrTomorrow = parseTime(timings.Fajr);
           fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
+          const remaining = fajrTomorrow.getTime() - now.getTime();
           setNextPrayer({ name: "__imsak__", time: fajrTomorrow });
-          setTimeRemaining(fajrTomorrow.getTime() - now.getTime());
+          setTimeRemaining(remaining);
+          setDayState({
+            labelKey: 'time_until_imsak',
+            isPrayerNow: remaining <= 0,
+            isApproaching: remaining > 0 && remaining <= NEAR_THRESHOLD_MS,
+            approachingKey: remaining > 0 && remaining <= NEAR_THRESHOLD_MS ? 'imsak_approaching' : undefined,
+            isTomorrowFajr: true,
+          });
         }
       } else {
-        const prayers = [
+        const prayerList = [
           { name: "Fajr", time: parseTime(timings.Fajr) },
           { name: "Sunrise", time: parseTime(timings.Sunrise) },
           { name: "Dhuhr", time: parseTime(timings.Dhuhr) },
@@ -166,19 +194,53 @@ export function usePrayerTimes() {
           { name: "Isha", time: parseTime(timings.Isha) },
         ];
 
-        let next = prayers.find(p => p.time > now);
-        
+        const mainPrayers = prayerList.filter(p => p.name !== "Sunrise");
+        const next = prayerList.find(p => p.time > now);
+
         if (!next) {
           const fajrTomorrow = parseTime(timings.Fajr);
           fajrTomorrow.setDate(fajrTomorrow.getDate() + 1);
-          next = { name: "Fajr", time: fajrTomorrow };
+          const remaining = fajrTomorrow.getTime() - now.getTime();
+          setNextPrayer({ name: "Fajr", time: fajrTomorrow });
+          setTimeRemaining(remaining);
+          setDayState({
+            labelKey: 'remaining_tomorrow_fajr',
+            isPrayerNow: false,
+            isApproaching: false,
+            isTomorrowFajr: true,
+          });
+        } else {
+          const remaining = next.time.getTime() - now.getTime();
+          const isPrayerNow = remaining <= 60000 && remaining >= 0;
+          const prevMainPrayer = [...mainPrayers].reverse().find(p => p.time <= now);
+
+          let labelKey: string;
+          let labelParams: Record<string, string> | undefined;
+
+          if (isPrayerNow && next.name !== "Sunrise") {
+            labelKey = 'prayer_time_now';
+          } else if (prevMainPrayer) {
+            labelKey = 'after_prayer';
+            labelParams = { prayer: prevMainPrayer.name.toLowerCase() };
+          } else {
+            labelKey = 'remaining_to';
+          }
+
+          setNextPrayer(next);
+          setTimeRemaining(remaining);
+          setDayState({
+            labelKey,
+            labelParams,
+            isPrayerNow,
+            isApproaching: false,
+            isTomorrowFajr: false,
+          });
         }
-
-        setNextPrayer(next);
-        setTimeRemaining(next.time.getTime() - now.getTime());
       }
-    }, 1000);
+    };
 
+    computeState();
+    const interval = setInterval(computeState, 1000);
     return () => clearInterval(interval);
   }, [prayerData, isRamadan]);
 
@@ -220,6 +282,7 @@ export function usePrayerTimes() {
     timeRemaining,
     dailyAyah,
     isRamadan,
+    dayState,
     handleCountryChange,
     handleCityChange,
     handleUseCurrentLocation,
