@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
+import { getNextEvent, getFollowingEvent, formatDate, formatHijriDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { DailyContentView } from "@/components/daily-content-view";
 import { motion } from "framer-motion";
@@ -299,9 +299,14 @@ ${t('isha')}: ${prayerData.timings.Isha}
             </div>
 
             {prayerData ? (
-              <span className="text-xs font-bold text-muted-foreground/80 leading-tight">
-                {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
-              </span>
+              <div className="text-end leading-tight">
+                <span className="text-xs font-bold text-muted-foreground/80 block">
+                  {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
+                </span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 block">
+                  {new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date())}
+                </span>
+              </div>
             ) : (
               <div className="w-9" />
             )}
@@ -472,6 +477,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                  <div className="text-center md:text-start">
                    <h4 className="text-lg font-black text-foreground">{t(nextEvent.nameKey)}</h4>
                    <p className="text-sm text-muted-foreground font-medium">{formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
+                   <p className="text-xs text-primary/70 font-bold mt-0.5">{formatHijriDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
                  </div>
                  
                  <div className="w-full md:w-auto">

@@ -87,3 +87,39 @@ export function formatDate(dateStr: string, locale: string = 'ar-SA'): string {
     day: 'numeric' 
   }).format(date);
 }
+
+export function formatHijriDate(dateStr: string, locale: string = 'ar-SA'): string {
+  const date = parseLocalDate(dateStr);
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      calendar: 'islamic-umalqura',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date);
+  } catch {
+    return '';
+  }
+}
+
+export function getTodayFormatted(locale: string = 'ar-SA'): { gregorian: string; hijri: string } {
+  const now = new Date();
+  const gregorian = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(now);
+
+  let hijri = '';
+  try {
+    hijri = new Intl.DateTimeFormat(locale, {
+      calendar: 'islamic-umalqura',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(now);
+  } catch {}
+
+  return { gregorian, hijri };
+}
