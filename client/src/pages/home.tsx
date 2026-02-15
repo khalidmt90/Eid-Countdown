@@ -163,20 +163,45 @@ export default function Home() {
   }, [locationSelected]);
 
   const pillContainerRef = useRef<HTMLDivElement>(null);
+  const [showFadeLeft, setShowFadeLeft] = useState(false);
+  const [showFadeRight, setShowFadeRight] = useState(true);
+
+  const updateFades = useCallback(() => {
+    const el = pillContainerRef.current;
+    if (!el) return;
+    const isRtl = i18n.dir() === 'rtl';
+    if (isRtl) {
+      setShowFadeRight(el.scrollLeft < -1);
+      setShowFadeLeft(el.scrollLeft > -(el.scrollWidth - el.clientWidth - 1));
+    } else {
+      setShowFadeLeft(el.scrollLeft > 1);
+      setShowFadeRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+    }
+  }, [i18n]);
+
+  useEffect(() => {
+    const el = pillContainerRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateFades, { passive: true });
+    updateFades();
+    return () => el.removeEventListener('scroll', updateFades);
+  }, [updateFades]);
 
   useEffect(() => {
     if (!pillContainerRef.current) return;
     const container = pillContainerRef.current;
-    const buttons = Array.from(container.querySelectorAll('button'));
-    const active = buttons.find(btn => {
-      const tabMap: Record<string, string> = { home: 'tab-prayer-times', qiblah: 'tab-qiblah', khatm: 'tab-quran-khatm', dua: 'tab-dua', daily: 'tab-daily-content' };
-      return btn.getAttribute('data-testid') === tabMap[activeTab];
-    });
+    const tabMap: Record<string, string> = { home: 'tab-prayer-times', qiblah: 'tab-qiblah', khatm: 'tab-quran-khatm', dua: 'tab-dua', daily: 'tab-daily-content' };
+    const active = container.querySelector(`[data-testid="${tabMap[activeTab]}"]`) as HTMLElement | null;
     if (active) {
-      const scrollLeft = active.offsetLeft - container.offsetWidth / 2 + active.offsetWidth / 2;
-      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      try {
+        active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } catch {
+        const scrollLeft = active.offsetLeft - container.offsetWidth / 2 + active.offsetWidth / 2;
+        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      }
     }
-  }, [activeTab]);
+    requestAnimationFrame(updateFades);
+  }, [activeTab, updateFades]);
 
   const [timeFormat, setTimeFormat] = useState<'12' | '24'>('12');
   const [shareHidden, setShareHidden] = useState(false);
@@ -379,14 +404,47 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </div>
 
           {/* Layer 2: Navigation Pills */}
-          <nav className="px-3" style={{ marginTop: '8px', marginBottom: '12px' }}>
+          <nav className="relative" style={{ marginTop: '8px', marginBottom: '12px' }}>
+            <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
+            {showFadeLeft && (
+              <div
+                className="absolute top-0 bottom-0 z-10 pointer-events-none"
+                style={{
+                  ...(i18n.dir() === 'rtl' ? { right: 0 } : { left: 0 }),
+                  width: '28px',
+                  background: i18n.dir() === 'rtl'
+                    ? 'linear-gradient(to left, transparent, #0B1324)'
+                    : 'linear-gradient(to right, #0B1324, transparent)',
+                }}
+              />
+            )}
+            {showFadeRight && (
+              <div
+                className="absolute top-0 bottom-0 z-10 pointer-events-none"
+                style={{
+                  ...(i18n.dir() === 'rtl' ? { left: 0 } : { right: 0 }),
+                  width: '28px',
+                  background: i18n.dir() === 'rtl'
+                    ? 'linear-gradient(to right, transparent, #0B1324)'
+                    : 'linear-gradient(to left, transparent, #0B1324)',
+                }}
+              />
+            )}
             <div
               ref={pillContainerRef}
-              className="flex items-center gap-2.5 overflow-x-auto max-w-lg mx-auto justify-center"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', height: '60px', whiteSpace: 'nowrap' }}
+              className="flex items-center overflow-x-auto overflow-y-hidden"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch',
+                height: '60px',
+                whiteSpace: 'nowrap',
+                gap: '10px',
+                paddingInline: '12px',
+                scrollSnapType: 'x proximity',
+              }}
               data-testid="tabs-nav"
             >
-              <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
               {([
                 { value: 'home', i18nKey: 'nav_prayer_times', testId: 'tab-prayer-times' },
                 { value: 'qiblah', i18nKey: 'nav_qiblah', testId: 'tab-qiblah' },
@@ -401,13 +459,15 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     onClick={() => handleTabChange(tab.value)}
                     className="whitespace-nowrap transition-all duration-200 active:scale-95"
                     style={{
-                      minWidth: '90px',
+                      minWidth: '92px',
                       flexShrink: 0,
                       height: '56px',
-                      padding: '0 18px',
+                      padding: '0 20px',
                       borderRadius: '14px',
                       fontSize: '17px',
                       fontWeight: 700,
+                      lineHeight: 'normal',
+                      scrollSnapAlign: 'center',
                       ...(isActive
                         ? { background: 'linear-gradient(135deg, #0D6EFD, #1E88FF)', color: '#FFFFFF', border: '1px solid transparent' }
                         : { background: '#101A2E', color: '#9FB3C8', border: '1px solid rgba(42, 60, 99, 0.55)' }),
