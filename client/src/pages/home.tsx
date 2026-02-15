@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
-import { StoriesView } from "@/components/stories-view";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronDown, ChevronUp, Sunrise, Sun, Sunset, Share2, X } from "lucide-react";
@@ -25,7 +24,6 @@ const ROUTE_TO_TAB: Record<string, string> = {
   "/": "home",
   "/prayer-times": "home",
   "/qiblah": "qiblah",
-  "/daily-content": "daily",
   "/quran-khatm": "khatm",
   "/dua": "dua",
 };
@@ -33,7 +31,6 @@ const ROUTE_TO_TAB: Record<string, string> = {
 const TAB_TO_ROUTE: Record<string, string> = {
   home: "/prayer-times",
   qiblah: "/qiblah",
-  daily: "/daily-content",
   khatm: "/quran-khatm",
   dua: "/dua",
 };
@@ -57,12 +54,6 @@ const PAGE_SEO: Record<string, PageSeo> = {
     titleAr: "اتجاه القبلة - بوصلة دقيقة لتحديد اتجاه الكعبة",
     description: "Find the accurate Qiblah direction from your location using GPS and compass. Point towards Mecca for prayer easily.",
     descriptionAr: "حدد اتجاه القبلة الدقيق من موقعك باستخدام GPS والبوصلة. توجه نحو مكة المكرمة للصلاة بسهولة.",
-  },
-  daily: {
-    title: "Daily Islamic Content - Quran Verses, Hadiths & Prophet Stories",
-    titleAr: "المحتوى الإسلامي اليومي - آيات قرآنية وأحاديث وقصص الأنبياء",
-    description: "Read daily Quran verses with tafsir, authentic Hadiths from Sahih Bukhari and Muslim, and inspiring Prophet stories from reliable sources.",
-    descriptionAr: "اقرأ آيات قرآنية يومية مع التفسير، وأحاديث صحيحة من البخاري ومسلم، وقصص ملهمة من سيرة الأنبياء من مصادر موثوقة.",
   },
   khatm: {
     title: "Quran Khatm Tracker - Complete Quran Reading in Ramadan",
@@ -197,7 +188,7 @@ export default function Home() {
   useEffect(() => {
     if (!pillContainerRef.current) return;
     const container = pillContainerRef.current;
-    const tabMap: Record<string, string> = { home: 'tab-prayer-times', qiblah: 'tab-qiblah', khatm: 'tab-quran-khatm', dua: 'tab-dua', daily: 'tab-daily-content' };
+    const tabMap: Record<string, string> = { home: 'tab-prayer-times', qiblah: 'tab-qiblah', khatm: 'tab-quran-khatm', dua: 'tab-dua' };
     const active = container.querySelector(`[data-testid="${tabMap[activeTab]}"]`) as HTMLElement | null;
     if (active) {
       try {
@@ -454,7 +445,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 { value: 'qiblah', i18nKey: 'nav_qiblah', testId: 'tab-qiblah' },
                 { value: 'khatm', i18nKey: 'nav_quran', testId: 'tab-quran-khatm' },
                 { value: 'dua', i18nKey: 'nav_duas', testId: 'tab-dua' },
-                { value: 'daily', i18nKey: 'nav_stories', testId: 'tab-daily-content' },
               ] as const).map((tab) => {
                 const isActive = activeTab === tab.value;
                 return (
@@ -495,7 +485,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
             {activeTab === 'qiblah' && t('page_qiblah')}
             {activeTab === 'khatm' && t('page_quran')}
             {activeTab === 'dua' && t('page_duas')}
-            {activeTab === 'daily' && t('page_stories')}
           </h2>
         </div>
 
@@ -849,7 +838,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
                   { label: t('holy_quran'), tab: 'khatm', icon: '📖', color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
                   { label: t('nav_duas'), tab: 'dua', icon: '🤲', color: 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400' },
                   { label: t('nav_qiblah'), tab: 'qiblah', icon: '🧭', color: 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400' },
-                  { label: t('nav_stories'), tab: 'daily', icon: '📚', color: 'bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400' },
                 ].map((item) => (
                   <button
                     key={item.tab}
@@ -871,10 +859,6 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
           <TabsContent value="qiblah" className="mt-0">
             <QiblahFinder />
-          </TabsContent>
-
-          <TabsContent value="daily" className="mt-0">
-            <StoriesView />
           </TabsContent>
 
           <TabsContent value="khatm" className="mt-0">
