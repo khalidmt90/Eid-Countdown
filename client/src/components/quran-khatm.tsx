@@ -263,6 +263,8 @@ export function QuranKhatm() {
     const saved = localStorage.getItem(LS_KEY_FONT_SIZE);
     return saved ? parseInt(saved) : DEFAULT_FONT_SIZE;
   });
+  const [showSurahSelector, setShowSurahSelector] = useState(false);
+  const [surahSearchQuery, setSurahSearchQuery] = useState("");
   const [controlsHidden, setControlsHidden] = useState(false);
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const lastScrollY = useRef(0);
@@ -799,6 +801,14 @@ export function QuranKhatm() {
             </button>
           )}
         </div>
+        <button
+          onClick={() => { setShowSurahSelector(true); setSurahSearchQuery(""); }}
+          className="flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 rounded-xl px-3 py-1.5 text-xs font-black hover:bg-primary/15 transition-colors active:scale-95"
+          data-testid="button-surah-selector"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          {isArabic ? "اختيار السورة" : "Select Surah"}
+        </button>
         {searchQuery && searchQuery.length >= 2 && globalSearchDone && (
           <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
             {globalSearchResults.length > 0
@@ -1113,6 +1123,99 @@ export function QuranKhatm() {
         </button>
 
       </div>
+
+      {/* === SURAH SELECTOR BOTTOM SHEET === */}
+      {showSurahSelector && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end justify-center animate-in fade-in duration-200"
+          onClick={() => setShowSurahSelector(false)}
+        >
+          <div
+            className="bg-card w-full max-w-lg rounded-t-3xl p-5 pb-8 space-y-4 animate-in slide-in-from-bottom-8 duration-400 max-h-[80vh] flex flex-col"
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center">
+              <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-black text-foreground">
+                {isArabic ? "اختيار السورة" : "Select Surah"}
+              </h3>
+              <button
+                onClick={() => setShowSurahSelector(false)}
+                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
+                data-testid="button-close-surah-sheet"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-3 py-2.5">
+              <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <input
+                type="text"
+                value={surahSearchQuery}
+                onChange={(e) => setSurahSearchQuery(e.target.value)}
+                placeholder={isArabic ? "ابحث باسم السورة…" : "Search surah name..."}
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
+                dir="rtl"
+                autoFocus
+                data-testid="input-surah-search"
+              />
+              {surahSearchQuery && (
+                <button
+                  onClick={() => setSurahSearchQuery("")}
+                  className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0"
+                  data-testid="button-clear-surah-search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="overflow-y-auto flex-1 -mx-1 px-1 space-y-1">
+              {Array.from({ length: 114 }, (_, i) => i + 1)
+                .filter((num) => {
+                  if (!surahSearchQuery) return true;
+                  const name = SURAH_NAMES_AR[num] || "";
+                  const normalizedName = normalizeArabicForSearch(name);
+                  const normalizedQuery = normalizeArabicForSearch(surahSearchQuery);
+                  return (
+                    normalizedName.includes(normalizedQuery) ||
+                    String(num) === surahSearchQuery.trim()
+                  );
+                })
+                .map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => {
+                      let globalAyah = 1;
+                      for (let s = 1; s < num; s++) {
+                        globalAyah += SURAH_AYAH_COUNTS[s] || 0;
+                      }
+                      const juz = getJuzForAyah(globalAyah);
+                      setShowSurahSelector(false);
+                      setSurahSearchQuery("");
+                      selectDay(juz);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/60 active:bg-muted transition-colors text-right"
+                    data-testid={`button-surah-${num}`}
+                  >
+                    <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary text-xs font-black flex items-center justify-center shrink-0">
+                      {num}
+                    </span>
+                    <span className="text-sm font-bold text-foreground">
+                      {SURAH_NAMES_AR[num]}
+                    </span>
+                  </button>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* === DAY PICKER BOTTOM SHEET === */}
       {showDaySheet && (
