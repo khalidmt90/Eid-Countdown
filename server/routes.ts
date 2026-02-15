@@ -169,6 +169,12 @@ async function resolveLocation(
   return { lat: FALLBACK.lat, lng: FALLBACK.lng, source: "fallback" };
 }
 
+function extractBearerToken(req: Request): string | null {
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith("Bearer ")) return null;
+  return header.slice(7).trim() || null;
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -180,6 +186,109 @@ export async function registerRoutes(
       version: API_VERSION,
       time: new Date().toISOString(),
     });
+  });
+
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body || {};
+
+      if (!username || typeof username !== "string" || username.trim().length < 3) {
+        return error(res, 400, "INVALID_USERNAME", "Username must be at least 3 characters");
+      }
+      if (!password || typeof password !== "string" || password.length < 6) {
+        return error(res, 400, "INVALID_PASSWORD", "Password must be at least 6 characters");
+      }
+
+      const existing = await storage.getUserByUsername(username.trim());
+      if (existing) {
+        return error(res, 409, "USERNAME_TAKEN", "This username is already registered");
+      }
+
+      const user = await storage.createUser({ username: username.trim(), password });
+      const session = await storage.createSession(user.id);
+
+      success(res, {
+        token: session.token,
+        expiresAt: session.expiresAt.toISOString(),
+        user: { id: user.id, username: user.username },
+      }, 201);
+    } catch (err) {
+      error(res, 500, "REGISTER_FAILED", "Registration failed");
+    }
+  });
+
+  app.post("/api/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body || {};
+
+      if (!username || typeof username !== "string") {
+        return error(res, 400, "INVALID_USERNAME", "Username is required");
+      }
+      if (!password || typeof password !== "string") {
+        return error(res, 400, "INVALID_PASSWORD", "Password is required");
+      }
+
+      const user = await storage.getUserByUsername(username.trim());
+      if (!user) {
+        return error(res, 401, "INVALID_CREDENTIALS", "Invalid username or password");
+      }
+
+      const valid = await storage.verifyPassword(password, user.password);
+      if (!valid) {
+        return error(res, 401, "INVALID_CREDENTIALS", "Invalid username or password");
+      }
+
+      const session = await storage.createSession(user.id);
+
+      success(res, {
+        token: session.token,
+        expiresAt: session.expiresAt.toISOString(),
+        user: { id: user.id, username: user.username },
+      });
+    } catch (err) {
+      error(res, 500, "LOGIN_FAILED", "Login failed");
+    }
+  });
+
+  app.post("/api/auth/logout", async (req: Request, res: Response) => {
+    try {
+      const token = extractBearerToken(req);
+      if (!token) {
+        return error(res, 401, "UNAUTHORIZED", "Authorization header with Bearer token is required");
+      }
+
+      await storage.deleteSession(token);
+      success(res, { ok: true });
+    } catch (err) {
+      error(res, 500, "LOGOUT_FAILED", "Logout failed");
+    }
+  });
+
+  app.get("/api/me", async (req: Request, res: Response) => {
+    try {
+      const token = extractBearerToken(req);
+      if (!token) {
+        return error(res, 401, "UNAUTHORIZED", "Authorization header with Bearer token is required");
+      }
+
+      const session = await storage.getSessionByToken(token);
+      if (!session) {
+        return error(res, 401, "SESSION_EXPIRED", "Token is invalid or expired");
+      }
+
+      const user = await storage.getUser(session.userId);
+      if (!user) {
+        return error(res, 401, "USER_NOT_FOUND", "User not found");
+      }
+
+      success(res, {
+        id: user.id,
+        username: user.username,
+        createdAt: user.createdAt.toISOString(),
+      });
+    } catch (err) {
+      error(res, 500, "PROFILE_FAILED", "Failed to fetch profile");
+    }
   });
 
   app.get("/api/next-prayer", async (req: Request, res: Response) => {
