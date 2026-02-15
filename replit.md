@@ -58,6 +58,9 @@ Preferred communication style: Simple, everyday language.
 - `client/src/data/quran.json` - Full Quran text (114 surahs, 6236 verses) from quran-json@3.1.2, loaded locally
 - `client/src/data/surahs.json` - All 114 Surahs (number + Arabic name)
 - `client/src/data/hisn-al-muslim.json` - 37 authentic duas from Hisn Al-Muslim with sources
+- `client/src/data/hadith-stories.json` - 100 curated narrative hadiths (60 Bukhari + 40 Muslim) from fawazahmed0/hadith-api
+- `client/src/data/prophet-stories.ts` - 25 prophet stories covering 10 prophets, bilingual (ar/en), with Quran references
+- `client/src/components/stories-view.tsx` - Restructured Stories section with 4 categories: قصص الأنبياء (active), السيرة النبوية (coming soon), قصص من الأحاديث (active), مواقف من الصحابة (coming soon). Features category cards, grouped prophet stories, paginated/searchable hadith list, detail views with source attribution
 
 ## External Dependencies
 
