@@ -338,7 +338,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
         {/* Sticky Header + Tabs */}
         <header className="sticky top-0 z-50 border-b border-white/[0.06]" style={{ background: '#0B1324' }}>
           {/* Layer 1: App Identity */}
-          <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-4 flex items-center justify-between" style={{ paddingTop: '14px', paddingBottom: '6px' }}>
             <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
               <SelectTrigger className="w-10 h-10 p-0 bg-transparent border-none shadow-none hover:bg-white/[0.06] rounded-xl flex items-center justify-center" data-testid="select-language">
                 <Globe className="w-5 h-5 text-[#9FB3C8]" />
@@ -358,14 +358,11 @@ ${t('isha')}: ${prayerData.timings.Isha}
             </Select>
 
             <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2">
-                <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg shrink-0" data-testid="img-logo" />
-                <span className="text-[17px] font-black text-white font-serif leading-tight">
-                  {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
-                </span>
-              </div>
+              <span className="text-white font-serif leading-tight" style={{ fontSize: '18px', fontWeight: 600 }}>
+                {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
+              </span>
               {prayerData && (
-                <span className="text-[11px] font-bold text-[#9FB3C8]/70 mt-0.5">
+                <span className="mt-0.5" style={{ fontSize: '12px', color: '#8FA3BF' }}>
                   {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
                   {' · '}
                   {new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short' }).format(new Date())}
@@ -373,19 +370,15 @@ ${t('isha')}: ${prayerData.timings.Isha}
               )}
             </div>
 
-            {prayerData ? (
-              <div className="w-10" />
-            ) : (
-              <div className="w-10" />
-            )}
+            <div className="w-10" />
           </div>
 
           {/* Layer 2: Navigation Pills */}
-          <nav className="px-3 pb-2.5">
+          <nav className="px-3" style={{ marginTop: '8px', marginBottom: '12px' }}>
             <div
               ref={pillContainerRef}
               className="flex items-center gap-2.5 overflow-x-auto max-w-lg mx-auto justify-center"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', height: '60px', whiteSpace: 'nowrap' }}
               data-testid="tabs-nav"
             >
               <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
@@ -401,15 +394,17 @@ ${t('isha')}: ${prayerData.timings.Isha}
                   <button
                     key={tab.value}
                     onClick={() => handleTabChange(tab.value)}
-                    className="shrink-0 whitespace-nowrap font-black transition-all duration-200 active:scale-95"
+                    className="whitespace-nowrap transition-all duration-200 active:scale-95"
                     style={{
-                      minWidth: '72px',
-                      height: '44px',
-                      padding: '0 20px',
+                      minWidth: '90px',
+                      flexShrink: 0,
+                      height: '56px',
+                      padding: '0 18px',
                       borderRadius: '14px',
-                      fontSize: '16px',
+                      fontSize: '17px',
+                      fontWeight: 700,
                       ...(isActive
-                        ? { background: 'linear-gradient(135deg, #0D6EFD, #1E88FF)', color: '#FFFFFF', border: 'none' }
+                        ? { background: 'linear-gradient(135deg, #0D6EFD, #1E88FF)', color: '#FFFFFF', border: '1px solid transparent' }
                         : { background: '#101A2E', color: '#9FB3C8', border: '1px solid rgba(42, 60, 99, 0.55)' }),
                     }}
                     data-testid={tab.testId}
@@ -423,7 +418,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
         </header>
 
         {/* Page Section Title */}
-        <div className="max-w-7xl mx-auto px-4 pt-4 pb-1" dir="rtl">
+        <div className="max-w-7xl mx-auto px-4 pb-1" dir="rtl" style={{ paddingTop: '12px' }}>
           <h2
             className="text-[22px] font-black text-foreground text-right"
             data-testid="text-page-title"
