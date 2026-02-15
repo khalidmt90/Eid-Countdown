@@ -74,7 +74,7 @@ function DuaCard({
   const defaultExpanded = compactMode ? false : dua.text.length < 500;
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [copied, setCopied] = useState(false);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
   useEffect(() => {
@@ -158,12 +158,12 @@ function DuaCard({
         >
           {expanded ? (
             <>
-              {isArabic ? "عرض أقل" : "Show less"}
+              {t('show_less')}
               <ChevronUp className="w-4 h-4" />
             </>
           ) : (
             <>
-              {isArabic ? "عرض المزيد" : "Show more"}
+              {t('show_more')}
               <ChevronDown className="w-4 h-4" />
             </>
           )}
@@ -177,7 +177,7 @@ function DuaCard({
               className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-lg"
               data-testid={`badge-repeat-${dua.id}`}
             >
-              {dua.repeat} {isArabic ? "مرات" : "times"}
+              {dua.repeat} {t('times_repeat')}
             </span>
           )}
           <span
@@ -193,7 +193,7 @@ function DuaCard({
             onClick={handleCopy}
             className="min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
             data-testid={`button-copy-${dua.id}`}
-            aria-label={isArabic ? "نسخ" : "Copy"}
+            aria-label={t('copy_label')}
           >
             {copied ? (
               <span className="text-sm font-bold text-green-500">✓</span>
@@ -205,7 +205,7 @@ function DuaCard({
             onClick={handleShare}
             className="min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
             data-testid={`button-share-${dua.id}`}
-            aria-label={isArabic ? "مشاركة" : "Share"}
+            aria-label={t('share_action')}
           >
             <Share2 className="w-4 h-4" />
           </button>
@@ -216,7 +216,7 @@ function DuaCard({
 }
 
 export default function DuaPage() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -300,10 +300,10 @@ export default function DuaPage() {
       <div className="space-y-1">
         <h2 className="text-xl font-black text-primary font-serif flex items-center gap-2" data-testid="text-dua-header">
           <BookOpen className="w-5 h-5" />
-          {isArabic ? "الأدعية والأذكار" : "Duas & Adhkar"}
+          {t('duas_header')}
         </h2>
         <p className="text-sm text-muted-foreground font-medium" data-testid="text-dua-subtitle">
-          {isArabic ? "أدعية وأذكار من حصن المسلم" : "Duas and Adhkar from Hisn Al-Muslim"}
+          {t('duas_subtitle')}
         </p>
       </div>
 
@@ -340,12 +340,12 @@ export default function DuaPage() {
           {viewMode === "compact" ? (
             <>
               <Eye className="w-4 h-4" />
-              {isArabic ? "عرض كامل" : "Full view"}
+              {t('full_view')}
             </>
           ) : (
             <>
               <EyeOff className="w-4 h-4" />
-              {isArabic ? "عرض مختصر" : "Compact"}
+              {t('compact_view')}
             </>
           )}
         </button>
@@ -357,7 +357,7 @@ export default function DuaPage() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={isArabic ? "ابحث في الأدعية والأذكار..." : "Search duas..."}
+          placeholder={t('search_duas')}
           className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm py-3"
           dir="rtl"
           data-testid="input-search-dua"
@@ -375,7 +375,7 @@ export default function DuaPage() {
 
       {debouncedQuery.trim() && (
         <p className="text-xs font-bold text-muted-foreground" data-testid="text-search-results-count">
-          {isArabic ? `النتائج: ${filteredDuas.length}` : `Results: ${filteredDuas.length}`}
+          {t('results_count', { count: filteredDuas.length })}
         </p>
       )}
 
@@ -407,10 +407,10 @@ export default function DuaPage() {
 
       {!debouncedQuery.trim() && (
         <p className="text-xs font-bold text-muted-foreground" data-testid="text-dua-count">
-          {filteredDuas.length} {isArabic ? "دعاء" : "duas"}
+          {filteredDuas.length} {t('dua_unit')}
           {totalPages > 1 && (
             <span className="text-muted-foreground/60">
-              {" "} · {isArabic ? `صفحة ${safePage} من ${totalPages}` : `Page ${safePage} of ${totalPages}`}
+              {" "} · {t('page_x_of_y', { page: safePage, total: totalPages })}
             </span>
           )}
         </p>
@@ -420,8 +420,8 @@ export default function DuaPage() {
         {paginatedDuas.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">
             <Search className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p className="font-bold">{isArabic ? "لا توجد نتائج" : "No results found"}</p>
-            <p className="text-xs mt-1">{isArabic ? "جرّب كلمات مختلفة أو فئة أخرى" : "Try different words or another category"}</p>
+            <p className="font-bold">{t('no_duas_found')}</p>
+            <p className="text-xs mt-1">{t('try_different_category')}</p>
           </div>
         ) : (
           paginatedDuas.map((dua) => (
@@ -444,7 +444,7 @@ export default function DuaPage() {
             className="min-h-[44px] px-5 rounded-xl bg-card border border-border text-foreground font-bold text-sm hover:bg-muted disabled:opacity-30 transition-colors"
             data-testid="button-prev-page"
           >
-            {isArabic ? "السابق" : "Previous"}
+            {t('previous')}
           </button>
 
           <div className="flex items-center gap-2">
@@ -470,7 +470,7 @@ export default function DuaPage() {
             className="min-h-[44px] px-5 rounded-xl bg-card border border-border text-foreground font-bold text-sm hover:bg-muted disabled:opacity-30 transition-colors"
             data-testid="button-next-page"
           >
-            {isArabic ? "التالي" : "Next"}
+            {t('next')}
           </button>
         </div>
       )}

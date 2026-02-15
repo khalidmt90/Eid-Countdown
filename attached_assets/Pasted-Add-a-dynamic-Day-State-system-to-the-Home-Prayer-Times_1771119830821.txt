@@ -1,0 +1,112 @@
+Add a dynamic “Day State” system to the Home (Prayer Times) page.
+Do NOT add new widgets. Enhance the existing countdown context.
+
+====================================================
+GOAL
+====================================================
+
+The home screen should instantly tell the user:
+Where they are in the prayer day.
+
+The countdown label and context must change automatically based on time.
+
+====================================================
+1) NORMAL DAYS BEHAVIOR
+====================================================
+
+Determine:
+- current time
+- today’s prayer times
+
+Logic:
+
+If current time < Fajr:
+  stateLabel = "المتبقي على الفجر"
+  targetTime = Fajr
+
+If Fajr <= time < Dhuhr:
+  stateLabel = "بعد الفجر"
+  nextLabel = "المتبقي على الظهر"
+  targetTime = Dhuhr
+
+If Dhuhr <= time < Asr:
+  stateLabel = "بعد الظهر"
+  targetTime = Asr
+
+If Asr <= time < Maghrib:
+  stateLabel = "المتبقي على المغرب"
+  targetTime = Maghrib
+
+If Maghrib <= time < Isha:
+  stateLabel = "بعد المغرب"
+  targetTime = Isha
+
+If time >= Isha:
+  stateLabel = "انتهت صلوات اليوم"
+  nextLabel = "المتبقي على فجر الغد"
+  targetTime = tomorrowFajr
+
+Display the stateLabel above the countdown.
+
+If within ±10 minutes of prayer:
+Show:
+"حان الآن وقت الصلاة"
+
+====================================================
+2) RAMADAN MODE
+====================================================
+
+If Hijri month == Ramadan:
+
+Before Maghrib:
+  stateLabel = "المتبقي على الإفطار"
+  targetTime = Maghrib
+
+After Maghrib until Fajr:
+  stateLabel = "المتبقي على الإمساك"
+  targetTime = nextDayFajr
+
+If within 10 minutes of Maghrib:
+  show:
+  "اقترب موعد الإفطار"
+
+If within 10 minutes of Fajr:
+  show:
+  "اقترب موعد الإمساك"
+
+Do NOT create a second countdown widget.
+Only change the main countdown context.
+
+====================================================
+3) UI
+====================================================
+
+Above the large timer show:
+- stateLabel (font-size 16–18px)
+- color: #9FB3C8
+- center aligned
+
+Keep existing card design.
+
+====================================================
+4) PERFORMANCE
+====================================================
+
+Update state every second along with countdown.
+Do not re-fetch prayer times.
+Use already loaded data.
+
+====================================================
+DELIVERABLE
+====================================================
+
+Create a helper:
+getDayState(now, prayerTimes, hijriMonth)
+
+Return:
+{
+  label,
+  targetTime,
+  isPrayerNow,
+  isRamadanMode
+}

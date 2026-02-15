@@ -73,7 +73,7 @@ export function LocationSheet({
               <SelectContent>
                 {COUNTRIES.map(country => (
                   <SelectItem key={country.nameEn} value={country.nameEn}>
-                    {i18n.language === 'ar' ? country.nameAr : country.nameEn}
+                    {['ar'].includes(i18n.language) ? country.nameAr : country.nameEn}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -100,7 +100,7 @@ export function LocationSheet({
               <SelectContent>
                 {selectedCountry.cities.map(city => (
                   <SelectItem key={city.nameEn} value={city.nameEn}>
-                    {i18n.language === 'ar' ? city.nameAr : city.nameEn}
+                    {['ar'].includes(i18n.language) ? city.nameAr : city.nameEn}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -112,7 +112,7 @@ export function LocationSheet({
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
+              <span className="bg-background px-2 text-muted-foreground">{t('or_divider')}</span>
             </div>
           </div>
 

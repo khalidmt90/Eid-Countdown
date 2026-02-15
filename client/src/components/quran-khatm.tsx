@@ -240,7 +240,7 @@ function getJuzData(juzNumber: number): JuzData {
 }
 
 export function QuranKhatm() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
   const savedStart = localStorage.getItem(LS_KEY_START);
@@ -569,13 +569,13 @@ export function QuranKhatm() {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-black text-primary font-serif flex items-center gap-2">
             <span className="text-2xl">📖</span>
-            {isArabic ? "ختم القرآن في رمضان" : "Ramadan Quran Khatm"}
+            {t('quran_khatm_title')}
           </h2>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setFocusMode(true)}
               className="h-9 w-9 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-              title={isArabic ? "وضع التركيز" : "Focus Mode"}
+              title={t('focus_mode')}
               data-testid="button-focus-on"
             >
               <Maximize2 className="w-4 h-4" />
@@ -587,12 +587,12 @@ export function QuranKhatm() {
         <div className="bg-card border border-border rounded-xl p-3 space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-black text-foreground">
-              {isArabic ? `اليوم ${completedCount} من 30` : `Day ${completedCount} of 30`}
+              {t('day_of_30', { day: completedCount })}
             </span>
             <span className="text-muted-foreground font-bold text-xs">
               {remaining > 0
-                ? (isArabic ? `تبقى ${remaining} يومًا لإتمام الختمة` : `${remaining} days remaining`)
-                : (isArabic ? "🎉 أتممت الختمة!" : "🎉 Khatm Complete!")}
+                ? t('days_remaining', { count: remaining })
+                : t('khatm_complete')}
             </span>
           </div>
           <Progress value={Math.round((completedCount / 30) * 100)} className="h-2" data-testid="progress-khatm" />
@@ -606,7 +606,7 @@ export function QuranKhatm() {
             data-testid="button-catchup"
           >
             <AlertCircle className="w-3.5 h-3.5" />
-            {isArabic ? `انتقل لأقدم يوم فاتني (يوم ${oldestMissedDay})` : `Catch up: Day ${oldestMissedDay}`}
+            {t('catch_up_day', { day: oldestMissedDay })}
           </button>
         )}
       </div>
@@ -628,16 +628,16 @@ export function QuranKhatm() {
           data-testid="button-open-day-picker"
         >
           <div className="text-sm font-black text-foreground truncate">
-            {isArabic ? `الجزء ${selectedDay}` : `Juz ${selectedDay}`}
+            {t('juz_number', { number: selectedDay })}
             {isRamadanActive && todayDay === selectedDay && (
               <span className="text-[10px] bg-primary/15 text-primary font-bold px-1.5 py-0.5 rounded-md mr-1.5">
-                {isArabic ? "اليوم" : "Today"}
+                {t('today_label')}
               </span>
             )}
           </div>
           {startDate && (
             <div className="text-[10px] text-muted-foreground/70 truncate">
-              {isArabic ? `يوم ${selectedDay} من رمضان` : `Ramadan Day ${selectedDay}`}
+              {t('ramadan_day', { day: selectedDay })}
             </div>
           )}
         </button>
@@ -667,7 +667,7 @@ export function QuranKhatm() {
           ) : (
             <Circle className="w-4 h-4" />
           )}
-          {isArabic ? (completion[selectedDay]?.completed ? "تم" : "إتمام") : (completion[selectedDay]?.completed ? "Done" : "Done")}
+          {completion[selectedDay]?.completed ? t('done_label') : t('mark_label')}
         </button>
       </div>
 
@@ -703,11 +703,11 @@ export function QuranKhatm() {
       <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border/50 pb-1.5 pt-1 -mx-1 px-1">
         <div className="flex items-center justify-between text-xs font-bold text-muted-foreground px-1 mb-1">
           <span>
-            {isArabic ? `الجزء ${selectedDay}` : `Juz ${selectedDay}`}
+            {t('juz_number', { number: selectedDay })}
             {totalPages > 1 && (
               <span className="text-foreground mr-1">
                 {" • "}
-                {isArabic ? `صفحة ${currentPage + 1} / ${totalPages}` : `Page ${currentPage + 1}/${totalPages}`}
+                {t('page_of', { current: currentPage + 1, total: totalPages })}
               </span>
             )}
           </span>
@@ -739,7 +739,7 @@ export function QuranKhatm() {
             type="text"
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(0); }}
-            placeholder={isArabic ? "ابحث في القرآن الكريم..." : "Search the entire Quran..."}
+            placeholder={t('search_quran')}
             className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
             dir="rtl"
             data-testid="input-search-quran"
@@ -763,17 +763,15 @@ export function QuranKhatm() {
           data-testid="button-surah-selector"
         >
           <BookOpen className="w-3.5 h-3.5" />
-          {isArabic ? "اختيار السورة" : "Select Surah"}
+          {t('select_surah')}
         </button>
         {searchQuery && searchQuery.length >= 2 && globalSearchDone && (
           <div className="text-xs font-bold text-muted-foreground px-1" data-testid="text-search-count">
             {globalSearchResults.length > 0
-              ? (isArabic
-                  ? `${globalSearchResults.length} نتيجة${!allJuzLoaded ? " (جارٍ تحميل بقية الأجزاء...)" : ""}`
-                  : `${globalSearchResults.length} results${!allJuzLoaded ? " (loading more...)" : ""}`)
-              : (isArabic
-                  ? (!allJuzLoaded ? "جارٍ تحميل الأجزاء..." : "لا توجد نتائج")
-                  : (!allJuzLoaded ? "Loading Quran data..." : "No results"))}
+              ? (!allJuzLoaded
+                  ? t('search_loading_more', { count: globalSearchResults.length })
+                  : t('search_results_with_count', { count: globalSearchResults.length }))
+              : (!allJuzLoaded ? t('loading_quran') : t('no_results'))}
           </div>
         )}
       </div>
@@ -784,14 +782,14 @@ export function QuranKhatm() {
           {globalSearchLoading && !globalSearchDone && (
             <div className="flex items-center justify-center gap-2 py-6 text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span className="text-sm font-bold">{isArabic ? "جارٍ البحث..." : "Searching..."}</span>
+              <span className="text-sm font-bold">{t('searching')}</span>
             </div>
           )}
           {globalSearchDone && globalSearchResults.length === 0 && (
             <div className="py-8 text-center text-muted-foreground">
               <Search className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p className="font-bold">{isArabic ? "لا توجد نتائج" : "No results found"}</p>
-              <p className="text-xs mt-1">{isArabic ? "جرّب كلمات مختلفة" : "Try different words"}</p>
+              <p className="font-bold">{t('no_results')}</p>
+              <p className="text-xs mt-1">{t('try_different')}</p>
             </div>
           )}
           {globalSearchDone && globalSearchResults.length > 0 && (
@@ -806,10 +804,10 @@ export function QuranKhatm() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-black text-primary">
-                      {SURAH_NAMES_AR[result.surah.number] || result.surah.name} - {isArabic ? "آية" : "Ayah"} {result.numberInSurah}
+                      {SURAH_NAMES_AR[result.surah.number] || result.surah.name} - {t('ayah')} {result.numberInSurah}
                     </span>
                     <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md shrink-0">
-                      {isArabic ? `الجزء ${result.juz}` : `Juz ${result.juz}`}
+                      {t('juz_number', { number: result.juz })}
                     </span>
                   </div>
                   <p
@@ -842,7 +840,7 @@ export function QuranKhatm() {
 
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-black text-foreground">
-                {isArabic ? "حجم الخط" : "Font Size"}
+                {t('font_size')}
               </h3>
               <button onClick={() => setShowFontSheet(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                 <X className="w-4 h-4" />
@@ -861,7 +859,7 @@ export function QuranKhatm() {
 
               <div className="text-center">
                 <div className="text-3xl font-black text-foreground">{fontSize}</div>
-                <div className="text-xs text-muted-foreground">{isArabic ? "بكسل" : "px"}</div>
+                <div className="text-xs text-muted-foreground">{t('px_label')}</div>
               </div>
 
               <button
@@ -906,9 +904,7 @@ export function QuranKhatm() {
           data-testid="button-continue-reading"
         >
           <Bookmark className="w-4 h-4" />
-          {isArabic
-            ? `تابع من حيث توقفت (صفحة ${(savedPos?.page || 0) + 1})`
-            : `Continue where you stopped (page ${(savedPos?.page || 0) + 1})`}
+          {t('continue_reading', { page: (savedPos?.page || 0) + 1 })}
         </button>
       )}
 
@@ -929,12 +925,12 @@ export function QuranKhatm() {
           <AlertCircle className="w-12 h-12 text-destructive mx-auto" />
           <p className="text-destructive font-bold">{fetchError}</p>
           <Button onClick={() => fetchJuz(selectedDay)} variant="outline" data-testid="button-retry">
-            {isArabic ? "إعادة المحاولة" : "Retry"}
+            {t('retry_label')}
           </Button>
         </div>
       ) : filteredAyahs.length === 0 && normalizedQuery ? (
         <div className="py-8 text-center text-muted-foreground">
-          {isArabic ? "لا توجد نتائج" : "No results found"}
+          {t('no_results')}
         </div>
       ) : (
         <>
@@ -949,7 +945,7 @@ export function QuranKhatm() {
                       سورة {group.surahName}
                     </h3>
                     <p className="text-[11px] text-muted-foreground font-bold">
-                      {group.surahAyahCount} {isArabic ? "آية" : "verses"}
+                      {group.surahAyahCount} {t('verses')}
                     </p>
                   </div>
                   <div className="absolute inset-x-4 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
@@ -1003,7 +999,7 @@ export function QuranKhatm() {
                 data-testid="button-prev-page"
               >
                 <ChevronRight className="w-5 h-5" />
-                {isArabic ? "السابق" : "Previous"}
+                {t('previous')}
               </Button>
 
               <span className="text-sm font-black text-muted-foreground whitespace-nowrap">
@@ -1017,7 +1013,7 @@ export function QuranKhatm() {
                 className="flex-1 h-12 rounded-xl font-bold text-base gap-2"
                 data-testid="button-next-page"
               >
-                {isArabic ? "التالي" : "Next"}
+                {t('next')}
                 <ChevronLeft className="w-5 h-5" />
               </Button>
             </div>
@@ -1028,17 +1024,17 @@ export function QuranKhatm() {
             <div className="text-center py-6 space-y-3 border-t border-border/50">
               <div className="text-2xl">🤲</div>
               <p className="text-muted-foreground font-bold text-lg">
-                {isArabic ? `انتهى الجزء ${selectedDay}` : `End of Juz ${selectedDay}`}
+                {t('end_of_juz', { number: selectedDay })}
               </p>
               {!completion[selectedDay]?.completed && (
                 <Button onClick={() => toggleComplete(selectedDay)} className="rounded-xl font-bold h-12 px-8" data-testid="button-mark-end">
                   <CheckCircle2 className="w-4 h-4 ml-2" />
-                  {isArabic ? "وضع علامة تم" : "Mark Complete"}
+                  {t('mark_complete')}
                 </Button>
               )}
               {selectedDay < 30 && (
                 <Button onClick={() => selectDay(selectedDay + 1)} variant="outline" className="rounded-xl font-bold" data-testid="button-next-juz">
-                  {isArabic ? `الانتقال للجزء ${selectedDay + 1}` : `Go to Juz ${selectedDay + 1}`}
+                  {t('go_to_juz', { number: selectedDay + 1 })}
                 </Button>
               )}
             </div>
@@ -1097,7 +1093,7 @@ export function QuranKhatm() {
 
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-black text-foreground">
-                {isArabic ? "اختيار السورة" : "Select Surah"}
+                {t('select_surah')}
               </h3>
               <button
                 onClick={() => setShowSurahSelector(false)}
@@ -1114,7 +1110,7 @@ export function QuranKhatm() {
                 type="text"
                 value={surahSearchQuery}
                 onChange={(e) => setSurahSearchQuery(e.target.value)}
-                placeholder={isArabic ? "ابحث باسم السورة…" : "Search surah name..."}
+                placeholder={t('search_surah_name')}
                 className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-sm"
                 dir="rtl"
                 autoFocus
@@ -1200,7 +1196,7 @@ export function QuranKhatm() {
 
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-black text-foreground">
-                {isArabic ? "اختر اليوم" : "Select Day"}
+                {t('select_day')}
               </h3>
               <button onClick={() => setShowDaySheet(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center" data-testid="button-close-day-sheet">
                 <X className="w-4 h-4" />
@@ -1215,7 +1211,7 @@ export function QuranKhatm() {
                 data-testid="button-read-today"
               >
                 <BookOpen className="w-4 h-4 ml-2" />
-                {isArabic ? `اقرأ جزء اليوم (${todayDay})` : `Read Today's Juz (${todayDay})`}
+                {t('read_today_juz', { day: todayDay })}
               </Button>
             )}
 

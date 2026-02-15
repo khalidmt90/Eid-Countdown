@@ -80,6 +80,11 @@ const PAGE_SEO: Record<string, PageSeo> = {
 
 export default function Home() {
   const { t, i18n } = useTranslation();
+  const dateLocale = (() => {
+    const lang = i18n.language;
+    const map: Record<string, string> = { ar: 'ar-SA', fa: 'fa-IR', ur: 'ur-PK', bn: 'bn-BD', id: 'id-ID', tr: 'tr-TR', fr: 'fr-FR', ru: 'ru-RU', es: 'es-ES' };
+    return map[lang] || 'en-US';
+  })();
   const [location, setLocation] = useLocation();
 
   const activeTab = ROUTE_TO_TAB[location] || "home";
@@ -209,8 +214,8 @@ export default function Home() {
             if (data.code === 200) {
               const t = data.data.timings;
               const dateObj = new Date(date + 'T12:00:00');
-              const dayName = new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { weekday: 'short' }).format(dateObj);
-              const shortDate = new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short' }).format(dateObj);
+              const dayName = new Intl.DateTimeFormat(dateLocale, { weekday: 'short' }).format(dateObj);
+              const shortDate = new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'short' }).format(dateObj);
               return { date: shortDate, dayName, fajr: t.Fajr?.split(' ')[0] || '', maghrib: t.Maghrib?.split(' ')[0] || '' };
             }
             return null;
@@ -359,13 +364,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
 
             <div className="flex flex-col items-center">
               <span className="text-white font-serif leading-tight" style={{ fontSize: '18px', fontWeight: 600 }}>
-                {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
+                {t('page_prayer_times')}
               </span>
               {prayerData && (
                 <span className="mt-0.5" style={{ fontSize: '12px', color: '#8FA3BF' }}>
                   {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
                   {' · '}
-                  {new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short' }).format(new Date())}
+                  {new Intl.DateTimeFormat(dateLocale, { day: 'numeric', month: 'short' }).format(new Date())}
                 </span>
               )}
             </div>
@@ -383,11 +388,11 @@ ${t('isha')}: ${prayerData.timings.Isha}
             >
               <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
               {([
-                { value: 'home', labelAr: 'المواقيت', labelEn: 'Prayer', testId: 'tab-prayer-times' },
-                { value: 'qiblah', labelAr: 'القبلة', labelEn: 'Qiblah', testId: 'tab-qiblah' },
-                { value: 'khatm', labelAr: 'القرآن', labelEn: 'Quran', testId: 'tab-quran-khatm' },
-                { value: 'dua', labelAr: 'الأدعية', labelEn: 'Duas', testId: 'tab-dua' },
-                { value: 'daily', labelAr: 'القصص', labelEn: 'Stories', testId: 'tab-daily-content' },
+                { value: 'home', i18nKey: 'nav_prayer_times', testId: 'tab-prayer-times' },
+                { value: 'qiblah', i18nKey: 'nav_qiblah', testId: 'tab-qiblah' },
+                { value: 'khatm', i18nKey: 'nav_quran', testId: 'tab-quran-khatm' },
+                { value: 'dua', i18nKey: 'nav_duas', testId: 'tab-dua' },
+                { value: 'daily', i18nKey: 'nav_stories', testId: 'tab-daily-content' },
               ] as const).map((tab) => {
                 const isActive = activeTab === tab.value;
                 return (
@@ -409,7 +414,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                     }}
                     data-testid={tab.testId}
                   >
-                    {i18n.language === 'ar' ? tab.labelAr : tab.labelEn}
+                    {t(tab.i18nKey)}
                   </button>
                 );
               })}
@@ -423,11 +428,11 @@ ${t('isha')}: ${prayerData.timings.Isha}
             className="text-[22px] font-black text-foreground text-right"
             data-testid="text-page-title"
           >
-            {activeTab === 'home' && (i18n.language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times')}
-            {activeTab === 'qiblah' && (i18n.language === 'ar' ? 'القبلة' : 'Qiblah Finder')}
-            {activeTab === 'khatm' && (i18n.language === 'ar' ? 'القرآن الكريم' : 'Holy Quran')}
-            {activeTab === 'dua' && (i18n.language === 'ar' ? 'الأدعية والأذكار' : 'Duas & Adhkar')}
-            {activeTab === 'daily' && (i18n.language === 'ar' ? 'القصص' : 'Stories')}
+            {activeTab === 'home' && t('page_prayer_times')}
+            {activeTab === 'qiblah' && t('page_qiblah')}
+            {activeTab === 'khatm' && t('page_quran')}
+            {activeTab === 'dua' && t('page_duas')}
+            {activeTab === 'daily' && t('page_stories')}
           </h2>
         </div>
 
@@ -487,7 +492,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                         <div className="flex flex-col items-center gap-3 py-4">
                           <div className="text-4xl">🕌</div>
                           <div className="text-2xl font-black text-primary animate-pulse">
-                            {i18n.language === 'ar' ? 'حان وقت الصلاة' : 'Prayer Time Now'}
+                            {t('prayer_time_now')}
                           </div>
                           <div className="text-lg font-bold text-muted-foreground">
                             {t(nextPrayer.name.toLowerCase())}
@@ -497,9 +502,9 @@ ${t('isha')}: ${prayerData.timings.Isha}
                         <>
                           <span className="text-sm md:text-base font-bold text-muted-foreground uppercase tracking-wider mb-2">
                             {isRamadan && nextPrayer.name === "__iftar__"
-                              ? (i18n.language === 'ar' ? "المتبقي على الإفطار" : "Time until Iftar")
+                              ? t('time_until_iftar')
                               : isRamadan && nextPrayer.name === "__imsak__"
-                              ? (i18n.language === 'ar' ? "المتبقي على الإمساك (الفجر)" : "Time until Imsak (Fajr)")
+                              ? t('time_until_imsak')
                               : `${t('remaining_to')} ${t(nextPrayer.name.toLowerCase())}`}
                           </span>
                           
@@ -540,13 +545,13 @@ ${t('isha')}: ${prayerData.timings.Isha}
                       <div className="flex items-center gap-4 text-sm font-bold bg-muted/50 px-5 py-2 rounded-full mt-1" dir="rtl">
                         <div className="flex items-center gap-1.5">
                           <Moon className="w-3.5 h-3.5 text-primary/70" />
-                          <span className="text-muted-foreground">{i18n.language === 'ar' ? 'الإمساك:' : 'Imsak:'}</span>
+                          <span className="text-muted-foreground">{t('imsak_label')}</span>
                           <span className="text-foreground">{formatTime(prayerData.timings.Fajr)}</span>
                         </div>
                         <span className="text-muted-foreground/30">|</span>
                         <div className="flex items-center gap-1.5">
                           <Sunset className="w-3.5 h-3.5 text-primary/70" />
-                          <span className="text-muted-foreground">{i18n.language === 'ar' ? 'الإفطار:' : 'Iftar:'}</span>
+                          <span className="text-muted-foreground">{t('iftar_label')}</span>
                           <span className="text-foreground">{formatTime(prayerData.timings.Maghrib)}</span>
                         </div>
                       </div>
@@ -598,7 +603,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                   <div className="flex items-center gap-2">
                     <Moon className="w-4 h-4 text-primary" />
                     <h3 className="text-sm font-bold text-muted-foreground">
-                      {i18n.language === 'ar' ? 'رمضان — ٧ أيام القادمة' : 'Ramadan — Next 7 Days'}
+                      {t('ramadan_next_7')}
                     </h3>
                   </div>
                   {ramadanScheduleOpen ? (
@@ -615,10 +620,10 @@ ${t('isha')}: ${prayerData.timings.Isha}
                       <table className="w-full text-sm" dir="rtl">
                         <thead>
                           <tr className="border-b border-border bg-muted/50">
-                            <th className="py-3 px-4 text-start font-bold text-muted-foreground">{i18n.language === 'ar' ? 'اليوم' : 'Day'}</th>
-                            <th className="py-3 px-4 text-start font-bold text-muted-foreground">{i18n.language === 'ar' ? 'التاريخ' : 'Date'}</th>
-                            <th className="py-3 px-4 text-center font-bold text-muted-foreground">{i18n.language === 'ar' ? 'الإمساك (الفجر)' : 'Imsak (Fajr)'}</th>
-                            <th className="py-3 px-4 text-center font-bold text-muted-foreground">{i18n.language === 'ar' ? 'الإفطار (المغرب)' : 'Iftar (Maghrib)'}</th>
+                            <th className="py-3 px-4 text-start font-bold text-muted-foreground">{t('table_day')}</th>
+                            <th className="py-3 px-4 text-start font-bold text-muted-foreground">{t('table_date')}</th>
+                            <th className="py-3 px-4 text-center font-bold text-muted-foreground">{t('imsak_fajr')}</th>
+                            <th className="py-3 px-4 text-center font-bold text-muted-foreground">{t('iftar_maghrib')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -648,11 +653,11 @@ ${t('isha')}: ${prayerData.timings.Isha}
                           <div className="text-[11px] text-muted-foreground">{day.date}</div>
                           <div className="space-y-1 pt-1 border-t border-border/50">
                             <div>
-                              <span className="text-[10px] text-muted-foreground block">{i18n.language === 'ar' ? 'الإمساك' : 'Imsak'}</span>
+                              <span className="text-[10px] text-muted-foreground block">{t('imsak')}</span>
                               <span className="text-sm font-black font-mono text-foreground">{formatTime(day.fajr)}</span>
                             </div>
                             <div>
-                              <span className="text-[10px] text-muted-foreground block">{i18n.language === 'ar' ? 'الإفطار' : 'Iftar'}</span>
+                              <span className="text-[10px] text-muted-foreground block">{t('iftar')}</span>
                               <span className="text-sm font-black font-mono text-foreground">{formatTime(day.maghrib)}</span>
                             </div>
                           </div>
@@ -674,7 +679,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
                <div className="bg-card border border-border rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                  <div className="text-center md:text-start">
                    <h4 className="text-lg font-black text-foreground">{t(nextEvent.nameKey)}</h4>
-                   <p className="text-sm text-muted-foreground font-medium">{formatDate(nextEvent.date, i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
+                   <p className="text-sm text-muted-foreground font-medium">{formatDate(nextEvent.date, dateLocale)}</p>
                    <p className="text-xs text-primary/70 font-bold mt-0.5">{nextEvent.hijriDate}</p>
                  </div>
                  
@@ -689,15 +694,15 @@ ${t('isha')}: ${prayerData.timings.Isha}
               <div className="flex items-center gap-2 mb-3">
                 <BookOpen className="w-4 h-4 text-muted-foreground" />
                 <h3 className="text-sm font-bold text-muted-foreground">
-                  {i18n.language === 'ar' ? 'خدمات إضافية' : 'Quick Services'}
+                  {t('quick_services')}
                 </h3>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: i18n.language === 'ar' ? 'القرآن الكريم' : 'Holy Quran', tab: 'khatm', icon: '📖', color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
-                  { label: i18n.language === 'ar' ? 'الأدعية' : 'Duas', tab: 'dua', icon: '🤲', color: 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400' },
-                  { label: i18n.language === 'ar' ? 'القبلة' : 'Qiblah', tab: 'qiblah', icon: '🧭', color: 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400' },
-                  { label: i18n.language === 'ar' ? 'القصص' : 'Stories', tab: 'daily', icon: '📚', color: 'bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400' },
+                  { label: t('holy_quran'), tab: 'khatm', icon: '📖', color: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' },
+                  { label: t('nav_duas'), tab: 'dua', icon: '🤲', color: 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400' },
+                  { label: t('nav_qiblah'), tab: 'qiblah', icon: '🧭', color: 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400' },
+                  { label: t('nav_stories'), tab: 'daily', icon: '📚', color: 'bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400' },
                 ].map((item) => (
                   <button
                     key={item.tab}
@@ -730,7 +735,7 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </TabsContent>
 
           <TabsContent value="dua" className="mt-0">
-            <Suspense fallback={<div className="py-12 text-center text-muted-foreground animate-pulse font-bold">{i18n.language === 'ar' ? 'جارٍ التحميل...' : 'Loading...'}</div>}>
+            <Suspense fallback={<div className="py-12 text-center text-muted-foreground animate-pulse font-bold">{t('loading')}</div>}>
               <DuaPage />
             </Suspense>
           </TabsContent>
@@ -752,30 +757,22 @@ ${t('isha')}: ${prayerData.timings.Isha}
             <DialogContent className="sm:max-w-md text-start bg-card border-primary/10">
               <DialogHeader className="text-start space-y-4">
                 <DialogTitle className="text-xl font-serif text-primary border-b border-border pb-2">
-                  {i18n.language === 'ar' ? "عن التطبيق" : "About This App"}
+                  {t('about_app')}
                 </DialogTitle>
                 <DialogDescription asChild>
                   <div className="text-sm leading-relaxed text-foreground/80 space-y-4">
-                    <p>
-                      {i18n.language === 'ar' 
-                        ? "يقدم هذا التطبيق محتوى إسلامي من مصادر موثوقة تشمل القرآن الكريم وصحيح البخاري وصحيح مسلم وكتب التفاسير المعتمدة."
-                        : "This app provides Islamic content from authentic sources including the Holy Quran, Sahih Bukhari, Sahih Muslim, and approved scholarly Tafsir."}
-                    </p>
+                    <p>{t('about_description')}</p>
                     <ul className="list-disc list-inside space-y-1 text-foreground/70 bg-primary/5 p-3 rounded-xl border border-primary/10">
-                      <li>{i18n.language === 'ar' ? "القرآن الكريم" : "The Holy Quran"}</li>
-                      <li>{i18n.language === 'ar' ? "صحيح البخاري" : "Sahih Bukhari"}</li>
-                      <li>{i18n.language === 'ar' ? "صحيح مسلم" : "Sahih Muslim"}</li>
-                      <li>{i18n.language === 'ar' ? "تفسير ابن كثير" : "Tafsir Ibn Kathir"}</li>
+                      <li>{t('source_quran')}</li>
+                      <li>{t('source_bukhari')}</li>
+                      <li>{t('source_muslim')}</li>
+                      <li>{t('source_tafsir')}</li>
                     </ul>
                     <div className="bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-foreground text-sm">
-                      <p>
-                        {i18n.language === 'ar'
-                          ? "هذا العمل صدقة جارية عني وعن جميع المسلمين، وأسأل الله أن ينفع به ويجعله خالصًا لوجهه الكريم."
-                          : "This work is an ongoing charity (Sadaqah Jariyah) for me and all Muslims. I ask Allah to make it beneficial and sincere for His sake."}
-                      </p>
+                      <p>{t('about_sadaqah')}</p>
                     </div>
                     <p className="text-center font-serif text-primary font-bold text-base">
-                      {i18n.language === 'ar' ? "اللهم تقبّل منا ومنكم." : "May Allah accept from us and from you."}
+                      {t('about_closing')}
                     </p>
                   </div>
                 </DialogDescription>

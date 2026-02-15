@@ -1,0 +1,110 @@
+Add a “Next Action” recommendation panel to the Home (Prayer Times) page.
+
+Do NOT create a new page.
+Place this panel below the main countdown card.
+
+====================================================
+GOAL
+====================================================
+
+The app should guide the user on what to do next based on time of day and prayer cycle.
+
+====================================================
+1) PANEL DESIGN
+====================================================
+
+Card style:
+- Same dark theme
+- Border radius: 16px
+- Padding: 14–16px
+- Margin-top: 12px
+
+Content structure:
+
+Title:
+"اقتراح الآن"
+
+Below:
+Action title (bold)
+Short subtitle (optional)
+
+Button:
+Primary blue
+Full width
+Height: 44–48px
+
+====================================================
+2) TIME-BASED LOGIC
+====================================================
+
+Use current time + prayer times.
+
+If time is between Fajr and sunrise:
+Action:
+Title: "أذكار الصباح"
+Button link: /dua?category=morning
+
+If time is between Maghrib and sleep (after Isha):
+Action:
+Title: "أذكار المساء"
+Button link: /dua?category=evening
+
+If time is between any prayers during the day:
+Action:
+Title: "ورد اليوم من القرآن"
+Subtitle: "اقرأ 5 دقائق"
+Button link: /quran
+If last reading position exists, open it.
+
+====================================================
+3) RAMADAN MODE
+====================================================
+
+If Hijri month == Ramadan:
+
+Before Maghrib:
+Title: "دعاء قبل الإفطار"
+Button link: /dua?category=fasting
+
+After Fajr:
+Show morning adhkar + Quran suggestion.
+
+====================================================
+4) PRIORITY RULES
+====================================================
+
+Priority order:
+
+1) Ramadan fasting context
+2) Morning adhkar period
+3) Evening adhkar period
+4) Quran daily reading (default)
+
+Only show ONE recommendation at a time.
+
+====================================================
+5) PERFORMANCE
+====================================================
+
+Do not fetch new data.
+Use already loaded prayer times and Hijri date.
+Update logic every minute.
+
+====================================================
+DELIVERABLE
+====================================================
+
+Create helper:
+getNextAction(now, prayerTimes, hijriMonth)
+
+Return:
+{
+  title,
+  subtitle,
+  link
+}
+
+Add a new component:
+NextActionCard
+
+Render it under the countdown card on the home page.

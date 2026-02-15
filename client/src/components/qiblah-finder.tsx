@@ -219,10 +219,10 @@ export function QiblahFinder() {
 
   const arrowRotation = cumulativeRotation.current;
   
-  const isArabic = i18n.language === 'ar' || i18n.language === 'ur' || i18n.language === 'fa';
+  const isRTL = i18n.language === 'ar' || i18n.language === 'ur' || i18n.language === 'fa';
   const directionText = delta > 0 
-    ? (isArabic ? 'يمين' : t('turn_right')) 
-    : (isArabic ? 'يسار' : t('turn_left'));
+    ? t('turn_right') 
+    : t('turn_left');
 
   const isNear = degreesRemaining > ALIGNED_TOLERANCE && degreesRemaining <= NEAR_THRESHOLD;
 
@@ -270,9 +270,7 @@ export function QiblahFinder() {
     red: 'text-red-500'
   };
 
-  const calibrationTip = isArabic 
-    ? "إذا الاتجاه غير دقيق، حرّك الجوال بشكل رقم ٨ لإعادة معايرة البوصلة"
-    : t('accuracy_tip');
+  const calibrationTip = t('calibration_text');
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in zoom-in duration-500">
@@ -296,10 +294,7 @@ export function QiblahFinder() {
               <span className={`w-1.5 h-1.5 rounded-full ${
                 accuracy === 'high' ? 'bg-green-500' : accuracy === 'medium' ? 'bg-yellow-500' : 'bg-red-500'
               }`} />
-              {isArabic 
-                ? (accuracy === 'high' ? 'دقة عالية' : accuracy === 'medium' ? 'دقة متوسطة' : 'دقة منخفضة')
-                : (accuracy === 'high' ? 'High accuracy' : accuracy === 'medium' ? 'Medium accuracy' : 'Low accuracy')
-              }
+              {accuracy === 'high' ? t('accuracy_high') : accuracy === 'medium' ? t('accuracy_medium') : t('accuracy_low')}
             </div>
           )}
         </CardHeader>
@@ -359,7 +354,7 @@ export function QiblahFinder() {
                 </div>
                 {distance !== null && (
                   <div className="text-sm font-bold text-muted-foreground mt-1" data-testid="text-distance-makkah">
-                    {isArabic ? `${distance.toLocaleString('ar-SA')} كم من مكة المكرمة` : `${distance.toLocaleString()} km to Makkah`}
+                    {t('km_to_makkah', { distance: distance.toLocaleString(i18n.language === 'ar' ? 'ar-SA' : undefined) })}
                   </div>
                 )}
                 
@@ -373,11 +368,7 @@ export function QiblahFinder() {
                       style={{ backgroundColor: colorState === 'yellow' ? 'rgba(234, 179, 8, 0.1)' : colorState === 'red' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }}
                     >
                       <span dir="rtl">
-                        {isArabic ? (
-                          <>باقي {degreesRemaining}° {directionText}</>
-                        ) : (
-                          <>{degreesRemaining}° {directionText}</>
-                        )}
+                        {t('remaining_degrees', { degrees: degreesRemaining, direction: directionText })}
                       </span>
                     </div>
                   )
@@ -414,7 +405,7 @@ export function QiblahFinder() {
         <div className="text-center max-w-sm text-muted-foreground text-sm px-4 bg-amber-500/10 p-4 rounded-xl border border-amber-500/30 shadow-sm">
           <div className="flex items-center justify-center gap-2 mb-2">
             <RotateCcw className="w-5 h-5 text-amber-600 animate-spin" style={{ animationDuration: '3s' }} />
-            <span className="font-black text-amber-700 text-base">{isArabic ? "⚠️ تلميح مهم" : "⚠️ Calibration Tip"}</span>
+            <span className="font-black text-amber-700 text-base">{t('calibration_tip_title')}</span>
           </div>
           <p className="text-sm font-medium">{calibrationTip}</p>
         </div>

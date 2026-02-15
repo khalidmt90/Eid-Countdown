@@ -512,7 +512,7 @@ function HadithListView({
                             : "bg-purple-500/10 text-purple-500"
                         }`}
                       >
-                        {hadith.collection === "البخاري" ? (isAr ? "البخاري" : "Bukhari") : (isAr ? "مسلم" : "Muslim")}
+                        {hadith.collection === "البخاري" ? t('sahih_bukhari') : t('sahih_muslim')}
                       </span>
                     </div>
                     {isExpanded ? (

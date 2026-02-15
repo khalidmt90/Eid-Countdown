@@ -1,0 +1,83 @@
+Fix the mobile header navigation pills so ALL 5 tabs are accessible and visible in a predictable way.
+
+Problem:
+On small screens, only 4 of 5 tabs show. The 5th appears only after selecting the far right tab. This is bad UX.
+
+Goals:
+- Tabs are horizontally scrollable
+- Active tab is always fully visible (auto-scroll into view)
+- Tabs never shrink too small
+- Add subtle UI hint that the row scrolls (fade edges)
+- Keep current theme/colors and pill style
+
+Tabs order must remain:
+[ المواقيت ] [ القبلة ] [ القرآن ] [ الأدعية ] [ القصص ]
+
+====================================================
+1) NAV CONTAINER (HORIZONTAL SCROLL + SAFE PADDING)
+====================================================
+
+Update the nav pills wrapper to:
+- overflow-x: auto
+- overflow-y: hidden
+- -webkit-overflow-scrolling: touch
+- white-space: nowrap
+- scroll-snap-type: x proximity (optional)
+- padding-inline: 12px (so first/last tab aren’t cut)
+- gap between pills: 10px
+- hide scrollbar (but keep scrolling)
+
+Make sure no parent container uses overflow:hidden that clips the row.
+
+====================================================
+2) TAB SIZE STABILITY (DON’T SHRINK)
+====================================================
+
+Each pill:
+- height: 56–60px
+- font-size: 17px
+- padding-inline: 18–22px
+- border-radius: 14px
+- min-width: 92px
+- flex-shrink: 0  (IMPORTANT)
+- line-height: normal
+- keep active and inactive same dimensions (no layout jump)
+
+====================================================
+3) AUTO-SCROLL ACTIVE TAB INTO VIEW
+====================================================
+
+When:
+- page loads
+- route/tab changes
+- user taps a tab
+
+Then:
+- find the active tab element
+- call activeEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" })
+
+Also do a fallback for older Safari:
+- use navContainer.scrollTo({ left: activeEl.offsetLeft - (containerWidth/2) + (activeElWidth/2), behavior:"smooth" })
+
+====================================================
+4) VISUAL HINT THAT IT SCROLLS (FADE EDGES)
+====================================================
+
+Add left/right gradient fades on the nav container (like iOS):
+- Left fade shows only when scrollLeft > 0
+- Right fade shows only when not at max scroll
+This makes users instantly understand it’s scrollable.
+
+====================================================
+DELIVERABLES
+====================================================
+
+- Update the Header/Nav component
+- Add refs to nav container + active tab
+- Implement the auto-scroll logic
+- Add fade overlay elements (pointer-events:none)
+
+Return the exact code changes:
+- component code
+- CSS/Tailwind classes
+- any helper hook (useAutoScrollTabs)

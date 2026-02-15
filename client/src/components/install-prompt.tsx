@@ -9,7 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallPrompt() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -82,7 +82,7 @@ export function InstallPrompt() {
               data-testid="button-install-app"
             >
               <Download className="w-5 h-5" />
-              {isArabic ? "تثبيت التطبيق" : "Install App"}
+              {t('install_app')}
             </Button>
             <button
               onClick={handleDismiss}
@@ -108,7 +108,7 @@ export function InstallPrompt() {
           >
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black text-foreground">
-                {isArabic ? "إضافة للشاشة الرئيسية" : "Add to Home Screen"}
+                {t('add_to_home')}
               </h3>
               <button
                 onClick={() => setShowIOSOverlay(false)}
@@ -127,13 +127,13 @@ export function InstallPrompt() {
                 </div>
                 <div className="flex-1 pt-1.5">
                   <p className="text-base font-bold text-foreground flex items-center gap-2 flex-wrap">
-                    {isArabic ? "اضغط على زر المشاركة" : "Tap the Share button"}
+                    {t('tap_share_button')}
                     <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-lg">
                       <Share className="w-4 h-4" />
                     </span>
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {isArabic ? "في أسفل الشاشة (سفاري)" : "At the bottom of Safari"}
+                    {t('at_bottom_safari')}
                   </p>
                 </div>
               </div>
@@ -145,13 +145,13 @@ export function InstallPrompt() {
                 </div>
                 <div className="flex-1 pt-1.5">
                   <p className="text-base font-bold text-foreground flex items-center gap-2 flex-wrap">
-                    {isArabic ? 'اختر "إضافة إلى الشاشة الرئيسية"' : 'Select "Add to Home Screen"'}
+                    {t('select_add_home')}
                     <span className="inline-flex items-center justify-center w-8 h-8 bg-muted text-foreground rounded-lg border border-border">
                       <Plus className="w-4 h-4" />
                     </span>
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {isArabic ? "مرر للأسفل في القائمة لتجدها" : "Scroll down in the menu to find it"}
+                    {t('scroll_menu')}
                   </p>
                 </div>
               </div>
@@ -163,10 +163,10 @@ export function InstallPrompt() {
                 </div>
                 <div className="flex-1 pt-1.5">
                   <p className="text-base font-bold text-foreground">
-                    {isArabic ? 'اضغط "إضافة" للتأكيد' : 'Tap "Add" to confirm'}
+                    {t('tap_add_confirm')}
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {isArabic ? "سيظهر التطبيق على شاشتك الرئيسية" : "The app will appear on your home screen"}
+                    {t('app_on_homescreen')}
                   </p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export function InstallPrompt() {
                 className="w-full h-12 rounded-xl font-bold text-base"
                 variant="outline"
               >
-                {isArabic ? "فهمت" : "Got it"}
+                {t('got_it')}
               </Button>
             </div>
 
