@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -11,6 +12,8 @@ declare module "http" {
     rawBody: unknown;
   }
 }
+
+app.use(cors({ origin: "*", methods: ["GET", "POST", "OPTIONS"], allowedHeaders: ["Content-Type", "Authorization"] }));
 
 app.use(
   express.json({
@@ -64,10 +67,10 @@ app.use((req, res, next) => {
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const message = status === 500 ? "Internal Server Error" : (err.message || "Internal Server Error");
+    const code = err.code || "INTERNAL_ERROR";
 
-    res.status(status).json({ message });
-    throw err;
+    res.status(status).json({ error: { code, message } });
   });
 
   // importantly only setup vite in development and after

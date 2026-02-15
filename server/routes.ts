@@ -12,6 +12,8 @@ import tzlookup from "tz-lookup";
 // @ts-ignore
 import momentHijri from "moment-hijri";
 
+const API_VERSION = "1.0";
+
 const ARABIC_NAMES: Record<string, string> = {
   fajr: "الفجر",
   sunrise: "الشروق",
@@ -46,8 +48,23 @@ const cache = new Map<string, CacheEntry>();
 const CACHE_TTL_NEXT = 5 * 60 * 1000;
 const CACHE_TTL_TIMES = 10 * 60 * 1000;
 
+function success(res: Response, data: any, status = 200) {
+  return res.status(status).json({ data });
+}
+
+function error(res: Response, status: number, code: string, message: string) {
+  return res.status(status).json({ error: { code, message } });
+}
+
 function cacheKey(lat: number, lng: number, lang: string): string {
   return `${lat.toFixed(2)}_${lng.toFixed(2)}_${lang}`;
+}
+
+function cleanExpiredCache() {
+  const now = Date.now();
+  for (const [k, v] of cache.entries()) {
+    if (v.expires < now) cache.delete(k);
+  }
 }
 
 function formatISO(date: Date, tz: string): string {
@@ -63,9 +80,6 @@ function formatISO(date: Date, tz: string): string {
   };
   const parts = new Intl.DateTimeFormat("en-CA", opts).formatToParts(date);
   const get = (t: string) => parts.find((p) => p.type === t)?.value || "00";
-  const offsetMs = date.getTime() - new Date(
-    new Date(date.toLocaleString("en-US", { timeZone: tz })).getTime()
-  ).getTime();
   const now = new Date(date.toLocaleString("en-US", { timeZone: tz }));
   const utc = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
   const diffMin = Math.round((now.getTime() - utc.getTime()) / 60000);
@@ -105,16 +119,35 @@ function computeNextPrayer(lat: number, lng: number, tz: string, lang: string) {
   return { name: displayName, timeISO: formatISO(fajrTime, tz) };
 }
 
+function validateLang(raw: unknown): "ar" | "en" {
+  return raw === "ar" ? "ar" : "en";
+}
+
+function validateCoords(latRaw: unknown, lngRaw: unknown): { lat: number; lng: number } | null {
+  if (!latRaw || !lngRaw) return null;
+  const lat = parseFloat(String(latRaw));
+  const lng = parseFloat(String(lngRaw));
+  if (isNaN(lat) || isNaN(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return { lat, lng };
+}
+
+function validateDate(raw: unknown): string | null {
+  if (!raw) return null;
+  const s = String(raw);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const [y, m, d] = s.split("-").map(Number);
+  if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return null;
+  return s;
+}
+
 async function resolveLocation(
-  queryLat: string | undefined,
-  queryLng: string | undefined
+  queryLat: unknown,
+  queryLng: unknown
 ): Promise<{ lat: number; lng: number; source: "gps" | "ip" | "fallback" }> {
-  if (queryLat && queryLng) {
-    const lat = parseFloat(queryLat);
-    const lng = parseFloat(queryLng);
-    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-      return { lat, lng, source: "gps" };
-    }
+  const coords = validateCoords(queryLat, queryLng);
+  if (coords) {
+    return { ...coords, source: "gps" };
   }
 
   try {
@@ -140,18 +173,24 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  app.get("/api/health", (_req: Request, res: Response) => {
+    success(res, {
+      ok: true,
+      version: API_VERSION,
+      time: new Date().toISOString(),
+    });
+  });
+
   app.get("/api/next-prayer", async (req: Request, res: Response) => {
     try {
-      const lang = (req.query.lang as string) === "ar" ? "ar" : "en";
-      const location = await resolveLocation(
-        req.query.lat as string | undefined,
-        req.query.lng as string | undefined
-      );
+      const lang = validateLang(req.query.lang);
+      const location = await resolveLocation(req.query.lat, req.query.lng);
 
-      const key = cacheKey(location.lat, location.lng, lang);
+      const key = `next_${cacheKey(location.lat, location.lng, lang)}`;
       const cached = cache.get(key);
       if (cached && cached.expires > Date.now()) {
-        return res.json(cached.data);
+        return success(res, cached.data);
       }
 
       let tz: string;
@@ -163,7 +202,7 @@ export async function registerRoutes(
 
       const nextPrayer = computeNextPrayer(location.lat, location.lng, tz, lang);
 
-      const response = {
+      const payload = {
         tz,
         method: "UmmAlQura",
         location: {
@@ -174,32 +213,30 @@ export async function registerRoutes(
         nextPrayer,
       };
 
-      cache.set(key, { data: response, expires: Date.now() + CACHE_TTL_NEXT });
+      cache.set(key, { data: payload, expires: Date.now() + CACHE_TTL_NEXT });
+      cleanExpiredCache();
 
-      for (const [k, v] of cache.entries()) {
-        if (v.expires < Date.now()) cache.delete(k);
-      }
-
-      res.json(response);
+      success(res, payload);
     } catch (err) {
-      res.status(500).json({ error: "Failed to compute prayer time" });
+      error(res, 500, "NEXT_PRAYER_FAILED", "Failed to compute next prayer time");
     }
   });
 
   app.get("/api/prayer-times", async (req: Request, res: Response) => {
     try {
-      const lang = (req.query.lang as string) === "ar" ? "ar" : "en";
-      const dateParam = req.query.date as string | undefined;
-      const location = await resolveLocation(
-        req.query.lat as string | undefined,
-        req.query.lng as string | undefined
-      );
+      const lang = validateLang(req.query.lang);
+      const location = await resolveLocation(req.query.lat, req.query.lng);
+
+      const dateParam = req.query.date ? String(req.query.date) : undefined;
+      if (dateParam && !validateDate(dateParam)) {
+        return error(res, 400, "INVALID_DATE", "Date must be in YYYY-MM-DD format");
+      }
 
       const dateSuffix = dateParam || "today";
       const key = `times_${cacheKey(location.lat, location.lng, lang)}_${dateSuffix}`;
       const cached = cache.get(key);
       if (cached && cached.expires > Date.now()) {
-        return res.json(cached.data);
+        return success(res, cached.data);
       }
 
       let tz: string;
@@ -214,7 +251,7 @@ export async function registerRoutes(
       params.madhab = Madhab.Shafi;
 
       let targetDate: Date;
-      if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      if (dateParam) {
         const [y, m, d] = dateParam.split("-").map(Number);
         targetDate = new Date(y, m - 1, d);
       } else {
@@ -288,7 +325,7 @@ export async function registerRoutes(
         time: formatHHMM(prayerTimeMap[p]),
       }));
 
-      const response = {
+      const payload = {
         city,
         hijri,
         date: dateParts,
@@ -301,16 +338,17 @@ export async function registerRoutes(
         prayers,
       };
 
-      cache.set(key, { data: response, expires: Date.now() + CACHE_TTL_TIMES });
+      cache.set(key, { data: payload, expires: Date.now() + CACHE_TTL_TIMES });
+      cleanExpiredCache();
 
-      for (const [k, v] of cache.entries()) {
-        if (v.expires < Date.now()) cache.delete(k);
-      }
-
-      res.json(response);
+      success(res, payload);
     } catch (err) {
-      res.status(500).json({ error: "Failed to compute prayer times" });
+      error(res, 500, "PRAYER_TIMES_FAILED", "Failed to compute prayer times");
     }
+  });
+
+  app.use("/api/*", (req: Request, res: Response) => {
+    error(res, 404, "NOT_FOUND", `Endpoint ${req.method} ${req.path} not found`);
   });
 
   return httpServer;
