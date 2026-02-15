@@ -1,0 +1,169 @@
+Do a major, comprehensive UI/UX upgrade across the entire website (all tabs + homepage) WITHOUT changing the dark theme style direction.
+This is an investor-pitch level refinement: calm, clear hierarchy, accessibility, consistent patterns, and fast performance.
+
+DO NOT rewrite the app architecture. Refactor UI components and add missing UX primitives.
+
+====================================================
+A) GLOBAL UX PRIMITIVES (APPLY EVERYWHERE)
+====================================================
+
+1) Add a global Accessibility/Reading Preferences system:
+- Font scale presets: small(1.0), medium(1.15), large(1.3)
+- Line-height follows font:
+  small 1.9, medium 2.05, large 2.2
+- Persist in localStorage:
+  key: uiFontScale
+- Provide UI controls as A- / A / A+ in content-heavy pages:
+  Quran, Adhkar, Stories (and any reading page)
+- Apply to Arabic and English.
+
+2) Add global “Search pattern”:
+Any page with lists or reading content MUST have search:
+- Quran: search surah name (picker) + within text (if already, keep)
+- Adhkar: search title + text + source
+- Stories: search title + excerpt + content + source
+- Place search near the top, big height, with clear (x) button.
+
+3) Remove endless scroll fatigue:
+- Paginate list pages (Adhkar & Stories at minimum)
+  Mobile: 8 per page
+  Desktop: 10–12 per page
+- Add next/prev + page indicator
+- Reset page to 1 on category/filter changes.
+
+4) Add skeleton loaders (not spinners):
+For:
+- Prayer times load
+- Quran load
+- Adhkar load
+- Stories load
+Makes it feel “native”.
+
+====================================================
+B) HEADER + NAVIGATION (BIGGEST VISUAL FIX)
+====================================================
+
+Refactor header into 2 layers:
+
+Layer 1 (identity row):
+- Center: app title (e.g. "مواقيت الصلاة" or app name)
+- Below it: Hijri date (smaller muted)
+- Left: language icon only
+Padding: top 14px, bottom 6px
+
+Layer 2 (primary nav pills):
+Tabs order:
+[ المواقيت ] [ القبلة ] [ القرآن ] [ الأدعية ] [ القصص ]
+Rules:
+- height: 60px
+- font-size: 17px
+- padding horizontal: 18–22px
+- border radius: 14px
+- gap: 10px
+- each pill min-width: 90px
+- flex-shrink: 0 (tabs never compress)
+- horizontally scrollable, hide scrollbar
+- active tab is gradient blue, inactive dark
+- scroll to center active tab on change (smooth)
+
+Under nav add page title:
+- 22px bold, right aligned, margin-bottom: 8px
+Examples:
+"مواقيت الصلاة", "القبلة", "القرآن الكريم", "الأدعية", "القصص"
+
+====================================================
+C) HOME / PRAYER TIMES PAGE
+====================================================
+
+Keep existing countdown card and prayer tiles grid.
+Enhance meaning:
+
+1) Countdown label intelligence:
+- Show the next prayer name clearly
+- If within ±10 minutes of prayer time: show "حان الآن وقت الصلاة" or "وقت الصلاة الآن"
+- During Ramadan (if Hijri month رمضان):
+  - Before Maghrib: countdown label becomes "المتبقي على الإفطار" target Maghrib
+  - After Maghrib: label becomes "المتبقي على الإمساك (الفجر)" target next day Fajr
+Do NOT add a second countdown card (no duplication).
+
+2) Add a compact “Today overview strip” (year-round):
+- A single horizontal row with all prayer times (fajr…isha)
+- Highlight next upcoming prayer subtly
+- Mobile horizontal scroll, desktop fits.
+
+3) Ramadan 7-days view (collapsible):
+- Collapsed by default unless Ramadan
+- Shows next 7 days: Imsak(Fajr) + Iftar(Maghrib)
+- Mobile horizontal cards, desktop table.
+
+====================================================
+D) QIBLA PAGE
+====================================================
+
+Improve trust + clarity:
+- Add accuracy indicator (high/medium/low)
+- Add simple calibration hint (figure-8 motion)
+- Add distance to Makkah
+- Ensure compass UI does not feel “loose” (smooth but responsive)
+- Keep it clean; do not clutter.
+
+====================================================
+E) QURAN PAGE
+====================================================
+
+1) Add reading controls:
+- A- / A / A+ at top of Quran page (persist global scale)
+- Ensure Quran text reflows properly with larger sizes (no overflow).
+- Improve spacing for older users.
+
+2) Surah selection UX:
+- Add “اختيار السورة” button
+- Open modal/bottom sheet with search bar auto-focused
+- Surah list shows ONLY surah number + Arabic name
+- Do NOT show ayah count
+- Selecting surah scrolls to top.
+
+3) Add “continue reading”:
+- Save last surah + scroll position in localStorage
+- Show a small “متابعة القراءة” button.
+
+====================================================
+F) ADHKAR PAGE
+====================================================
+
+Fix long-scroll fatigue and readability:
+- Category pills bigger (touch-friendly)
+- Add search (title + text + source)
+- Pagination
+- Collapsible long duas with "عرض المزيد"
+- Add optional “Step Reading Mode”:
+  one dua at a time with next/prev (huge for older users)
+- Ensure no Quran-surah list style appears here.
+- Every item shows:
+  text + repeat badge + source line.
+
+====================================================
+G) STORIES PAGE
+====================================================
+
+Make it credible and usable:
+- Add search
+- Add font controls
+- Pagination
+- Require source display in list and details
+- If some categories lack reliable data, show “قريباً” and do not fill with random content.
+
+====================================================
+DELIVERABLE
+====================================================
+
+Create/modify:
+- a global hook: useUIPreferences() for font scale
+- shared components:
+  Header2LayerNav, PageTitle, SearchBar, Pagination, SkeletonCard
+- update each tab to use them consistently
+
+After implementation:
+- show list of changed files
+- show key components code
+- verify font scaling works on Quran/Adhkar/Stories.

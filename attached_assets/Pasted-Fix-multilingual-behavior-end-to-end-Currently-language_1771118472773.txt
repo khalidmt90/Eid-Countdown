@@ -1,0 +1,85 @@
+Fix multilingual behavior end-to-end. Currently language options exist but most content does not change.
+Implement real i18n with proper RTL/LTR handling, translated UI strings, and language-specific content mapping.
+
+RULES
+- Do NOT add new languages. Only support the languages already shown in the language selector.
+- Every UI label must change when language changes.
+- Content pages must behave correctly per language (or fallback clearly).
+
+====================================================
+A) IMPLEMENT I18N FOUNDATION
+====================================================
+
+1) Add i18n framework appropriate for the stack:
+- If Next.js/React: use i18next or next-intl
+- Store language in:
+  localStorage key: appLang
+- Sync with URL optionally:
+  /ar, /en, etc (only if already used; if not, keep simple)
+
+2) Create translation dictionaries:
+- /locales/{lang}/common.json
+- Include ALL UI strings for:
+  nav tabs, buttons, labels, placeholders, errors, titles
+
+3) RTL/LTR switch:
+- If language is Arabic (or RTL language), set:
+  dir="rtl"
+  text-align default right
+- For LTR languages:
+  dir="ltr"
+- Ensure layout does not break.
+
+====================================================
+B) CONTENT LOCALIZATION RULES (Quran / Adhkar / Stories)
+====================================================
+
+Quran:
+- Arabic Quran text remains Arabic always (do not “translate Quran text” unless you have a verified translation dataset).
+- UI around Quran must translate.
+- If user selects English, show Arabic text + optional translation panel only if dataset exists; otherwise hide translation panel.
+
+Adhkar (Hisn Al-Muslim):
+- Arabic text stays Arabic (primary).
+- UI translates.
+- If you do not have reliable translated adhkar text, do NOT fake it.
+  Instead:
+   - show Arabic text
+   - optionally show small note: "النص العربي متوفر حالياً" in that language.
+
+Stories:
+- If you don’t have translated stories dataset, don’t pretend.
+- UI translates.
+- For non-Arabic languages:
+  - Show Arabic story text with a clear label: "Arabic content"
+  - Or disable category with “Not available in this language” message
+Do NOT show Arabic UI labels inside non-Arabic interface.
+
+====================================================
+C) LANGUAGE COVERAGE AUDIT
+====================================================
+
+Add a dev-only audit helper:
+- Scan all pages for hardcoded Arabic strings not in translation files.
+- Replace them with t('key').
+
+Ensure:
+- Nav tabs translate
+- Search placeholders translate
+- Buttons translate
+- Page titles translate
+
+====================================================
+DELIVERABLE
+====================================================
+
+- Provide list of supported languages from your current selector
+- Create /locales for each existing language
+- Replace all UI text with translation keys
+- Ensure language switch immediately updates:
+  - nav
+  - titles
+  - placeholders
+  - empty states
+  - error messages
+- Ensure RTL/LTR toggles correctly per language.
