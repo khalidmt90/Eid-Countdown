@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import quranData from "@/data/quran.json";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -67,7 +68,6 @@ interface ReadPosition {
 
 const LS_KEY_START = "ramadanStartDateISO";
 const LS_KEY_COMPLETION = "khatmCompletion";
-const LS_KEY_JUZ_CACHE = "juzCache";
 const LS_KEY_LAST_DAY = "lastSelectedDay";
 const LS_KEY_FONT_SIZE = "khatmFontSize";
 const LS_KEY_READ_POS = "khatmReadPosition";
@@ -108,33 +108,6 @@ function getCompletion(): CompletionMap {
 
 function setCompletion(map: CompletionMap) {
   localStorage.setItem(LS_KEY_COMPLETION, JSON.stringify(map));
-}
-
-function getAllCachedJuz(): Record<number, JuzData> {
-  try {
-    return JSON.parse(localStorage.getItem(LS_KEY_JUZ_CACHE) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function getCachedJuz(juz: number): JuzData | null {
-  try {
-    const cache = JSON.parse(localStorage.getItem(LS_KEY_JUZ_CACHE) || "{}");
-    return cache[juz] || null;
-  } catch {
-    return null;
-  }
-}
-
-function setCachedJuz(juz: number, data: JuzData) {
-  try {
-    const cache = JSON.parse(localStorage.getItem(LS_KEY_JUZ_CACHE) || "{}");
-    cache[juz] = data;
-    localStorage.setItem(LS_KEY_JUZ_CACHE, JSON.stringify(cache));
-  } catch {
-    localStorage.setItem(LS_KEY_JUZ_CACHE, JSON.stringify({ [juz]: data }));
-  }
 }
 
 function getReadPosition(juz: number): ReadPosition | null {
@@ -232,6 +205,38 @@ function getJuzForAyah(globalNumber: number): number {
     }
   }
   return 1;
+}
+
+function buildAllAyahs(): Ayah[] {
+  const ayahs: Ayah[] = [];
+  let globalNumber = 0;
+  for (const surah of quranData) {
+    for (const verse of surah.verses) {
+      globalNumber++;
+      ayahs.push({
+        number: globalNumber,
+        text: verse.text,
+        surah: {
+          number: surah.id,
+          name: surah.name,
+          englishName: surah.transliteration,
+          numberOfAyahs: surah.total_verses,
+        },
+        numberInSurah: verse.id,
+        juz: getJuzForAyah(globalNumber),
+      });
+    }
+  }
+  return ayahs;
+}
+
+const ALL_AYAHS = buildAllAyahs();
+
+function getJuzData(juzNumber: number): JuzData {
+  return {
+    ayahs: ALL_AYAHS.filter(a => a.juz === juzNumber),
+    fetchedAt: "local",
+  };
 }
 
 export function QuranKhatm() {
@@ -335,125 +340,35 @@ export function QuranKhatm() {
     };
   }, []);
 
-  const fetchJuz = useCallback(
-    async (juzNumber: number) => {
-      const cached = getCachedJuz(juzNumber);
-      if (cached) {
-        setJuzData(cached);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setFetchError(null);
-
-      try {
-        const res = await fetch(
-          `https://api.alquran.cloud/v1/juz/${juzNumber}/quran-uthmani`
-        );
-        if (!res.ok) throw new Error("API error");
-        const json = await res.json();
-        const data: JuzData = {
-          ayahs: json.data.ayahs.map((a: any) => ({
-            number: a.number,
-            text: a.text,
-            surah: {
-              number: a.surah.number,
-              name: a.surah.name,
-              englishName: a.surah.englishName,
-              numberOfAyahs: a.surah.numberOfAyahs,
-            },
-            numberInSurah: a.numberInSurah,
-            juz: a.juz,
-          })),
-          fetchedAt: new Date().toISOString(),
-        };
-        setCachedJuz(juzNumber, data);
-        setJuzData(data);
-      } catch {
-        setFetchError(
-          isArabic
-            ? "حدث خطأ في تحميل الجزء. تحقق من الاتصال بالإنترنت."
-            : "Error loading Juz. Check your internet connection."
-        );
-      } finally {
-        setLoading(false);
-      }
-    },
-    [isArabic]
-  );
-
-  const [allJuzLoaded, setAllJuzLoaded] = useState(false);
-  const prefetchingRef = useRef(false);
-
-  const prefetchAllJuz = useCallback(async () => {
-    if (prefetchingRef.current) return;
-    prefetchingRef.current = true;
-    const cached = getAllCachedJuz();
-    const missing: number[] = [];
-    for (let i = 1; i <= 30; i++) {
-      if (!cached[i]) missing.push(i);
-    }
-    if (missing.length === 0) {
-      setAllJuzLoaded(true);
-      prefetchingRef.current = false;
-      return;
-    }
-    for (const juzNum of missing) {
-      try {
-        const res = await fetch(`https://api.alquran.cloud/v1/juz/${juzNum}/quran-uthmani`);
-        if (!res.ok) continue;
-        const json = await res.json();
-        const data: JuzData = {
-          ayahs: json.data.ayahs.map((a: any) => ({
-            number: a.number,
-            text: a.text,
-            surah: { number: a.surah.number, name: a.surah.name, englishName: a.surah.englishName, numberOfAyahs: a.surah.numberOfAyahs },
-            numberInSurah: a.numberInSurah,
-            juz: a.juz,
-          })),
-          fetchedAt: new Date().toISOString(),
-        };
-        setCachedJuz(juzNum, data);
-      } catch { /* skip, retry later */ }
-    }
-    setAllJuzLoaded(true);
-    prefetchingRef.current = false;
+  const fetchJuz = useCallback((juzNumber: number) => {
+    setJuzData(getJuzData(juzNumber));
+    setLoading(false);
+    setFetchError(null);
   }, []);
 
-  useEffect(() => {
-    prefetchAllJuz();
-  }, [prefetchAllJuz]);
+  const allJuzLoaded = true;
 
   const searchLocalQuran = useCallback((query: string) => {
     if (!query || query.length < 2) {
       setGlobalSearchResults([]);
       setGlobalSearchDone(false);
+      setGlobalSearchLoading(false);
       return;
     }
     const normalized = normalizeArabicForSearch(query);
-    if (!normalized || normalized.length < 2) {
-      setGlobalSearchResults([]);
-      setGlobalSearchDone(false);
-      return;
-    }
     const words = normalized.split(" ").filter(Boolean);
-    const allCached = getAllCachedJuz();
     const results: GlobalSearchResult[] = [];
-    for (let juzNum = 1; juzNum <= 30; juzNum++) {
-      const juz = allCached[juzNum];
-      if (!juz) continue;
-      for (const ayah of juz.ayahs) {
-        const searchText = normalizeArabicForSearch(ayah.text);
-        if (words.every(w => searchText.includes(w))) {
-          results.push({
-            number: ayah.number,
-            text: ayah.text,
-            numberInSurah: ayah.numberInSurah,
-            juz: juzNum,
-            surah: ayah.surah,
-          });
-        }
+    for (const ayah of ALL_AYAHS) {
+      const ayahNormalized = normalizeArabicForSearch(ayah.text);
+      if (words.every(w => ayahNormalized.includes(w))) {
+        results.push({
+          number: ayah.number,
+          text: ayah.text,
+          numberInSurah: ayah.numberInSurah,
+          juz: ayah.juz,
+          surah: ayah.surah,
+        });
+        if (results.length >= 50) break;
       }
     }
     setGlobalSearchResults(results);
