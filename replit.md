@@ -41,7 +41,7 @@ Preferred communication style: Simple, everyday language.
 3. **Qiblah Finder**: Uses device compass and geolocation to calculate direction to Mecca
 4. **Daily Content**: Rotating Islamic content with reading time estimates, sourced from static data files
 5. **Quran Reader**: Full Quran with Juz-based navigation, Surah selector modal (search by name/number), global search across all 30 Juz with local caching, bookmarks, and focus mode
-6. **Duas & Adhkar**: Hisn Al-Muslim content with 37 authentic duas across 8 categories (أذكار الصباح/المساء/النوم/الاستيقاظ, دعاء السفر/المنزل, أذكار الطعام). Features search, category filters, copy/share, expand/collapse
+6. **Duas & Adhkar**: Hisn Al-Muslim content with 295 authentic duas across 15 categories. Features pagination (8 mobile/12 desktop), font size controls (A-/A/A+ with 3 scales persisted in localStorage), compact/full view toggle, debounced search across title+text+source, category pills with counts, collapsible cards, copy/share with 44px touch targets, and scroll-to-top button. Uses `useDuaPreferences` hook for persisted settings.
 7. **Home Quick Services**: Service shortcut cards on home page linking to Quran, Duas, Qiblah, and Stories
 
 ### Navigation Tabs (5 tabs)
