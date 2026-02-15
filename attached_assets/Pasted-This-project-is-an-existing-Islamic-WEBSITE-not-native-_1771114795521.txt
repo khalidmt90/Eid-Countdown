@@ -1,0 +1,217 @@
+This project is an existing Islamic WEBSITE (not native app).
+Stack and layout already exist with dark theme and RTL.
+
+DO NOT redesign the site.
+DO NOT change existing styles.
+ONLY extend the current system and match existing UI exactly.
+
+Existing main tabs:
+- المواقيت
+- القبلة
+- القصص
+- القرآن الكريم
+
+Add new functionality carefully.
+
+==================================================
+PART 1 — QURAN PAGE IMPROVEMENTS
+==================================================
+
+Current Quran page already displays Surah text and has search inside Quran.
+
+Add a Surah selector feature.
+
+1) Add button near Quran search:
+Text: "اختيار السورة"
+
+2) When clicked:
+Open modal:
+- Desktop: centered modal
+- Mobile: bottom sheet
+
+3) Modal content:
+
+Top:
+Search input
+Placeholder: "ابحث باسم السورة…"
+Auto-focus when modal opens.
+
+Search must filter instantly by:
+- Arabic name
+- English name (if exists)
+- Surah number
+
+4) Surah list row must show ONLY:
+- Surah number (small circle or pill)
+- Arabic name
+
+DO NOT show:
+- عدد الآيات
+- أي معلومات إضافية
+
+5) Selecting a Surah:
+- Close modal
+- Load selected Surah in current Quran viewer
+- Scroll to top
+
+6) Data file:
+/data/surahs.json
+
+Structure:
+[
+  {
+    "number": 1,
+    "name": "الفاتحة"
+  }
+]
+
+==================================================
+PART 2 — NEW TAB: الأدعية (Hisn Al-Muslim)
+==================================================
+
+Add new top navigation tab:
+الأدعية
+
+Route:
+/dua
+
+This section must use ONLY authentic content from حصن المسلم.
+
+IMPORTANT CONTENT RULES:
+- Do NOT generate any dua text with AI.
+- Use exact wording only.
+- Each dua must include its source.
+- If unsure about authenticity, do not include it.
+
+==================================================
+PART 3 — HISN AL-MUSLIM DATA
+==================================================
+
+Create file:
+/data/hisn-al-muslim.json
+
+Structure:
+
+[
+  {
+    "id": 1,
+    "category": "أذكار الصباح",
+    "title": "",
+    "text": "النص الكامل للدعاء",
+    "repeat": 1,
+    "source": "رواه مسلم"
+  }
+]
+
+Categories:
+
+- الكل
+- أذكار الصباح
+- أذكار المساء
+- أذكار النوم
+- أذكار الاستيقاظ
+- دعاء السفر
+- دعاء دخول المنزل
+- دعاء الخروج من المنزل
+- أذكار الطعام
+
+Initial content size:
+Morning: 10
+Evening: 10
+Sleep: 5
+Wake: 3
+Travel: 3
+Enter home: 2
+Leave home: 2
+Food: 2
+
+==================================================
+PART 4 — DUA PAGE UI
+==================================================
+
+Layout must match current dark theme.
+
+Page structure:
+
+Header:
+Title: الأدعية
+Subtitle: "أدعية وأذكار من حصن المسلم"
+
+1) Search bar
+Placeholder: "ابحث داخل الأدعية"
+
+Search must filter by:
+- text
+- title
+
+2) Category pills (horizontal scroll)
+Rounded buttons
+Blue active state
+
+Default category: الكل
+
+3) Dua cards
+
+Card style:
+Same as prayer/Quran cards
+
+Each card shows:
+
+- Title (if exists)
+- Full Arabic text (large font, line-height 1.9)
+- Repeat badge (example: 3 مرات)
+- Source (small muted text)
+
+Actions:
+- Copy button
+- Share button (Web Share API)
+- Expand / Collapse if long
+
+All filtering must be local (no API calls).
+
+==================================================
+PART 5 — HOME PAGE UPDATE
+==================================================
+
+On Home page (where prayer times exist):
+
+Add new section below prayer area.
+
+Section title:
+"خدمات إضافية"
+
+Add cards:
+
+- القرآن الكريم → /quran
+- الأدعية → /dua
+- القبلة → existing
+- القصص → existing
+
+Cards must match existing card style and spacing.
+
+==================================================
+PART 6 — UX REQUIREMENTS
+==================================================
+
+- Full RTL support
+- Mobile-first responsive
+- No horizontal overflow
+- Large readable Arabic text
+- Smooth transitions only
+- Fast filtering (use memoization if needed)
+- Use existing color variables and components
+
+==================================================
+DELIVERABLE
+==================================================
+
+Create or modify:
+
+/data/surahs.json
+/data/hisn-al-muslim.json
+/components/SurahSelectorModal
+/pages/dua (or equivalent)
+/components/DuaCard
+/components/DuaCategoryBar
+
+After implementation, show file structure and main components.
