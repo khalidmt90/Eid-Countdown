@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { getNextEvent, getFollowingEvent, formatDate, type EidDate } from "@/lib/eid-dates";
 import { CountdownTimer } from "@/components/countdown-timer";
@@ -9,7 +9,7 @@ import { Moon, Calendar, Info, Clock, BookOpen, Compass, Globe, MapPin, ChevronD
 import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QiblahFinder } from "@/components/qiblah-finder";
@@ -156,6 +156,22 @@ export default function Home() {
       setIsLocationSheetOpen(true);
     }
   }, [locationSelected]);
+
+  const pillContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!pillContainerRef.current) return;
+    const container = pillContainerRef.current;
+    const buttons = Array.from(container.querySelectorAll('button'));
+    const active = buttons.find(btn => {
+      const tabMap: Record<string, string> = { home: 'tab-prayer-times', qiblah: 'tab-qiblah', khatm: 'tab-quran-khatm', dua: 'tab-dua', daily: 'tab-daily-content' };
+      return btn.getAttribute('data-testid') === tabMap[activeTab];
+    });
+    if (active) {
+      const scrollLeft = active.offsetLeft - container.offsetWidth / 2 + active.offsetWidth / 2;
+      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }, [activeTab]);
 
   const [timeFormat, setTimeFormat] = useState<'12' | '24'>('12');
   const [shareHidden, setShareHidden] = useState(false);
@@ -320,11 +336,12 @@ ${t('isha')}: ${prayerData.timings.Isha}
     <div className="min-h-screen bg-background text-foreground">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         {/* Sticky Header + Tabs */}
-        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+        <header className="sticky top-0 z-50 border-b border-white/[0.06]" style={{ background: '#0B1324' }}>
+          {/* Layer 1: App Identity */}
+          <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
             <Select onValueChange={changeLanguage} defaultValue={i18n.language}>
-              <SelectTrigger className="w-9 h-9 p-0 bg-transparent border-none shadow-none hover:bg-muted/50 rounded-lg flex items-center justify-center" data-testid="select-language">
-                <Globe className="w-5 h-5 text-muted-foreground" />
+              <SelectTrigger className="w-10 h-10 p-0 bg-transparent border-none shadow-none hover:bg-white/[0.06] rounded-xl flex items-center justify-center" data-testid="select-language">
+                <Globe className="w-5 h-5 text-[#9FB3C8]" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ar">العربية</SelectItem>
@@ -340,70 +357,87 @@ ${t('isha')}: ${prayerData.timings.Isha}
               </SelectContent>
             </Select>
 
-            <div className="flex items-center gap-2.5">
-              <img src="/logo.png" alt="Logo" className="w-9 h-9 rounded-lg shrink-0" data-testid="img-logo" />
-              <span className="text-base font-black text-primary font-serif leading-tight">
-                {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
-              </span>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg shrink-0" data-testid="img-logo" />
+                <span className="text-[17px] font-black text-white font-serif leading-tight">
+                  {i18n.language === 'ar' ? "مواقيت الصلاة" : "Prayer Times"}
+                </span>
+              </div>
+              {prayerData && (
+                <span className="text-[11px] font-bold text-[#9FB3C8]/70 mt-0.5">
+                  {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
+                  {' · '}
+                  {new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short' }).format(new Date())}
+                </span>
+              )}
             </div>
 
             {prayerData ? (
-              <div className="text-end leading-tight">
-                <span className="text-xs font-bold text-muted-foreground/80 block">
-                  {prayerData.date.hijri.day} {prayerData.date.hijri.month.ar} {prayerData.date.hijri.year}هـ
-                </span>
-                <span className="text-[10px] font-medium text-muted-foreground/60 block">
-                  {new Intl.DateTimeFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date())}
-                </span>
-              </div>
+              <div className="w-10" />
             ) : (
-              <div className="w-9" />
+              <div className="w-10" />
             )}
           </div>
 
-          <div className="px-3 pb-2">
-            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-5 h-11 bg-muted/80 border border-border/50 rounded-xl p-0.5" data-testid="tabs-nav">
-              <TabsTrigger 
-                value="home" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-9 transition-all"
-                data-testid="tab-prayer-times"
-              >
-                {i18n.language === 'ar' ? 'المواقيت' : t('prayer_times')}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="qiblah" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-accent data-[state=active]:text-accent-foreground h-9 transition-all"
-                data-testid="tab-qiblah"
-              >
-                {t('qiblah')}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="daily" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground h-9 transition-all"
-                data-testid="tab-daily-content"
-              >
-                {i18n.language === 'ar' ? 'القصص' : t('daily_content')}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="khatm" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-emerald-600 data-[state=active]:text-white h-9 transition-all"
-                data-testid="tab-quran-khatm"
-              >
-                {i18n.language === 'ar' ? 'القرآن' : 'Quran'}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="dua" 
-                className="rounded-lg text-[11px] md:text-sm font-black data-[state=active]:bg-amber-600 data-[state=active]:text-white h-9 transition-all"
-                data-testid="tab-dua"
-              >
-                {i18n.language === 'ar' ? 'الأدعية' : 'Duas'}
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          {/* Layer 2: Navigation Pills */}
+          <nav className="px-3 pb-2.5">
+            <div
+              ref={pillContainerRef}
+              className="flex items-center gap-2.5 overflow-x-auto max-w-lg mx-auto justify-center"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+              data-testid="tabs-nav"
+            >
+              <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
+              {([
+                { value: 'home', labelAr: 'المواقيت', labelEn: 'Prayer', testId: 'tab-prayer-times' },
+                { value: 'qiblah', labelAr: 'القبلة', labelEn: 'Qiblah', testId: 'tab-qiblah' },
+                { value: 'khatm', labelAr: 'القرآن', labelEn: 'Quran', testId: 'tab-quran-khatm' },
+                { value: 'dua', labelAr: 'الأدعية', labelEn: 'Duas', testId: 'tab-dua' },
+                { value: 'daily', labelAr: 'القصص', labelEn: 'Stories', testId: 'tab-daily-content' },
+              ] as const).map((tab) => {
+                const isActive = activeTab === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => handleTabChange(tab.value)}
+                    className="shrink-0 whitespace-nowrap font-black transition-all duration-200 active:scale-95"
+                    style={{
+                      minWidth: '72px',
+                      height: '44px',
+                      padding: '0 20px',
+                      borderRadius: '14px',
+                      fontSize: '16px',
+                      ...(isActive
+                        ? { background: 'linear-gradient(135deg, #0D6EFD, #1E88FF)', color: '#FFFFFF', border: 'none' }
+                        : { background: '#101A2E', color: '#9FB3C8', border: '1px solid rgba(42, 60, 99, 0.55)' }),
+                    }}
+                    data-testid={tab.testId}
+                  >
+                    {i18n.language === 'ar' ? tab.labelAr : tab.labelEn}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
         </header>
 
+        {/* Page Section Title */}
+        <div className="max-w-7xl mx-auto px-4 pt-4 pb-1" dir="rtl">
+          <h2
+            className="text-[22px] font-black text-foreground text-right"
+            data-testid="text-page-title"
+          >
+            {activeTab === 'home' && (i18n.language === 'ar' ? 'مواقيت الصلاة' : 'Prayer Times')}
+            {activeTab === 'qiblah' && (i18n.language === 'ar' ? 'القبلة' : 'Qiblah Finder')}
+            {activeTab === 'khatm' && (i18n.language === 'ar' ? 'القرآن الكريم' : 'Holy Quran')}
+            {activeTab === 'dua' && (i18n.language === 'ar' ? 'الأدعية والأذكار' : 'Duas & Adhkar')}
+            {activeTab === 'daily' && (i18n.language === 'ar' ? 'القصص' : 'Stories')}
+          </h2>
+        </div>
+
         {/* Main Content */}
-        <main className="p-4 max-w-7xl mx-auto">
+        <main className="px-4 pb-4 pt-2 max-w-7xl mx-auto">
           <TabsContent value="home" className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-0">
             
             {/* HERO: Next Prayer Countdown with Location & Time Format */}
