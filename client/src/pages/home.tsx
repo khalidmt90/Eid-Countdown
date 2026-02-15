@@ -184,8 +184,12 @@ export default function Home() {
     const el = pillContainerRef.current;
     if (!el) return;
     el.addEventListener('scroll', updateFades, { passive: true });
+    window.addEventListener('resize', updateFades);
     updateFades();
-    return () => el.removeEventListener('scroll', updateFades);
+    return () => {
+      el.removeEventListener('scroll', updateFades);
+      window.removeEventListener('resize', updateFades);
+    };
   }, [updateFades]);
 
   useEffect(() => {
@@ -405,31 +409,41 @@ ${t('isha')}: ${prayerData.timings.Isha}
           </div>
 
           {/* Layer 2: Navigation Pills */}
-          <nav className="relative" style={{ marginTop: '8px', marginBottom: '12px' }}>
+          <nav className="relative" style={{ marginTop: '8px', marginBottom: '12px', overflow: 'visible' }}>
             <style>{`[data-testid="tabs-nav"]::-webkit-scrollbar { display: none; }`}</style>
             {showFadeLeft && (
               <div
-                className="absolute top-0 bottom-0 z-10 pointer-events-none"
+                className="absolute top-0 bottom-0 z-10 pointer-events-none flex items-center"
                 style={{
                   ...(i18n.dir() === 'rtl' ? { right: 0 } : { left: 0 }),
-                  width: '28px',
+                  width: '32px',
                   background: i18n.dir() === 'rtl'
                     ? 'linear-gradient(to left, transparent, #0B1324)'
                     : 'linear-gradient(to right, #0B1324, transparent)',
                 }}
-              />
+              >
+                <ChevronDown
+                  className="w-4 h-4 text-white/60"
+                  style={{ transform: i18n.dir() === 'rtl' ? 'rotate(-90deg)' : 'rotate(90deg)', marginInlineStart: '4px' }}
+                />
+              </div>
             )}
             {showFadeRight && (
               <div
-                className="absolute top-0 bottom-0 z-10 pointer-events-none"
+                className="absolute top-0 bottom-0 z-10 pointer-events-none flex items-center justify-end"
                 style={{
                   ...(i18n.dir() === 'rtl' ? { left: 0 } : { right: 0 }),
-                  width: '28px',
+                  width: '32px',
                   background: i18n.dir() === 'rtl'
                     ? 'linear-gradient(to right, transparent, #0B1324)'
                     : 'linear-gradient(to left, transparent, #0B1324)',
                 }}
-              />
+              >
+                <ChevronDown
+                  className="w-4 h-4 text-white/60"
+                  style={{ transform: i18n.dir() === 'rtl' ? 'rotate(90deg)' : 'rotate(-90deg)', marginInlineEnd: '4px' }}
+                />
+              </div>
             )}
             <div
               ref={pillContainerRef}
@@ -439,10 +453,12 @@ ${t('isha')}: ${prayerData.timings.Isha}
                 msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch',
                 height: '60px',
-                whiteSpace: 'nowrap',
+                whiteSpace: 'nowrap' as const,
                 gap: '10px',
                 paddingInline: '12px',
                 scrollSnapType: 'x proximity',
+                touchAction: 'pan-x',
+                flexWrap: 'nowrap',
               }}
               data-testid="tabs-nav"
             >
