@@ -414,37 +414,27 @@ ${t('isha')}: ${prayerData.timings.Isha}
           <nav className="relative" style={{ marginTop: '8px', marginBottom: '12px' }}>
             {showFadeLeft && (
               <div
-                className="absolute top-0 bottom-0 z-10 pointer-events-none flex items-center"
+                className="absolute top-0 bottom-0 z-10 pointer-events-none"
                 style={{
                   ...(i18n.dir() === 'rtl' ? { right: 0 } : { left: 0 }),
-                  width: '32px',
+                  width: '16px',
                   background: i18n.dir() === 'rtl'
                     ? 'linear-gradient(to left, transparent, #0B1324)'
                     : 'linear-gradient(to right, #0B1324, transparent)',
                 }}
-              >
-                <ChevronDown
-                  className="w-4 h-4 text-white/60"
-                  style={{ transform: i18n.dir() === 'rtl' ? 'rotate(-90deg)' : 'rotate(90deg)', marginInlineStart: '4px' }}
-                />
-              </div>
+              />
             )}
             {showFadeRight && (
               <div
-                className="absolute top-0 bottom-0 z-10 pointer-events-none flex items-center justify-end"
+                className="absolute top-0 bottom-0 z-10 pointer-events-none"
                 style={{
                   ...(i18n.dir() === 'rtl' ? { left: 0 } : { right: 0 }),
-                  width: '32px',
+                  width: '16px',
                   background: i18n.dir() === 'rtl'
                     ? 'linear-gradient(to right, transparent, #0B1324)'
                     : 'linear-gradient(to left, transparent, #0B1324)',
                 }}
-              >
-                <ChevronDown
-                  className="w-4 h-4 text-white/60"
-                  style={{ transform: i18n.dir() === 'rtl' ? 'rotate(90deg)' : 'rotate(-90deg)', marginInlineEnd: '4px' }}
-                />
-              </div>
+              />
             )}
             <div
               ref={pillContainerRef}
