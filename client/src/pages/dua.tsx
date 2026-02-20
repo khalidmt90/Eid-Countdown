@@ -71,11 +71,9 @@ function DuaCard({
   compactMode: boolean;
 }) {
   const isLong = dua.text.length > 300;
-  const defaultExpanded = compactMode ? false : dua.text.length < 500;
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded, setExpanded] = useState(!compactMode && dua.text.length < 500);
   const [copied, setCopied] = useState(false);
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
+  const { t } = useTranslation();
 
   useEffect(() => {
     setExpanded(compactMode ? false : dua.text.length < 500);
@@ -227,6 +225,7 @@ export default function DuaPage({ initialCategory }: { initialCategory?: string 
       setActiveCategory(initialCategory);
       setCurrentPage(1);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCategory]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showScrollTop, setShowScrollTop] = useState(false);
